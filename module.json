@@ -6,7 +6,7 @@
   "library": "false",
   "manifestPlusVersion": "1.2.0",
   "compatibility": {
-    "minimum": 10,
+    "minimum": 10.303,
     "verified": 11,
     "maximum": 11
   },
@@ -23,22 +23,27 @@
         "id": "dnd5e",
         "manifest": "https://raw.githubusercontent.com/foundryvtt/dnd5e/master/system.json",
         "compatibility": {
-          "minimum": "2.3.0",
-          "verified": "2.3.0"
+          "minimum": "2.0.0",
+          "verified": "2.3.1"
         }
       }
     ],
     "requires": [
       {
         "id": "socketlib"
+      },
+      {
+        "id": "lib-wrapper",
+        "type": "module",
+        "compatibility": {
+          "minimum": "1.0.0.0",
+          "verified": "1.12.13.0"
+        }
       }
     ]
   },
   "esmodules": [
-    "scripts/module.js"
-  ],
-  "scripts": [
-    "scripts/lib/lib.js"
+    "src/module.js"
   ],
   "styles": [
     "styles/module.css"
@@ -51,6 +56,7 @@
     }
   ],
   "url": "#{URL}#",
+  "bugs": "#{URL}#/issues",
   "manifest": "#{MANIFEST}#",
   "download": "#{DOWNLOAD}#",
   "license": "LICENSE",

@@ -12,6 +12,9 @@ Hooks.once('init', async () => {
 });
 
 Hooks.once("ready", async () => {
+    if (!game.modules.get('lib-wrapper')?.active && game.user.isGM)
+        ui.notifications.error("Oronder requires the 'libWrapper' module. Please install and activate it.");
+
     // Let's send a greeting to all other connected users.
     // Functions can either be called by their given name...
     socket.executeForEveryone("hello", game.user.name);
