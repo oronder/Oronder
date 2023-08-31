@@ -18,8 +18,21 @@
     }
   ],
   "relationships": {
-    "systems": [],
-    "requires": []
+    "systems": [
+      {
+        "id": "dnd5e",
+        "manifest": "https://raw.githubusercontent.com/foundryvtt/dnd5e/master/system.json",
+        "compatibility": {
+          "minimum": "2.3.0",
+          "verified": "2.3.0"
+        }
+      }
+    ],
+    "requires": [
+      {
+        "id": "socketlib"
+      }
+    ]
   },
   "esmodules": [
     "scripts/module.js"
