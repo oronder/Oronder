@@ -1,3 +1,5 @@
+import {LogUtility} from "./util";
+
 let socket;
 
 Hooks.once("socketlib.ready", () => {
@@ -8,7 +10,7 @@ Hooks.once("socketlib.ready", () => {
 
 
 Hooks.once('init', async () => {
-
+    LogUtility.log('Initializing');
 });
 
 Hooks.once("ready", async () => {
