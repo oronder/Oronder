@@ -9,7 +9,7 @@ export const MODULE_DEBUG_TAG = [
 /**
  * Utility class to handle logging to console with an attached debug tag to identify module logs.
  */
-export class LogUtility {
+export class Logger {
     /**
      * Sends an info log to the console.
      * @param {String} logString The string to log as an info.

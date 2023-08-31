@@ -1,4 +1,5 @@
-import {LogUtility, MODULE_NAME, MODULE_TITLE} from "./util.mjs";
+import {Logger, MODULE_NAME} from "./util.mjs";
+import {registerSettings} from "./settings.mjs";
 
 let socket;
 
@@ -10,14 +11,12 @@ Hooks.once("socketlib.ready", () => {
 
 
 Hooks.once('init', async () => {
-    LogUtility.log('Initializing');
+    Logger.log('Initializing');
+    registerSettings()
 });
 
 Hooks.once("ready", async () => {
-    if (!game.modules.get('lib-wrapper')?.active && game.user.isGM)
-        ui.notifications.error(`${MODULE_TITLE} requires the 'libWrapper' module. Please install and activate it.`);
-
-    LogUtility.log('Ready');
+    Logger.log('Ready');
     // Let's send a greeting to all other connected users.
     // Functions can either be called by their given name...
     socket.executeForEveryone("hello", game.user.name);
@@ -26,11 +25,48 @@ Hooks.once("ready", async () => {
     // The following function will be executed on a GM client.
     // The return value will be sent back to us.
     const result = await socket.executeAsGM("add", 5, 3);
-    LogUtility.log(`The GM client calculated: ${result}`);
+    Logger.log(`The GM client calculated: ${result}`);
 });
 
+Hooks.on("createActor", async (actor, data, options, userId) => {
+    //handle actor creation
+    console.log(actor)
+    console.log(data)
+    console.log(options)
+    console.log(userId)
+})
+Hooks.on("updateActor", async () => {
+    //handle actor updates
+})
+Hooks.on("deleteActor", async () => {
+    //handle actor deletion
+})
+
+
+Hooks.on("createItem", async () => {
+    //handle actor updates
+})
+Hooks.on("updateItem", async () => {
+    //handle item updates
+})
+Hooks.on("deleteItem", async () => {
+    //handle item deletion
+})
+
+
+Hooks.on("createActiveEffect", async () => {
+    //handle effect creation
+})
+Hooks.on("updateActiveEffect", async () => {
+    //handle effect updates
+})
+Hooks.on("deleteActiveEffect", async () => {
+    //handle effect deletion
+})
+
+
 function showHelloMessage(userName) {
-    LogUtility.log(`${userName} says hello!`);
+    Logger.log(`${userName} says hello!`);
 }
 
 function add(a, b) {

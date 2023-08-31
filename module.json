@@ -40,14 +40,6 @@
           "minimum": "1.0.10",
           "verified": "1.0.10"
         }
-      },
-      {
-        "id": "lib-wrapper",
-        "type": "module",
-        "compatibility": {
-          "minimum": "1.12.13.0",
-          "verified": "1.12.13.0"
-        }
       }
     ]
   },
