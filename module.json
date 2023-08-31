@@ -1,7 +1,7 @@
 {
-  "id": "module",
+  "id": "oronder",
   "title": "Oronder",
-  "description": "",
+  "description": "Deep Discord Integration for Foundry VTT",
   "version": "#{VERSION}#",
   "library": "false",
   "manifestPlusVersion": "1.2.0",
