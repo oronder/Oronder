@@ -30,20 +30,25 @@
     ],
     "requires": [
       {
-        "id": "socketlib"
+        "id": "socketlib",
+        "type": "module",
+        "compatibility": {
+          "minimum": "1.0.10",
+          "verified": "1.0.10"
+        }
       },
       {
         "id": "lib-wrapper",
         "type": "module",
         "compatibility": {
-          "minimum": "1.0.0.0",
+          "minimum": "1.12.13.0",
           "verified": "1.12.13.0"
         }
       }
     ]
   },
   "esmodules": [
-    "src/module.js"
+    "src/module.mjs"
   ],
   "styles": [
     "styles/module.css"
@@ -55,6 +60,7 @@
       "path": "languages/en.json"
     }
   ],
+  "socket": true,
   "url": "#{URL}#",
   "bugs": "#{URL}#/issues",
   "manifest": "#{MANIFEST}#",
