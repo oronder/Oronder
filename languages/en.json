@@ -1,3 +1,6 @@
 {
-    "ORONDER.User": "User"
+  "oronder.Auth-Token": "Auth Token",
+  "oronder.Discord-Server-Id": "Discord Server Id",
+  "oronder.Fetch-Discord-Ids": "Fetch Discord Ids",
+  "oronder.idk": "Idk"
 }

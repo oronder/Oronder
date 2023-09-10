@@ -1,10 +1,12 @@
-import {Logger, MODULE_NAME} from "./util.mjs";
+import {Logger} from "./util.mjs";
 import {registerSettings} from "./settings.mjs";
+import {MODULE_ID} from "./constants.mjs";
 
 let socket;
-
+export let setting = key => game.settings.get(MODULE_ID, key)
+export let discord_id = user_id => game.settings.get(MODULE_ID, `discord_id.${user_id}`)
 Hooks.once("socketlib.ready", () => {
-    socket = socketlib.registerModule(MODULE_NAME);
+    socket = socketlib.registerModule(MODULE_ID);
     socket.register("hello", showHelloMessage);
     socket.register("add", add);
 });
@@ -12,11 +14,12 @@ Hooks.once("socketlib.ready", () => {
 
 Hooks.once('init', async () => {
     Logger.log('Initializing');
-    registerSettings()
+
 });
 
 Hooks.once("ready", async () => {
     Logger.log('Ready');
+    await registerSettings()
     // Let's send a greeting to all other connected users.
     // Functions can either be called by their given name...
     socket.executeForEveryone("hello", game.user.name);
@@ -30,37 +33,37 @@ Hooks.once("ready", async () => {
 
 Hooks.on("createActor", async (actor, data, options, userId) => {
     //handle actor creation
-    console.log(actor)
-    console.log(data)
-    console.log(options)
-    console.log(userId)
 })
-Hooks.on("updateActor", async () => {
+Hooks.on("updateActor", async (actor, data, options, userId) => {
     //handle actor updates
+    Logger.log(actor)
+    Logger.log(data)
+    Logger.log(options)
+    Logger.log(userId)
 })
-Hooks.on("deleteActor", async () => {
+Hooks.on("deleteActor", async (actor, data, options, userId) => {
     //handle actor deletion
 })
 
 
-Hooks.on("createItem", async () => {
+Hooks.on("createItem", async (item, data, options, userId) => {
     //handle actor updates
 })
-Hooks.on("updateItem", async () => {
+Hooks.on("updateItem", async (item, data, options, userId) => {
     //handle item updates
 })
-Hooks.on("deleteItem", async () => {
+Hooks.on("deleteItem", async (item, data, options, userId) => {
     //handle item deletion
 })
 
 
-Hooks.on("createActiveEffect", async () => {
+Hooks.on("createActiveEffect", async (effect, data, options, userId) => {
     //handle effect creation
 })
-Hooks.on("updateActiveEffect", async () => {
+Hooks.on("updateActiveEffect", async (effect, data, options, userId) => {
     //handle effect updates
 })
-Hooks.on("deleteActiveEffect", async () => {
+Hooks.on("deleteActiveEffect", async (effect, data, options, userId) => {
     //handle effect deletion
 })
 

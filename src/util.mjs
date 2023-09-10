@@ -1,10 +1,4 @@
-export const MODULE_NAME = "oronder"
-export const MODULE_TITLE = "Oronder"
-export const MODULE_DEBUG_TAG = [
-    `%c${MODULE_TITLE}`,
-    `color: #66023c; font-weight: bold;`,
-    `|`,
-];
+import {MODULE_DEBUG_TAG} from "./constants.mjs";
 
 /**
  * Utility class to handle logging to console with an attached debug tag to identify module logs.
