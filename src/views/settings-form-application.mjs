@@ -72,7 +72,9 @@ export class OronderSettingsFormApplication extends FormApplication {
         const queryParams = new URLSearchParams()
         this.object.players.forEach(p => {
             p.discord_id = this.form.elements[p.foundry_id].value
-            queryParams.append('i', p.discord_id)
+            if (p.discord_id) {
+                queryParams.append('i', p.discord_id)
+            }
         })
         const requestOptions = this._requestOptions(this.object.guild_id, this.object.auth)
 
