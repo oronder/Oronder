@@ -5,7 +5,6 @@ export class OronderSettingsFormApplication extends FormApplication {
 
     constructor(object = {}, options = {}) {
         foundry.utils.mergeObject(object, {
-            error_msg: [],
             guild_id: game.settings.get(MODULE_ID, GUILD_ID),
             auth: game.settings.get(MODULE_ID, AUTH),
             valid_config: game.settings.get(MODULE_ID, VALID_CONFIG),
@@ -81,11 +80,11 @@ export class OronderSettingsFormApplication extends FormApplication {
             .then(response => {
                 if (!response.ok) {
                     if (response.status === 401) {
-                        ui.notifications.error(game.i18n.localize("oronder.Invalid-Auth"));
+                        Logger.logError(game.i18n.localize("oronder.Invalid-Auth"));
                     } else if (response.status === 400) {
-                        ui.notifications.error(game.i18n.localize("oronder.Server-Id-NaN"));
+                        Logger.logError(game.i18n.localize("oronder.Server-Id-NaN"));
                     } else {
-                        ui.notifications.error(game.i18n.localize("oronder.Unexpected-Error"));
+                        Logger.logError(game.i18n.localize("oronder.Unexpected-Error"));
                     }
                 }
                 return response.json()
@@ -95,7 +94,7 @@ export class OronderSettingsFormApplication extends FormApplication {
                     return this.object.players.find(p => p.discord_id === invalid_discord_id).foundry_name
                 })
                 if (invalid_player_names.length) {
-                    ui.notifications.error(
+                    Logger.logError(
                         `${game.i18n.localize("oronder.Invalid-Discord-Ids")}: ${invalid_player_names.join(', ')}`
                     )
                 } else {
@@ -104,7 +103,7 @@ export class OronderSettingsFormApplication extends FormApplication {
             })
             .catch(error => {
                 game.settings.set(MODULE_ID, VALID_CONFIG, false)
-                Logger.log(error)
+                Logger.logError(error)
             })
 
         game.settings.set(MODULE_ID, GUILD_ID, this.object.guild_id)
@@ -125,23 +124,28 @@ export class OronderSettingsFormApplication extends FormApplication {
         const players_without_discord_ids = this.object.players.filter(p =>
             !this.form.elements[p.foundry_id].value
         )
+        let err = false
 
-        this.object.error_msg = []
-        if (!Number.fromString(this.object.guild_id))
-            this.object.error_msg.push(`*${game.i18n.localize("oronder.Server-Id-NaN")}`)
-        if (!this.object.auth)
-            this.object.error_msg.push(`*${game.i18n.localize("oronder.Auth-Token-Empty")}`)
-        if (!players_without_discord_ids.length)
-            this.object.error_msg.push(`*${game.i18n.localize("oronder.No-Players-To-Sync")}`)
+        if (!Number.fromString(this.object.guild_id)) {
+            err = true
+            Logger.logError(game.i18n.localize("oronder.Server-Id-NaN"))
+        }
+        if (!this.object.auth) {
+            err = true
+            Logger.logError(game.i18n.localize("oronder.Auth-Token-Empty"))
+        }
+        if (!players_without_discord_ids.length) {
+            err = true
+            Logger.logWarning(game.i18n.localize("oronder.No-Players-To-Sync"))
+        }
 
-        if (this.object.error_msg.length) {
+        if (err) {
             this.render()
             return
         }
 
 
         this.object.fetch_button_icon = 'fa-solid fa-spinner fa-spin'
-        this.object.error_msg = ''
         this.render()
 
         const queryParams = new URLSearchParams()
@@ -154,11 +158,11 @@ export class OronderSettingsFormApplication extends FormApplication {
             .then(response => {
                 if (!response.ok) {
                     if (response.status === 401) {
-                        this.object.error_msg = `*${game.i18n.localize("oronder.Invalid-Auth")}`
+                        Logger.logError(game.i18n.localize("oronder.Invalid-Auth"))
                     } else if (response.status === 400) {
-                        this.object.error_msg = `*${game.i18n.localize("oronder.Server-Id-NaN")}`
+                        Logger.logError(game.i18n.localize("oronder.Server-Id-NaN"))
                     } else {
-                        this.object.error_msg = `*${game.i18n.localize("oronder.Unexpected-Error")}`
+                        Logger.logError(game.i18n.localize("oronder.Unexpected-Error"))
                     }
                 }
                 return response.json()
@@ -169,7 +173,7 @@ export class OronderSettingsFormApplication extends FormApplication {
                 }
             })
             .catch(error => {
-                Logger.log(error)
+                Logger.logError(error)
             })
 
         this.object.fetch_button_icon = "fa-solid fa-rotate"
