@@ -1,0 +1,64 @@
+<form autocomplete="off">
+  <div>
+    {{#unless valid_config}}
+      <h2>Installation Instructions</h2>
+      <ol>
+        <li>Invite the <a
+            href="https://discord.com/api/oauth2/authorize?client_id=1064553830810923048&permissions=18547851095248&scope=bot">
+          {{localize "oronder.Discord-Bot-Link-Title"}}</a> to your Discord.
+        </li>
+        <li>Subscribe to the <a href="https://discord.gg/27npDAXaCA\">
+          {{localize "oronder.Discord-Server-Link-Title"}}
+        </a> to gain access to advanced features.
+        </li>
+        <li>From your Discord, run "<code>/admin init</code>"</li>
+        <li>Copy your Discord server id, and the generated token into the fields below.</li>
+        <li>Clicking "<code>Fetch Discord User Ids</code>" will populate Discord user ids for players whose Discord name
+          matches their Foundry
+          name. For everyone else, you will need to manually add their user id.
+        </li>
+      </ol>
+      <hr>
+    {{/unless}}
+
+  </div>
+  <div class="form-group">
+    <label for="guild_id">{{localize "oronder.Discord-Server-Id"}}</label>
+    <input type="text" name="guild_id" value="{{guild_id}}" required inputmode="numeric">
+  </div>
+
+  <div class="form-group">
+    <label for="auth">{{localize "oronder.Auth-Token"}}</label>
+    <input type="password" name="auth" value="{{auth}}" required>
+  </div>
+
+  <div class="form-group">
+    <button type="button" class='control' data-action='fetch' style="{{button_style}}">
+      <i class="{{fetch_button_icon}}"></i> {{fetch_button_msg}}
+    </button>
+  </div>
+
+  {{#each error_msg}}
+    <div class="form-group">
+      <p style="color:#690008CC">{{this}}</p>
+    </div>
+  {{/each}}
+
+  {{#if players}}
+    <hr>
+    <h3 class="border">{{localize "oronder.Discord-Ids"}}</h3>
+  {{/if}}
+
+  {{#each players}}
+    <div class="form-group">
+      <label for="{{this.foundry_id}}">{{this.foundry_name}}</label>
+      <input type="text" name="{{this.foundry_id}}" inputmode="numeric" value="{{this.discord_id}}">
+    </div>
+  {{/each}}
+
+  <hr>
+  <button type="submit">
+    <i class="far fa-save"></i> {{ localize "Save Changes" }}
+  </button>
+
+</form>

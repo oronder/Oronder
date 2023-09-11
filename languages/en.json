@@ -1,6 +1,18 @@
 {
   "oronder.Auth-Token": "Auth Token",
   "oronder.Discord-Server-Id": "Discord Server Id",
-  "oronder.Fetch-Discord-Ids": "Fetch Discord Ids",
-  "oronder.idk": "Idk"
+  "oronder.Fetch-Discord-User-Ids": "Fetch Discord User Ids",
+  "oronder.Fetching-Discord-Ids": "Fetching Discord Ids",
+  "oronder.Oronder-Configuration": "Oronder Configuration",
+  "oronder.Configure-Oronder": "Configure Oronder",
+  "oronder.Discord-Ids": "Discord Ids",
+  "oronder.Oronder-Bot-Config": "Oronder Bot Config",
+  "oronder.Invalid-Auth": "Invalid Server Id and/or Auth Token. Have you run \"/admin init\" in Discord?",
+  "oronder.Server-Id-NaN": "Discord Server Id must be a number.",
+  "oronder.Unexpected-Error": "Unexpected Error Occurred!",
+  "oronder.Invalid-Discord-Ids": "Invalid Discord Ids for players",
+  "oronder.Discord-Server-Link-Title": "Oronder Discord",
+  "oronder.Discord-Bot-Link-Title": "Oronder Bot",
+  "oronder.Auth-Token-Empty": "Auth Token cannot be empty.",
+  "oronder.No-Players-To-Sync": "All Players have Discord Ids. Nothing to update."
 }
