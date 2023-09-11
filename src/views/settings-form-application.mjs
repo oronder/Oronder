@@ -1,9 +1,10 @@
 import {Logger} from "../util.mjs";
-import {AUTH, DISCORD_ID, GUILD_ID, MODULE_ID, ORONDER_BASE_URL, VALID_CONFIG} from "../constants.mjs";
+import {AUTH, GUILD_ID, ID_MAP, MODULE_ID, ORONDER_BASE_URL, VALID_CONFIG} from "../constants.mjs";
 
 export class OronderSettingsFormApplication extends FormApplication {
 
     constructor(object = {}, options = {}) {
+        const id_map = game.settings.get(MODULE_ID, ID_MAP)
         foundry.utils.mergeObject(object, {
             guild_id: game.settings.get(MODULE_ID, GUILD_ID),
             auth: game.settings.get(MODULE_ID, AUTH),
@@ -13,7 +14,7 @@ export class OronderSettingsFormApplication extends FormApplication {
             players: game.users.filter(user => user.role < 3).map(user => ({
                 foundry_name: user.name,
                 foundry_id: user.id,
-                discord_id: game.settings.get(MODULE_ID, `${DISCORD_ID}.${user.id}`)
+                discord_id: id_map[user.id] ?? ''
             }))
         });
         super(object, options);
@@ -69,15 +70,17 @@ export class OronderSettingsFormApplication extends FormApplication {
         this.object.guild_id = this.form.elements.guild_id.value
         this.object.auth = this.form.elements.auth.value
 
+        const id_map = {}
         const queryParams = new URLSearchParams()
         this.object.players.forEach(p => {
             p.discord_id = this.form.elements[p.foundry_id].value
             if (p.discord_id) {
                 queryParams.append('i', p.discord_id)
+                id_map[p.foundry_id] = p.discord_id
             }
         })
         const requestOptions = this._requestOptions(this.object.guild_id, this.object.auth)
-
+        let valid_config = false
         await fetch(`${ORONDER_BASE_URL}/validate_discord_ids?${queryParams}`, requestOptions)
             .then(response => {
                 if (!response.ok) {
@@ -100,19 +103,18 @@ export class OronderSettingsFormApplication extends FormApplication {
                         `${game.i18n.localize("oronder.Invalid-Discord-Ids")}: ${invalid_player_names.join(', ')}`
                     )
                 } else {
-                    game.settings.set(MODULE_ID, VALID_CONFIG, true)
+                    valid_config = true
                 }
             })
             .catch(error => {
-                game.settings.set(MODULE_ID, VALID_CONFIG, false)
                 Logger.logError(error)
             })
 
+        game.settings.set(MODULE_ID, VALID_CONFIG, valid_config)
         game.settings.set(MODULE_ID, GUILD_ID, this.object.guild_id)
         game.settings.set(MODULE_ID, AUTH, this.object.auth)
-        this.object.players.forEach(p =>
-            game.settings.set(MODULE_ID, `${DISCORD_ID}.${p.foundry_id}`, p.discord_id)
-        )
+        game.settings.set(MODULE_ID, ID_MAP, id_map)
+
         this.render()
     }
 
