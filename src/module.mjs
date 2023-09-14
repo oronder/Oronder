@@ -1,6 +1,6 @@
 import {Logger} from "./util.mjs";
 import {registerSettings} from "./settings.mjs";
-import {MODULE_ID} from "./constants.mjs";
+import {ID_MAP, MODULE_ID} from "./constants.mjs";
 
 let socket;
 export let setting = key => game.settings.get(MODULE_ID, key)
@@ -30,6 +30,13 @@ Hooks.once("ready", async () => {
     const result = await socket.executeAsGM("add", 5, 3);
     Logger.log(`The GM client calculated: ${result}`);
 });
+
+
+const actor_to_discord_ids = actor =>
+    Object.entries(actor.ownership)
+        .filter(([owner_id, perm_lvl]) => perm_lvl === 3)
+        .map(([owner_id, _]) => game.settings.get(MODULE_ID, ID_MAP)[owner_id])
+        .filter(discord_id => discord_id)
 
 Hooks.on("createActor", async (actor, data, options, userId) => {
     //handle actor creation

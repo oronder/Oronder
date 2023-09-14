@@ -1,5 +1,5 @@
-import {Logger} from "../util.mjs";
-import {AUTH, GUILD_ID, ID_MAP, MODULE_ID, ORONDER_BASE_URL, VALID_CONFIG} from "../constants.mjs";
+import {Logger} from "./util.mjs";
+import {AUTH, GUILD_ID, ID_MAP, MODULE_ID, ORONDER_BASE_URL, VALID_CONFIG} from "./constants.mjs";
 
 export class OronderSettingsFormApplication extends FormApplication {
 
