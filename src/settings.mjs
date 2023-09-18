@@ -1,6 +1,6 @@
-import {AUTH, GUILD_ID, ID_MAP, MODULE_ID, ORONDER_CONFIGURATION_FORM, VALID_CONFIG} from "./constants.mjs";
+import {ACTORS, AUTH, GUILD_ID, ID_MAP, MODULE_ID, ORONDER_CONFIGURATION_FORM, VALID_CONFIG} from "./constants.mjs";
 import {Logger} from "./util.mjs";
-import {OronderSettingsFormApplication} from "./views/settings-form-application.mjs";
+import {OronderSettingsFormApplication} from "./settings-form-application.mjs";
 
 export const registerSettings = async () => {
     game.settings.register(MODULE_ID, GUILD_ID, {

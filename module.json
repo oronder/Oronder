@@ -44,7 +44,7 @@
     ]
   },
   "esmodules": [
-    "src/module.mjs"
+    "dist/module.js"
   ],
   "styles": [
     "styles/module.css"
