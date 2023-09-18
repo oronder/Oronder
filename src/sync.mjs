@@ -1,6 +1,5 @@
 import {ACTORS, AUTH, GUILD_ID, ID_MAP, MODULE_ID, ORONDER_BASE_URL} from "./constants.mjs";
-
-// import {hash} from "./lib/object_hash.js";
+import {hash} from "./util.mjs";
 
 function prune_roll_data(
     {
@@ -178,7 +177,7 @@ export async function sync_actor(actor) {
 
     const old_hash = localStorage.getItem(`${ACTORS}.actor.id`)
     const actor_obj = enrich_actor(actor)
-    const new_hash = 'hash(actor_obj)'
+    const new_hash = hash(actor_obj)
     // const new_hash = hash(actor_obj)
     if (!old_hash || old_hash !== new_hash) {
         const response = await upload(actor_obj)

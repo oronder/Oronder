@@ -1,10 +1,7 @@
 import {Logger} from "./util.mjs";
 import {registerSettings} from "./settings.mjs";
-import {ACTORS, ID_MAP, MODULE_ID} from "./constants.mjs";
-import {enrich_actor, sync_actor} from "./sync.mjs"
-import hash from 'object-hash';
-
-// import {hash} from "./lib/object_hash.js";
+import {ID_MAP, MODULE_ID} from "./constants.mjs";
+import {sync_actor} from "./sync.mjs"
 
 let socket;
 
@@ -46,12 +43,7 @@ Hooks.on("createActor", async (actor, data, options, userId) => {
     await sync_actor(actor)
 })
 Hooks.on("updateActor", async (actor, data, options, userId) => {
-    const old_hash = localStorage.getItem(`${ACTORS}.actor.id`)
-    const actor_obj = enrich_actor(actor)
-    // const new_hash = hash(actor_obj)
-    const new_hash = ''
-    localStorage.setItem(`${ACTORS}.actor.id`, new_hash)
-    // await sync_actor(actor)
+    await sync_actor(actor)
     //todo handle incremental updates
 })
 Hooks.on("deleteActor", async (actor, data, options, userId) => {

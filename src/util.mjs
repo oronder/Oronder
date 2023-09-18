@@ -1,4 +1,5 @@
 import {MODULE_DEBUG_TAG} from "./constants.mjs";
+import objectHash from 'object-hash';
 
 /**
  * Utility class to handle logging to console with an attached debug tag to identify module logs.
@@ -41,4 +42,10 @@ export class Logger {
  */
 function _processLog(logString) {
     return [...MODULE_DEBUG_TAG, logString];
+}
+
+const hash_options = {unorderedArrays: true, respectType: false}
+
+export function hash(obj) {
+    return objectHash(obj, hash_options)
 }

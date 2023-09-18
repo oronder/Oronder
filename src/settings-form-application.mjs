@@ -1,5 +1,6 @@
 import {Logger} from "./util.mjs";
 import {AUTH, GUILD_ID, ID_MAP, MODULE_ID, ORONDER_BASE_URL, VALID_CONFIG} from "./constants.mjs";
+import {full_sync} from "./sync.mjs";
 
 export class OronderSettingsFormApplication extends FormApplication {
 
@@ -171,10 +172,12 @@ export class OronderSettingsFormApplication extends FormApplication {
                 }
                 return response.json()
             })
-            .then(result => {
+            .then(async result => {
                 for (const [foundry_name, discord_user_id] of Object.entries(result)) {
                     this.object.players.find(p => p.foundry_name === foundry_name).discord_id = discord_user_id
                 }
+
+                await full_sync()
             })
             .catch(error => {
                 Logger.logError(error)
