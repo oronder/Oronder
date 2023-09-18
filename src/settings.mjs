@@ -1,4 +1,4 @@
-import {AUTH, GUILD_ID, ID_MAP, MODULE_ID, ORONDER_CONFIGURATION_FORM, VALID_CONFIG} from "./constants.mjs";
+import {ACTORS, AUTH, GUILD_ID, ID_MAP, MODULE_ID, ORONDER_CONFIGURATION_FORM, VALID_CONFIG} from "./constants.mjs";
 import {Logger} from "./util.mjs";
 import {OronderSettingsFormApplication} from "./settings-form-application.mjs";
 

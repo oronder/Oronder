@@ -1,0 +1,10 @@
+{
+  "dependencies": {
+    "esbuild": "^0.19.3",
+    "object-hash": "^3.0.0"
+  },
+  "scripts": {
+    "build": "esbuild src/module.mjs --bundle --minify --format=esm --outdir=dist",
+    "build-dev": "esbuild src/module.mjs --bundle --sourcemap --format=esm --outdir=dist && mkdir -p ../foundry_data/Data/modules/oronder/ && cp -r ./* ../foundry_data/Data/modules/oronder/"
+  }
+}
