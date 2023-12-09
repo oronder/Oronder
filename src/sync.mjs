@@ -118,29 +118,22 @@ export function enrich_actor(actor) {
     let portrait_url = actor.img.indexOf('http://') === 0 || actor.img.indexOf('https://') === 0 ?
         actor.img : new URL(actor.img, window.location.origin).href
 
-    const pc_roll_data = actor.getRollData()
     const clone_pc = JSON.parse(JSON.stringify(
-        pc_roll_data,
+        actor.getRollData(),
         (k, v) => v instanceof Set ? [...v] : v)
     )
     clone_pc.details.dead = Boolean(actor.effects.find(e => !e.disabled && e.name === 'Dead'))
-
-    Logger.log(actor.system.details.background)
     clone_pc.details.background = typeof actor.system.details.background === "string" ?
         actor.system.details.background :
         actor.system.details.background ?
             actor.system.details.background.name :
             ''
 
-    Logger.log(clone_pc.details.background)
-
-    Logger.log(actor.system.details.race)
     clone_pc.details.race = typeof actor.system.details.race === "string" ?
         actor.system.details.race :
         actor.system.details.race ?
             actor.system.details.race.name :
             ''
-    Logger.log(clone_pc.details.race)
 
     return {
         ...prune_roll_data(clone_pc),
