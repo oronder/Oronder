@@ -6,8 +6,8 @@
   "library": "false",
   "manifestPlusVersion": "1.2.0",
   "compatibility": {
-    "minimum": 10.303,
-    "verified": 11,
+    "minimum": 11.303,
+    "verified": 11.315,
     "maximum": 11
   },
   "authors": [
@@ -27,8 +27,8 @@
         "id": "dnd5e",
         "manifest": "https://raw.githubusercontent.com/foundryvtt/dnd5e/master/system.json",
         "compatibility": {
-          "minimum": "2.0.0",
-          "verified": "2.3.1"
+          "minimum": "2.4.0",
+          "verified": "2.4.1"
         }
       }
     ],

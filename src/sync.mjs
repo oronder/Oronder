@@ -1,5 +1,5 @@
 import {ACTORS, AUTH, GUILD_ID, ID_MAP, MODULE_ID, ORONDER_BASE_URL} from "./constants.mjs";
-import {hash} from "./util.mjs";
+import {hash, Logger} from "./util.mjs";
 
 function prune_roll_data(
     {
@@ -78,7 +78,7 @@ function gen_item_deets(item, actor_lvl) {
         .filter(s => s !== '0')
 
     let attack = new Roll(
-        ["1d20", ...attack_parts].join(" + "),
+        ["1d20", ...attack_parts].join(" + ").replace(' + -', ' - '),
         item.getRollData()
     )
 
@@ -118,14 +118,16 @@ export function enrich_actor(actor) {
     let portrait_url = actor.img.indexOf('http://') === 0 || actor.img.indexOf('https://') === 0 ?
         actor.img : new URL(actor.img, window.location.origin).href
 
-
+    const pc_roll_data = actor.getRollData()
     const clone_pc = JSON.parse(JSON.stringify(
-        actor.getRollData(),
+        pc_roll_data,
         (k, v) => v instanceof Set ? [...v] : v)
     )
-    clone_pc.details['dead'] = Boolean(actor.effects.find(e => !e.disabled && e.name === 'Dead'))
+    clone_pc.details.dead = Boolean(actor.effects.find(e => !e.disabled && e.name === 'Dead'))
+    clone_pc.details.background = actor.system.details.background ? actor.system.details.background.name : ''
+    clone_pc.details.race = actor.system.details.race ? actor.system.details.race.name : ''
 
-    const out = {
+    return {
         ...prune_roll_data(clone_pc),
         name: actor.name,
         id: actor.id,
@@ -133,21 +135,23 @@ export function enrich_actor(actor) {
         weapons: weapons,
         portrait_url: portrait_url
     }
+}
 
-    return out
+function headers() {
+    const guild_id = game.settings.get(MODULE_ID, GUILD_ID)
+    const authorization = game.settings.get(MODULE_ID, AUTH)
+    return new Headers({
+        "Accept": "application/json",
+        "Content-Type": "application/json",
+        'Guild-Id': guild_id,
+        'Authorization': authorization
+    })
 }
 
 async function upload(pc) {
-    const guild_id = game.settings.get(MODULE_ID, GUILD_ID)
-    const authorization = game.settings.get(MODULE_ID, AUTH)
     const requestOptions = {
         method: 'PUT',
-        headers: new Headers({
-            "Accept": "application/json",
-            "Content-Type": "application/json",
-            'Guild-Id': guild_id,
-            'Authorization': authorization
-        }),
+        headers: headers(),
         body: JSON.stringify(pc),
         redirect: 'follow'
     };
@@ -155,10 +159,20 @@ async function upload(pc) {
     return await fetch(`${ORONDER_BASE_URL}/actor`, requestOptions)
 }
 
+export async function del_actor(pc_id) {
+    const requestOptions = {
+        method: 'DELETE',
+        headers: headers(),
+        redirect: 'follow'
+    };
+
+    return await fetch(`${ORONDER_BASE_URL}/actor/${pc_id}`, requestOptions)
+}
+
 
 const actor_to_discord_ids = actor =>
     Object.entries(actor.ownership)
-        .filter(([owner_id, perm_lvl]) => perm_lvl === 3)
+        .filter(([_, perm_lvl]) => perm_lvl === 3)
         .map(([owner_id, _]) => game.settings.get(MODULE_ID, ID_MAP)[owner_id])
         .filter(discord_id => discord_id)
 
@@ -175,14 +189,16 @@ export async function sync_actor(actor) {
     if (!discord_ids.length)
         return
 
-    const old_hash = localStorage.getItem(`${ACTORS}.actor.id`)
+    const old_hash = localStorage.getItem(`${ACTORS}.${actor.id}`)
     const actor_obj = enrich_actor(actor)
+
     const new_hash = hash(actor_obj)
-    // const new_hash = hash(actor_obj)
+
     if (!old_hash || old_hash !== new_hash) {
         const response = await upload(actor_obj)
         if (response.ok) {
-            localStorage.setItem(`${ACTORS}.actor.id`, new_hash)
+            localStorage.setItem(`${ACTORS}.${actor.id}`, new_hash)
+            Logger.log(`Syncing ${actor_obj.name}`);
         }
     }
 }

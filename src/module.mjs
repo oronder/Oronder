@@ -1,7 +1,7 @@
 import {Logger} from "./util.mjs";
 import {registerSettings} from "./settings.mjs";
 import {ID_MAP, MODULE_ID} from "./constants.mjs";
-import {sync_actor} from "./sync.mjs"
+import {del_actor, sync_actor} from "./sync.mjs"
 
 let socket;
 
@@ -43,11 +43,14 @@ Hooks.on("createActor", async (actor, data, options, userId) => {
     await sync_actor(actor)
 })
 Hooks.on("updateActor", async (actor, data, options, userId) => {
+    if ('currency' in data?.system) {
+        //todo handle currency
+    }
     await sync_actor(actor)
     //todo handle incremental updates
 })
 Hooks.on("deleteActor", async (actor, data, options, userId) => {
-    //handle actor deletion
+    await del_actor(actor.id)
 })
 
 
