@@ -124,8 +124,16 @@ export function enrich_actor(actor) {
         (k, v) => v instanceof Set ? [...v] : v)
     )
     clone_pc.details.dead = Boolean(actor.effects.find(e => !e.disabled && e.name === 'Dead'))
-    clone_pc.details.background = actor.system.details.background ? actor.system.details.background.name : ''
-    clone_pc.details.race = actor.system.details.race ? actor.system.details.race.name : ''
+    clone_pc.details.background = typeof actor.system.details.background === "string" ?
+        actor.system.details.background :
+        actor.system.details.background ?
+            actor.system.details.background.name :
+            ''
+    clone_pc.details.race = typeof actor.system.details.race === "string" ?
+        actor.system.details.race :
+        actor.system.details.race ?
+            actor.system.details.race.name :
+            ''
 
     return {
         ...prune_roll_data(clone_pc),
