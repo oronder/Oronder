@@ -32,13 +32,6 @@ Hooks.once("ready", async () => {
     Logger.log(`The GM client calculated: ${result}`);
 });
 
-
-const actor_to_discord_ids = actor =>
-    Object.entries(actor.ownership)
-        .filter(([owner_id, perm_lvl]) => perm_lvl === 3)
-        .map(([owner_id, _]) => game.settings.get(MODULE_ID, ID_MAP)[owner_id])
-        .filter(discord_id => discord_id)
-
 Hooks.on("createActor", async (actor, data, options, userId) => {
     await sync_actor(actor)
 })

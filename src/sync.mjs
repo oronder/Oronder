@@ -191,11 +191,7 @@ export async function full_sync() {
 }
 
 export async function sync_actor(actor) {
-    if (actor.type !== "character")
-        return Promise.resolve()
-
-    let discord_ids = actor_to_discord_ids(actor)
-    if (!discord_ids.length)
+    if (actor.type !== "character" || !actor_to_discord_ids(actor).length)
         return Promise.resolve()
 
     const old_hash = localStorage.getItem(`${ACTORS}.${actor.id}`)
