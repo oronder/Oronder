@@ -34,10 +34,12 @@
     </div>
 
     <div class="form-group">
-        <button type="button" class='control' data-action='fetch' style="{{button_style}}">
+        <button type="button" class='control' data-action='fetch' {{#if fetch_disabled}}disabled{{/if}}>
             <i class="{{fetch_button_icon}}"></i> {{fetch_button_msg}}
         </button>
-        <button type="button" class='control' data-action='sync-all' style="{{button_style}}">
+    </div>
+    <div class="form-group">
+        <button type="button" class='control' data-action='sync-all' {{#if full_sync_disabled}}disabled{{/if}}>
             <i class="{{full_sync_button_icon}}"></i> {{full_sync_button_msg}}
         </button>
     </div>

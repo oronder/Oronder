@@ -12,8 +12,10 @@ export class OronderSettingsFormApplication extends FormApplication {
             valid_config: game.settings.get(MODULE_ID, VALID_CONFIG),
             fetch_button_icon: "fa-solid fa-rotate",
             fetch_button_msg: game.i18n.localize("oronder.Fetch-Discord-User-Ids"),
+            fetch_sync_disabled: false,
             full_sync_button_icon: "fa-solid fa-users",
             full_sync_button_msg: game.i18n.localize("oronder.Full-Sync"),
+            full_sync_disabled: false,
             players: game.users.filter(user => user.role < 3).map(user => ({
                 foundry_name: user.name,
                 foundry_id: user.id,
@@ -126,9 +128,13 @@ export class OronderSettingsFormApplication extends FormApplication {
 
     async _full_sync() {
         this.object.full_sync_button_icon = 'fa-solid fa-spinner fa-spin'
+        this.object.full_sync_sync_disabled = true
         this.render()
-        await full_sync()
-        this.object.fetch_button_icon = "fa-solid fa-users"
+
+        await full_sync().catch(Logger.logError)
+
+        this.object.full_sync_button_icon = "fa-solid fa-users"
+        this.object.full_sync_sync_disabled = false
         this.render()
     }
 
@@ -162,8 +168,8 @@ export class OronderSettingsFormApplication extends FormApplication {
             return
         }
 
-
         this.object.fetch_button_icon = 'fa-solid fa-spinner fa-spin'
+        this.object.fetch_sync_disabled = true
         this.render()
 
         const queryParams = new URLSearchParams()
@@ -197,6 +203,7 @@ export class OronderSettingsFormApplication extends FormApplication {
             })
 
         this.object.fetch_button_icon = "fa-solid fa-rotate"
+        this.object.fetch_sync_disabled = false
         this.render()
     }
 }

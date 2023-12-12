@@ -186,27 +186,39 @@ const actor_to_discord_ids = actor =>
 
 
 export async function full_sync() {
-    game.actors.map(sync_actor)
+    return Promise.all(game.actors.map(sync_actor))
+
 }
 
 export async function sync_actor(actor) {
     if (actor.type !== "character")
-        return
+        return Promise.resolve()
 
     let discord_ids = actor_to_discord_ids(actor)
     if (!discord_ids.length)
-        return
+        return Promise.resolve()
 
     const old_hash = localStorage.getItem(`${ACTORS}.${actor.id}`)
     const actor_obj = enrich_actor(actor)
-
     const new_hash = hash(actor_obj)
 
-    if (!old_hash || old_hash !== new_hash) {
-        const response = await upload(actor_obj)
-        if (response.ok) {
-            localStorage.setItem(`${ACTORS}.${actor.id}`, new_hash)
-            Logger.log(`Syncing ${actor_obj.name}`);
-        }
+    if (
+        (!old_hash || old_hash !== new_hash) &&
+        actor_obj.details.level &&
+        actor_obj.details.race &&
+        actor_obj.details.background &&
+        Object.keys(actor_obj.classes).length
+    ) {
+        return upload(actor_obj).then(response => {
+            if (response.ok) {
+                localStorage.setItem(`${ACTORS}.${actor.id}`, new_hash)
+                Logger.log(`Synced ${actor_obj.name}`);
+            } else {
+                Logger.logError(`${actor_obj.name} failed to sync!`);
+            }
+        }).catch(Logger.logError)
+    } else {
+        Logger.log(`Skipping sync for ${actor_obj.name}.`);
+        return Promise.resolve()
     }
 }
