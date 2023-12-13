@@ -18,12 +18,12 @@ jobs:
       contents: write
 
     steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
       - name: Exit if not on main branch
         if: endsWith(github.event.base_ref, 'main') == false
         run: exit -1
-
-      - name: Checkout Repository
-        uses: actions/checkout@v4
 
       - name: Extract Version From Tag
         id: get_version
