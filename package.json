@@ -5,6 +5,7 @@
   },
   "scripts": {
     "build": "esbuild src/module.mjs --bundle --minify --format=esm --outdir=dist",
-    "build-dev": "esbuild src/module.mjs --bundle --sourcemap=inline --format=esm --outdir=dist && mkdir -p ../foundry_data/Data/modules/oronder/ && cp -r ./* ../foundry_data/Data/modules/oronder/"
+    "build-dev": "esbuild src/module.mjs --bundle --sourcemap=inline --format=esm --outdir=dist && mkdir -p ../foundry_data/Data/modules/oronder/ && cp -r ./* ../foundry_data/Data/modules/oronder/",
+    "build-dev-win": "esbuild src/module.mjs --bundle --sourcemap=inline --format=esm --outdir=dist && mkdir ..\\foundry_data\\Data\\modules\\oronder\\ && xcopy /E /Y .\\* ..\\foundry_data\\Data\\modules\\oronder\\"
   }
 }
