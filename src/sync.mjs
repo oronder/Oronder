@@ -187,7 +187,6 @@ const actor_to_discord_ids = actor =>
 
 export async function full_sync() {
     return Promise.all(game.actors.map(sync_actor))
-
 }
 
 export async function sync_actor(actor) {
