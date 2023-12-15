@@ -1,1 +1,1 @@
-wsl bash -c "cd ../../foundry_data/Data/modules/oronder/ && python ./release.py"
+wsl bash -c "python ./release.py"
