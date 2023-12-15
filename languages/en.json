@@ -2,7 +2,7 @@
   "oronder.Auth-Token": "Auth Token",
   "oronder.Discord-Server-Id": "Discord Server Id",
   "oronder.Fetch-Discord-User-Ids": "Fetch Discord User Ids",
-  "oronder.Full-Sync": "Full Sync",
+  "oronder.Full-Sync": "Manually Sync All Actors",
   "oronder.Fetching-Discord-Ids": "Fetching Discord Ids",
   "oronder.Oronder-Configuration": "Oronder Configuration",
   "oronder.Configure-Oronder": "Configure Oronder",
