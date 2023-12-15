@@ -1,0 +1,1 @@
+wsl bash -c "cd ../../foundry_data/Data/modules/oronder/ && python ./release.py"
