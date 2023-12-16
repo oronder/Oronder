@@ -190,30 +190,54 @@ export async function full_sync() {
 }
 
 export async function sync_actor(actor) {
-    if (actor.type !== "character" || !actor_to_discord_ids(actor).length)
+    const a = Date.now()
+    if (actor.type !== "character") {
+        Logger.log(
+            `${game.i18n.localize("oronder.Skipping-Sync-For")} ${actor.name}. ${game.i18n.localize("oronder.NPC")}`
+        );
         return Promise.resolve()
+    }
+    if (!actor_to_discord_ids(actor).length) {
+        Logger.log(
+            `${game.i18n.localize("oronder.Skipping-Sync-For")} ${actor.name}. ${game.i18n.localize("oronder.No-Owner")}`
+        );
+        return Promise.resolve()
+    }
 
     const old_hash = localStorage.getItem(`${ACTORS}.${actor.id}`)
     const actor_obj = enrich_actor(actor)
     const new_hash = hash(actor_obj)
 
-    if (
-        (!old_hash || old_hash !== new_hash) &&
-        actor_obj.details.level &&
-        actor_obj.details.race &&
-        actor_obj.details.background &&
-        Object.keys(actor_obj.classes).length
-    ) {
-        return upload(actor_obj).then(response => {
-            if (response.ok) {
-                localStorage.setItem(`${ACTORS}.${actor.id}`, new_hash)
-                Logger.log(`Synced ${actor_obj.name}`);
-            } else {
-                Logger.logError(`${actor_obj.name} failed to sync!`);
-            }
-        }).catch(Logger.logError)
-    } else {
-        Logger.log(`Skipping sync for ${actor_obj.name}.`);
+    if (old_hash && old_hash === new_hash) {
+        Logger.log(`${game.i18n.localize("oronder.Skipping-Sync-For")} ${actor_obj.name}. ${game.i18n.localize("oronder.No-Change")}`);
         return Promise.resolve()
     }
+    if (!actor_obj.details.level) {
+        Logger.log(`${game.i18n.localize("oronder.Skipping-Sync-For")} ${actor_obj.name}. ${game.i18n.localize("oronder.No-Level")}`);
+        return Promise.resolve()
+    }
+    if (!actor_obj.details.race) {
+        Logger.log(`${game.i18n.localize("oronder.Skipping-Sync-For")} ${actor_obj.name}. ${game.i18n.localize("oronder.No-Race")}`);
+        return Promise.resolve()
+    }
+    if (!actor_obj.details.background) {
+        Logger.log(`${game.i18n.localize("oronder.Skipping-Sync-For")} ${actor_obj.name}. ${game.i18n.localize("oronder.No-Background")}`);
+        return Promise.resolve()
+    }
+    if (!Object.keys(actor_obj.classes).length) {
+        Logger.log(`${game.i18n.localize("oronder.Skipping-Sync-For")} ${actor_obj.name}. ${game.i18n.localize("oronder.No-Class")}`);
+        return Promise.resolve()
+    }
+
+    const p = upload(actor_obj).then(response => {
+        if (response.ok) {
+            localStorage.setItem(`${ACTORS}.${actor.id}`, new_hash)
+            Logger.log(`${game.i18n.localize("oronder.Synced")} ${actor_obj.name}`);
+        } else {
+            Logger.logError(`${actor_obj.name} ${game.i18n.localize("oronder.Failed-To-Sync")}`);
+        }
+    }).catch(Logger.logError)
+
+    Logger.log(`${actor.name}: ${Math.floor((Date.now() - a) / 1000)} seconds`)
+    return p
 }

@@ -26,7 +26,7 @@ export const registerSettings = async () => {
         name: `${MODULE_ID}.Oronder-Configuration`,
         label: `${MODULE_ID}.Configure-Oronder`,
         icon: "fa-brands fa-discord",
-        hint: 'This will fetch Discord Ids for Users whose Foundry User names match their Discord name. Support for Pomelo Nicknames pending.',
+        hint: `${MODULE_ID}.Configure-Hint`,
         scope: "client",
         config: true,
         type: OronderSettingsFormApplication,

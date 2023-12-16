@@ -26,7 +26,7 @@ export class OronderSettingsFormApplication extends FormApplication {
     }
 
     static get defaultOptions() {
-        return mergeObject(super.defaultOptions, {
+        return foundry.utils.mergeObject(super.defaultOptions, {
             id: "oronder-options",
             template: `modules/${MODULE_ID}/templates/settings-form-application.hbs`,
             width: 580,
@@ -95,17 +95,15 @@ export class OronderSettingsFormApplication extends FormApplication {
                 const invalid_player_names = invalid_discord_ids.map(invalid_discord_id => {
                     return this.object.players.find(p => p.discord_id === invalid_discord_id).foundry_name
                 })
-                if (invalid_player_names.length) {
+                if (invalid_player_names.length===1) {
                     Logger.logError(
-                        `${game.i18n.localize("oronder.Invalid-Discord-Ids")}: ${invalid_player_names.join(', ')}`
+                        `${invalid_player_names[0]} ${game.i18n.localize("oronder.Could-Not-Be-Found")}`
                     )
                 } else {
                     valid_config = true
                 }
             })
-            .catch(error => {
-                Logger.logError(error)
-            })
+            .catch(Logger.logError)
 
         game.settings.set(MODULE_ID, VALID_CONFIG, valid_config)
         game.settings.set(MODULE_ID, GUILD_ID, this.object.guild_id)
@@ -174,9 +172,7 @@ export class OronderSettingsFormApplication extends FormApplication {
                     this.object.players.find(p => p.foundry_name === foundry_name).discord_id = discord_user_id
                 }
             })
-            .catch(e => {
-                Logger.logError(e)
-            })
+            .catch(Logger.logError)
 
         this.object.fetch_button_icon = "fa-solid fa-rotate"
         this.object.fetch_sync_disabled = false

@@ -14,4 +14,3 @@ export const ID_MAP = "id_map"
 
 export const ACTORS = "actors"
 export const ORONDER_BASE_URL = window.location.host === 'localhost:65434' ? 'http://localhost:65435' : 'https://api.oronder.com'
-// export const ORONDER_BASE_URL = 'https://api.oronder.com'
