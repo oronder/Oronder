@@ -36,7 +36,8 @@ Hooks.on("createActor", async (actor, data, options, userId) => {
     await sync_actor(actor)
 })
 Hooks.on("updateActor", async (actor, data, options, userId) => {
-    if ((data?.system || []).includes('currency')) {
+    let currency = data?.system?.currency
+    if (currency !== undefined) {
         //todo handle currency
     }
     await sync_actor(actor)
