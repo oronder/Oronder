@@ -96,14 +96,14 @@ export class OronderSettingsFormApplication extends FormApplication {
                     return this.object.players.find(p => p.discord_id === invalid_discord_id).foundry_name
                 })
                 if (invalid_player_names.length===1) {
-                    Logger.logError(
+                    Logger.error(
                         `${invalid_player_names[0]} ${game.i18n.localize("oronder.Could-Not-Be-Found")}`
                     )
                 } else {
                     valid_config = true
                 }
             })
-            .catch(Logger.logError)
+            .catch(Logger.error)
 
         game.settings.set(MODULE_ID, VALID_CONFIG, valid_config)
         game.settings.set(MODULE_ID, GUILD_ID, this.object.guild_id)
@@ -118,7 +118,7 @@ export class OronderSettingsFormApplication extends FormApplication {
         this.object.full_sync_sync_disabled = true
         this.render()
 
-        await full_sync().catch(Logger.logError)
+        await full_sync().catch(Logger.error)
 
         this.object.full_sync_button_icon = "fa-solid fa-users"
         this.object.full_sync_sync_disabled = false
@@ -139,15 +139,15 @@ export class OronderSettingsFormApplication extends FormApplication {
 
         if (!Number.fromString(this.object.guild_id)) {
             err = true
-            Logger.logError(game.i18n.localize("oronder.Server-Id-NaN"))
+            Logger.error(game.i18n.localize("oronder.Server-Id-NaN"))
         }
         if (!this.object.auth) {
             err = true
-            Logger.logError(game.i18n.localize("oronder.Auth-Token-Empty"))
+            Logger.error(game.i18n.localize("oronder.Auth-Token-Empty"))
         }
         if (!players_without_discord_ids.length) {
             err = true
-            Logger.logWarning(game.i18n.localize("oronder.No-Players-To-Sync"))
+            Logger.warn(game.i18n.localize("oronder.No-Players-To-Sync"))
         }
 
         if (err) {
@@ -172,7 +172,7 @@ export class OronderSettingsFormApplication extends FormApplication {
                     this.object.players.find(p => p.foundry_name === foundry_name).discord_id = discord_user_id
                 }
             })
-            .catch(Logger.logError)
+            .catch(Logger.error)
 
         this.object.fetch_button_icon = "fa-solid fa-rotate"
         this.object.fetch_sync_disabled = false

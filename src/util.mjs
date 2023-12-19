@@ -6,18 +6,26 @@ import objectHash from 'object-hash';
  */
 export class Logger {
 
+    static debug(logString) {
+        console.debug(..._processLog(logString));
+    }
+
+    static info(logString) {
+        console.info(..._processLog(logString));
+    }
+
     static log(logString) {
         console.log(..._processLog(logString));
     }
 
-    static logError(logString, options = {}) {
-        if (options.ui ?? true) ui.notifications.error(logString, {console: false});
-        if (options.console ?? true) console.error(..._processLog(logString));
-    }
-
-    static logWarning(logString, options = {}) {
+    static warn(logString, options = {}) {
         if (options.ui ?? true) ui.notifications.warn(logString, {console: false});
         if (options.console ?? true) console.warn(..._processLog(logString));
+    }
+
+    static error(logString, options = {}) {
+        if (options.ui ?? true) ui.notifications.error(logString, {console: false});
+        if (options.console ?? true) console.error(..._processLog(logString));
     }
 }
 
