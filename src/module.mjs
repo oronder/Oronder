@@ -1,86 +1,61 @@
 import {Logger} from "./util.mjs";
 import {registerSettings} from "./settings.mjs";
-import {ID_MAP, MODULE_ID} from "./constants.mjs";
+import {MODULE_ID} from "./constants.mjs";
 import {del_actor, sync_actor} from "./sync.mjs"
 
 let socket;
 
-
 Hooks.once("socketlib.ready", () => {
     socket = socketlib.registerModule(MODULE_ID);
-    socket.register("hello", showHelloMessage);
-    socket.register("add", add);
-});
-
-
-Hooks.once('init', async () => {
-    Logger.log('Initializing');
-
 });
 
 Hooks.once("ready", async () => {
     Logger.log('Ready');
     await registerSettings()
-    // Let's send a greeting to all other connected users.
-    // Functions can either be called by their given name...
-    socket.executeForEveryone("hello", game.user.name);
-    // ...or by passing in the function that you'd like to call.
-    socket.executeForEveryone(showHelloMessage, game.user.name);
-    // The following function will be executed on a GM client.
-    // The return value will be sent back to us.
-    const result = await socket.executeAsGM("add", 5, 3);
-    Logger.log(`The GM client calculated: ${result}`);
 });
 
-Hooks.on("createActor", async (actor, data, options, userId) => {
-    await sync_actor(actor)
-})
 Hooks.on("updateActor", async (actor, data, options, userId) => {
     let currency = data?.system?.currency
     if (currency !== undefined) {
         //todo handle currency
     }
-    await sync_actor(actor)
-    //todo handle incremental updates
+
+    if (game.user.id === userId) {
+        await sync_actor(actor)
+    }
 })
 Hooks.on("deleteActor", async (actor, data, options, userId) => {
-    await del_actor(actor.id)
+    if (game.user.id === userId) {
+        await del_actor(actor.id)
+    }
 })
-
-
-Hooks.on("createItem", async (item, data, options, userId) => {
-    //handle actor updates
-    let asdf = 'g'
-})
-Hooks.on("updateItem", async (item, data, options, userId) => {
-    //handle item updates
-    let asdf = 'g'
-})
-Hooks.on("deleteItem", async (item, data, options, userId) => {
-    //handle item deletion
-    let asdf = 'g'
-})
-
-
-Hooks.on("createActiveEffect", async (effect, data, options, userId) => {
-    //handle effect creation
-    let asdf = 'g'
-})
-Hooks.on("updateActiveEffect", async (effect, data, options, userId) => {
-    //handle effect updates
-    let asdf = 'g'
-})
-Hooks.on("deleteActiveEffect", async (effect, data, options, userId) => {
-    //handle effect deletion
-    let asdf = 'g'
-})
-
-
-function showHelloMessage(userName) {
-    Logger.log(`${userName} says hello!`);
-}
-
-function add(a, b) {
-    console.log("The addition is performed on a GM client.");
-    return a + b;
-}
+// Hooks.on("createItem", async (item, data, options, userId) => {
+//     if (game.user.id === userId) {
+//         //handle actor updates
+//     }
+// })
+// Hooks.on("updateItem", async (item, data, options, userId) => {
+//     if (game.user.id === userId) {
+//         //handle item updates
+//     }
+// })
+// Hooks.on("deleteItem", async (item, data, options, userId) => {
+//     if (game.user.id === userId) {
+//         //handle item deletion
+//     }
+// })
+// Hooks.on("createActiveEffect", async (effect, data, options, userId) => {
+//     if (game.user.id === userId) {
+//         //handle effect creation
+//     }
+// })
+// Hooks.on("updateActiveEffect", async (effect, data, options, userId) => {
+//     if (game.user.id === userId) {
+//         //handle effect updates
+//     }
+// })
+// Hooks.on("deleteActiveEffect", async (effect, data, options, userId) => {
+//     if (game.user.id === userId) {
+//         //handle effect deletion
+//     }
+// })
