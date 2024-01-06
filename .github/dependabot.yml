@@ -3,7 +3,14 @@
 # See the above link for the reason why "directory" is set to "/"
 version: 2
 updates:
-  # GitHub Actions
+  - package-ecosystem: "pip"
+    directory: "/"
+    schedule:
+      interval: "daily"
+    commit-message:
+      prefix: "chore"
+      prefix-development: "chore"
+      include: "scope"
   - package-ecosystem: "github-actions"
     open-pull-requests-limit: 10
     directory: "/"
