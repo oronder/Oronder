@@ -108,6 +108,11 @@ export function enrich_actor(actor) {
         .filter(item => item.hasAttack && item.type !== 'consumable')
         .map(item => gen_item_deets(item, actor.system.details.level))
 
+    const equipment = actor.items
+        .filter(item => item.type === "equipment" && item.system?.rarity)
+        .map(item => item.name)
+
+
     let currency = actor.system['currency']
     for (const key in currency) {
         if (currency.hasOwnProperty(key) && !currency[key]) {
@@ -141,6 +146,7 @@ export function enrich_actor(actor) {
         id: actor.id,
         discord_ids: actor_to_discord_ids(actor),
         weapons: weapons,
+        equipment: equipment,
         portrait_url: portrait_url
     }
 }
