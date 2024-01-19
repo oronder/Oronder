@@ -40,5 +40,5 @@ export const registerSettings = async () => {
         default: false
     })
 
-    Logger.log('registered settings')
+    Logger.log('Registered Settings')
 }
