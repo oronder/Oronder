@@ -16,4 +16,4 @@ export const ACTORS = "actors"
 
 const common  = window.location.host === 'localhost:65434' ? '://localhost:65435' : 's://api.oronder.com'
 export const ORONDER_BASE_URL = `http${common}`
-export const ORONDER_WS_URL = `w${common}`
+export const ORONDER_WS_URL = `ws${common}`
