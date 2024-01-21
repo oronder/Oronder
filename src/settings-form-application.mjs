@@ -1,6 +1,7 @@
 import {Logger} from "./util.mjs";
 import {AUTH, GUILD_ID, ID_MAP, MODULE_ID, ORONDER_BASE_URL, VALID_CONFIG} from "./constants.mjs";
 import {full_sync} from "./sync.mjs";
+import {open_socket_with_oronder} from "./module.mjs";
 
 export class OronderSettingsFormApplication extends FormApplication {
 
@@ -95,7 +96,7 @@ export class OronderSettingsFormApplication extends FormApplication {
                 const invalid_player_names = invalid_discord_ids.map(invalid_discord_id => {
                     return this.object.players.find(p => p.discord_id === invalid_discord_id).foundry_name
                 })
-                if (invalid_player_names.length===1) {
+                if (invalid_player_names.length === 1) {
                     Logger.error(
                         `${invalid_player_names[0]} ${game.i18n.localize("oronder.Could-Not-Be-Found")}`
                     )
@@ -105,12 +106,21 @@ export class OronderSettingsFormApplication extends FormApplication {
             })
             .catch(Logger.error)
 
+        let updated = false
+
+        if (game.settings.get(MODULE_ID, GUILD_ID) !== this.object.guild_id) {
+            game.settings.set(MODULE_ID, GUILD_ID, this.object.guild_id)
+            updated = true
+        }
+        if (game.settings.get(MODULE_ID, AUTH) !== this.object.auth) {
+            game.settings.set(MODULE_ID, AUTH, this.object.auth)
+            updated = true
+        }
         game.settings.set(MODULE_ID, VALID_CONFIG, valid_config)
-        game.settings.set(MODULE_ID, GUILD_ID, this.object.guild_id)
-        game.settings.set(MODULE_ID, AUTH, this.object.auth)
         game.settings.set(MODULE_ID, ID_MAP, id_map)
 
         this.render()
+        open_socket_with_oronder(updated)
     }
 
     async _full_sync() {

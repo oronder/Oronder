@@ -18,15 +18,24 @@ Hooks.once("ready", async () => {
     Logger.log('Ready')
 })
 
-function open_socket_with_oronder() {
-    if (oronder_socket !== undefined) return
+export function open_socket_with_oronder(update = false) {
+    if (oronder_socket !== undefined) {
+        if (update)
+            oronder_socket.disconnect();
+        else
+            return
+    }
 
     const guild_id = game.settings.get(MODULE_ID, GUILD_ID)
     const authorization = game.settings.get(MODULE_ID, AUTH)
+
+    if (!guild_id || !authorization) return
+
     oronder_socket = io(ORONDER_WS_URL, {
         transports: ["websocket"],
         auth: {'Guild-Id': guild_id, 'Authorization': authorization}
     })
+    oronder_socket.on('connect', () => Logger.info('Oronder Websocket connection established.'));
 
     oronder_socket.on('xp', data => {
         for (const [id, xp] of Object.entries(data)) {
@@ -39,7 +48,6 @@ function open_socket_with_oronder() {
             }
         }
     })
-    Logger.log('Oronder Websocket connection established.')
 }
 
 Hooks.on("updateActor", async (actor, data, options, userId) => {
