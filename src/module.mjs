@@ -28,21 +28,13 @@ function open_socket_with_oronder() {
         auth: {'Guild-Id': guild_id, 'Authorization': authorization}
     })
 
-    const asdf = JSON.stringify(game.actors
-        .filter(a => a.type === 'character')
-        .reduce((acc, cur) => {
-            acc[cur.id] = cur.system.details.xp.value + 1;
-            return acc
-        }, {}))
-
-
     oronder_socket.on('xp', data => {
         for (const [id, xp] of Object.entries(data)) {
             const actor = game.actors.get(id)
             if (actor === undefined) {
                 Logger.warn(`Failed to update XP. No Actor with ID ${id} found!`)
             } else {
-                console.info(`${actor.name} xp: ${actor.system.details.xp.value} -> ${xp}`)
+                Logger.info(`${actor.name} xp: ${actor.system.details.xp.value} -> ${xp}`)
                 actor.update({"system.details.xp.value": xp})
             }
         }
@@ -55,7 +47,7 @@ Hooks.on("updateActor", async (actor, data, options, userId) => {
     // if (currency !== undefined) {
     //     //todo handle currency
     // }
-    if (game.user.id === userId) {
+    if (game.user.id === userId && !data?.system?.details?.xp?.value) {
         await sync_actor(actor)
     }
 })
