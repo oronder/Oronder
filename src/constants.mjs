@@ -13,4 +13,7 @@ export const VALID_CONFIG = "valid_config"
 export const ID_MAP = "id_map"
 
 export const ACTORS = "actors"
-export const ORONDER_BASE_URL = window.location.host === 'localhost:65434' ? 'http://localhost:65435' : 'https://api.oronder.com'
+
+const common  = window.location.host === 'localhost:65434' ? '://localhost:65435' : 's://api.oronder.com'
+export const ORONDER_BASE_URL = `http${common}`
+export const ORONDER_WS_URL = `ws${common}`
