@@ -43,19 +43,23 @@ export function open_socket_with_oronder(update = false) {
         auth: {'Guild-Id': guild_id, 'Authorization': authorization}
     })
     Logger.debug('soc8')
-    oronder_socket.on('connect', () => Logger.info('Oronder Websocket connection established.'));
+    game.oronder_socket = oronder_socket
+    oronder_socket.on('connect', () => {
+        Logger.info('Oronder Websocket connection established.')
+    });
     Logger.debug('soc9')
     oronder_socket.on('xp', data => {
-        for (const [id, xp] of Object.entries(data)) {
-            const actor = game.actors.get(id)
+        for (const [actor_id, xp] of Object.entries(data)) {
+            const actor = game.actors.get(actor_id)
             if (actor === undefined) {
-                Logger.warn(`Failed to update XP. No Actor with ID ${id} found!`)
+                Logger.warn(`Failed to update XP. No Actor with ID ${actor_id} found!`)
             } else {
                 Logger.info(`${actor.name} xp: ${actor.system.details.xp.value} -> ${xp}`)
                 actor.update({"system.details.xp.value": xp})
             }
         }
     })
+    Logger.debug(`soc10`)
 }
 
 Hooks.on("updateActor", async (actor, data, options, userId) => {
