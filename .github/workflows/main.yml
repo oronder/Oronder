@@ -41,6 +41,7 @@ jobs:
 
       - name: Build
         run: npm run build
+        
       - name: Create Module Archive
         run: |
           zip                    \
@@ -67,3 +68,9 @@ jobs:
           artifacts: './module.json, ./module.zip'
           tag: ${{ github.event.release.tag_name }}
           body: ${{ github.event.release.body }}
+
+      - name: Update Foundry VTT Module Repo
+        run: python .github/workflows/foundry_release.py ${{ ./}}
+        env:
+          FOUNDRY_PACKAGE_RELEASE_TOKEN: ${{ secrets.FOUNDRY_PACKAGE_RELEASE_TOKEN }}
+          MODULE_JSON_PATH: ${{ steps.create_version_release.outputs.artifacts_folder }}/module.json
