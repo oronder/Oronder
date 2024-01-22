@@ -73,4 +73,5 @@ jobs:
         run: python .github/workflows/foundry_release.py
         env:
           FOUNDRY_PACKAGE_RELEASE_TOKEN: ${{ secrets.FOUNDRY_PACKAGE_RELEASE_TOKEN }}
+          URL: ${{ env.project_url }}
           MODULE_JSON_PATH: ./module.json

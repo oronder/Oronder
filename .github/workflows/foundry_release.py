@@ -1,22 +1,9 @@
 import http.client
 import json
 import os
-from pprint import pprint
 
 with open(os.environ.get('MODULE_JSON_PATH'), 'r') as file:
     module = json.load(file)
-
-body = {
-    'id': module['id'],
-    "dry-run": True,
-    'release': {
-        'version': module['version'],
-        'manifest': module['manifest'],
-        'notes': f"https://github.com/oronder/Oronder/releases/tag/{module['version']}",
-        'compatibility': module['compatibility']
-    }
-}
-pprint(body)
 
 connection = http.client.HTTPSConnection("api.foundryvtt.com")
 connection.request(
@@ -25,6 +12,14 @@ connection.request(
         'Content-Type': 'application/json',
         'Authorization': os.environ.get('FOUNDRY_PACKAGE_RELEASE_TOKEN')
     },
-    body=json.dumps(body)
+    body=json.dumps({
+        'id': module['id'],
+        'release': {
+            'version': module['version'],
+            'manifest': f"{os.environ.get('URL')}/releases/download/{module['version']}/module.json",
+            'notes': f"{os.environ.get('URL')}/releases/tag/{module['version']}",
+            'compatibility': module['compatibility']
+        }
+    })
 )
-pprint(json.loads(connection.getresponse().read().decode()))
+assert json.loads(connection.getresponse().read().decode())['status'] == 'success'
