@@ -4,7 +4,7 @@
 
 `https://github.com/oronder/Oronder/releases/latest/download/module.json`
 
-Oronder provides deep FoundryVTT Discord Integration. Access your character sheets, roll for downtime activities, schedule sessions and reward exp all without needing to log back into Foundry. Oronder is designed to meet the needs of running a complex Westmarches game with multiple DMs and players, but also shines for sinple party campaigns.
+Oronder provides deep FoundryVTT Discord Integration. Access your character sheets, roll for downtime activities, schedule sessions and reward exp all without needing to log back into Foundry. Oronder is designed to meet the needs of running a complex Westmarches game with multiple DMs and players, but also shines for single party campaigns.
 
 ### Installation Instructions
 
