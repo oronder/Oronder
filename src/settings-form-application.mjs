@@ -119,8 +119,9 @@ export class OronderSettingsFormApplication extends FormApplication {
         game.settings.set(MODULE_ID, VALID_CONFIG, valid_config)
         game.settings.set(MODULE_ID, ID_MAP, id_map)
 
-        this.render()
         open_socket_with_oronder(updated)
+
+        this.render()
     }
 
     async _full_sync() {
