@@ -2,7 +2,7 @@ import http.client
 import json
 import os
 
-with open(os.environ.get('./module.json'), 'r') as file:
+with open('./module.json', 'r') as file:
     module = json.load(file)
 
 connection = http.client.HTTPSConnection("api.foundryvtt.com")
