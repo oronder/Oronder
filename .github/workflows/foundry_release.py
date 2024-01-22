@@ -3,6 +3,7 @@ import json
 import os
 from pprint import pprint
 
+print(os.environ.get('MODULE_JSON_PATH'))
 with open(os.environ.get('MODULE_JSON_PATH'), 'r') as file:
     module = json.load(file)
 pprint(module)
