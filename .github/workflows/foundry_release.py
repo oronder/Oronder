@@ -1,6 +1,7 @@
 import http.client
 import json
 import os
+from pprint import pprint
 
 with open('./module.json', 'r') as file:
     module = json.load(file)
@@ -22,4 +23,7 @@ connection.request(
         }
     })
 )
-assert json.loads(connection.getresponse().read().decode())['status'] == 'success'
+response = json.loads(connection.getresponse().read().decode())
+if response['status'] != 'success':
+    pprint(response['errors'])
+    raise Exception()

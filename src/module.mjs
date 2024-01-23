@@ -36,7 +36,6 @@ export function open_socket_with_oronder(update = false) {
         auth: {'Guild-Id': guild_id, 'Authorization': authorization}
     })
 
-    game.oronder_socket = oronder_socket
     oronder_socket.on('connect', () => {
         Logger.info('Oronder Websocket connection established.')
     })
