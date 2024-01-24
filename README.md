@@ -7,9 +7,10 @@
 Oronder provides deep FoundryVTT Discord Integration. Access your character sheets, roll for downtime activities, schedule sessions and reward exp all without needing to log back into Foundry. Oronder is designed to meet the needs of running a complex Westmarches game with multiple DMs and players, but also shines for single party campaigns.
 
 ### Installation Instructions
+_The following must be done by the owner of the Discord server you'd like to integrate with._
 
 1.  Invite the [Oronder Bot](https://discord.com/oauth2/authorize?client_id=1064553830810923048&scope=bot+guilds.members.read&permissions=403761728512) to your Discord.
-2.   Subscribe to the [Oronder Discord](https://discord.gg/27npDAXaCA) to gain access to advanced features.
+2.  Subscribe to the [Oronder Discord](https://discord.gg/27npDAXaCA) to gain access to advanced features.
 3.  From your Discord:
     - run `/admin init` supplying all required fields.
 5.  From Foundry, select **Game Settings > Configure Settings > Oronder > Configure Oronder**.
