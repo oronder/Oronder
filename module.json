@@ -30,16 +30,6 @@
           "verified": "2.4.1"
         }
       }
-    ],
-    "requires": [
-      {
-        "id": "socketlib",
-        "type": "module",
-        "compatibility": {
-          "minimum": "1.0.10",
-          "verified": "1.0.10"
-        }
-      }
     ]
   },
   "esmodules": [

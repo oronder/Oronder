@@ -237,7 +237,7 @@ export async function sync_actor(actor) {
     return upload(actor_obj).then(response => {
         if (response.ok) {
             localStorage.setItem(`${ACTORS}.${actor.id}`, new_hash)
-            Logger.log(`${game.i18n.localize("oronder.Synced")} ${actor_obj.name}`);
+            Logger.info(`${game.i18n.localize("oronder.Synced")} ${actor_obj.name}`);
         } else {
             Logger.error(`${actor_obj.name} ${game.i18n.localize("oronder.Failed-To-Sync")}`);
         }
