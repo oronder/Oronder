@@ -238,8 +238,17 @@ export async function sync_actor(actor) {
         if (response.ok) {
             localStorage.setItem(`${ACTORS}.${actor.id}`, new_hash)
             Logger.info(`${game.i18n.localize("oronder.Synced")} ${actor_obj.name}`);
+        } else if (response.status === 422) {
+            response
+                .json()
+                .then(({detail}) => Logger.error(
+                    `${actor_obj.name} ${game.i18n.localize("oronder.Failed-To-Sync")}: ` +
+                    detail.flat().map(({loc, input, msg}) =>
+                        `${loc.filter(_ => _ !== 'body').join('->')}->${input} | ${msg}`
+                    ).join(' ')
+                ))
         } else {
-            Logger.error(`${actor_obj.name} ${game.i18n.localize("oronder.Failed-To-Sync")}`);
+            Logger.error(`${actor_obj.name} ${game.i18n.localize("oronder.Failed-To-Sync")}: ${response.status} ${response.statusText}`);
         }
     }).catch(Logger.error)
 }
