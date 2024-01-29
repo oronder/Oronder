@@ -1,12 +1,12 @@
 name: Create Module Files For GitHub Release
 env:
-  project_url: "https://github.com/${{github.repository}}"
-  latest_manifest_url: "https://github.com/${{github.repository}}/releases/latest/download/module.json"
-  release_module_url: "https://github.com/${{github.repository}}/releases/download/${{github.event.release.tag_name || github.ref_name}}/module.zip"
+  PROJECT_URL: "https://github.com/${{github.repository}}"
+  LATEST_MANIFEST_URL: "https://github.com/${{github.repository}}/releases/latest/download/module.json"
+  RELEASE_MODULE_URL: "https://github.com/${{github.repository}}/releases/download/${{github.event.release.tag_name || github.ref_name}}/module.zip"
 
 on:
   release:
-    types: [published]
+    types: [ published ]
   push:
     tags:
       - '[0-9]+.[0-9]+.[0-9]+'
@@ -20,6 +20,8 @@ jobs:
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Extract Version From Tag
         id: get_version
@@ -32,16 +34,16 @@ jobs:
           files: 'module.json'
         env:
           VERSION: ${{steps.get_version.outputs.version-without-v}}
-          URL: ${{ env.project_url }}
-          MANIFEST: ${{ env.latest_manifest_url }}
-          DOWNLOAD: ${{ env.release_module_url }}
+          URL: ${{ env.PROJECT_URL }}
+          MANIFEST: ${{ env.LATEST_MANIFEST_URL }}
+          DOWNLOAD: ${{ env.RELEASE_MODULE_URL }}
 
       - name: Downloading Dependencies
-        run: npm install
+        run: npm install --omit=dev
 
       - name: Build
         run: npm run build
-        
+
       - name: Create Module Archive
         run: |
           zip                    \
@@ -69,7 +71,22 @@ jobs:
           tag: ${{ github.event.release.tag_name }}
           body: ${{ github.event.release.body }}
 
+      - name: Get Changes between Tags
+        id: changes
+        uses: simbo/changes-between-tags-action@v1
+        with:
+          include-hashes: false
+          tag-pattern: ^[0-9]+\.[0-9]+\.[0-9]+$
+
+      - name: Install Python Dependencies
+        run: pip install markdown-it-py linkify-it-py
+
       - name: Update Foundry VTT Module Repo
         run: python .github/workflows/foundry_release.py
         env:
           FOUNDRY_PACKAGE_RELEASE_TOKEN: ${{ secrets.FOUNDRY_PACKAGE_RELEASE_TOKEN }}
+          FOUNDRY_USERNAME: ${{ secrets.FOUNDRY_USERNAME }}
+          FOUNDRY_PASSWORD: ${{ secrets.FOUNDRY_PASSWORD }}
+          FOUNDRY_AUTHOR: ${{ secrets.FOUNDRY_AUTHOR }}
+          UPDATE_DISCORD_KEY: ${{ secrets.UPDATE_DISCORD_KEY }}
+          CHANGES: ${{ steps.changes.outputs.changes }}

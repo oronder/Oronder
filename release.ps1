@@ -1,1 +1,1 @@
-wsl bash -c "python ./release.py"
+wsl bash -c "(pip show click > /dev/null || pip install click) && python ./release.py"
