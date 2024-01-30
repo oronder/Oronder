@@ -1,12 +1,8 @@
-# Oronder: Discord
+# Oronder
 
-![](https://img.shields.io/badge/Foundry-v11-informational)
-![Latest Release Download Count](https://img.shields.io/github/downloads/oronder/Oronder/latest/module.zip)
-![Forge Installs](https://img.shields.io/badge/dynamic/json?label=Forge%20Installs&query=package.installs&suffix=%25&url=https%3A%2F%2Fforge-vtt.com%2Fapi%2Fbazaar%2Fpackage%2Foronder&colorB=4aa94a)
+Oronder provides deep Discord integration for Foundry Virtual Tabletop. Access your character sheets, roll for downtime activities, schedule sessions and reward exp all without needing to log back into Foundry. 
 
-Oronder provides deep FoundryVTT Discord Integration. Access your character sheets, roll for downtime activities,
-schedule sessions and reward exp all without needing to log back into Foundry. Oronder is designed to meet the needs of
-running a complex Westmarches game with multiple DMs and players, but also shines for single party campaigns.
+Oronder is designed to meet the needs of running a complex Westmarches game with multiple DMs and players, but also shines for single party campaigns.
 
 ### Installation Instructions
 
@@ -24,5 +20,4 @@ _The following must be done by the owner of the Discord server you'd like to int
       Foundry name. For everyone else, you will need to manually add their Discord User Id.
     - Click `Save Changes`.
 
-Players should now be able to access characters they own in Foundry from Discord. If a PC is not showing up ensure that
-player ownership has been assigned and that the character has a class, race and background.
+Players should now be able to access characters they own in Foundry from Discord. If a PC is not showing up, ensure that player ownership has been assigned and that the character has a class, race and background.
