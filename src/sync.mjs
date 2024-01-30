@@ -192,6 +192,9 @@ const actor_to_discord_ids = actor =>
 
 
 export async function full_sync() {
+    game.actors
+        .filter(_ => localStorage.getItem(`${ACTORS}.${_.id}`))
+        .forEach(_ => localStorage.removeItem(`${ACTORS}${_.id}`))
     return Promise.all(game.actors.map(sync_actor))
 }
 
