@@ -24,8 +24,11 @@ def run_release(release):
     match release:
         case 'major':
             major += 1
+            minor = 0
+            revision = 0
         case 'minor':
             minor += 1
+            revision = 0
         case 'revision':
             revision += 1
         case _:

@@ -45,7 +45,7 @@ def push_release(module):
 
 
 def get_readme_as_html():
-    md = MarkdownIt('commonmark', {'breaks': True, 'html': True}).enable('table')
+    md = MarkdownIt('commonmark', {'html': True}).enable('table')
     with open('./README.md', 'r') as readme_file:
         readme = readme_file.read()
     return md.render(readme)
