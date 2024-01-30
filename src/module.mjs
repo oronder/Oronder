@@ -94,7 +94,7 @@ export function open_socket_with_oronder(update = false) {
     })
     socket.on('session', session => {
         set_session(session)
-        game.socket.emit(SOCKET_NAME, {action: 'session', data: session})
+        game.socket.emit(SOCKET_NAME, {action: 'session', session: session})
     })
 }
 
