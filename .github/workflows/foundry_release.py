@@ -27,11 +27,8 @@ CHANGES = os.environ['CHANGES']
 def main():
     module_json = get_module_json()
 
-    post_update()
-
     if PUSH_RELEASE:
         push_release(module_json)
-
     else:
         print('SKIPPING RELEASE!')
 
@@ -43,7 +40,7 @@ def main():
     else:
         print('SKIPPING FOUNDRY REPO DESCRIPTION UPDATE')
 
-
+    post_update(module_json['version'])
 
 
 def get_module_json():
@@ -136,13 +133,13 @@ def post_packages_oronder_edit(csrf_token, csrf_middleware_token, session_id, de
     conn.request('POST', '/packages/oronder/edit', body, headers)
     response = conn.getresponse()
     if response.status != 200:
-        raise Exception('Update Description Failed')
-    content = response.read().decode()
-    headers = response.headers.as_string()
-    print(f'{content=}')
-    print(f'{headers=}')
+        content = response.read().decode()
+        headers = response.headers.as_string()
+        err_msg = f'Update Description Failed\n{content=}\n{headers=}'
+        raise Exception(err_msg)
 
-def post_update():
+
+def post_update(version):
     conn = http.client.HTTPSConnection("api.oronder.com")
     conn.request(
         "POST", '/update_discord',
@@ -150,10 +147,15 @@ def post_update():
             'Content-Type': 'application/json',
             'Authorization': UPDATE_DISCORD_KEY
         },
-        body=json.dumps({'changes':CHANGES})
+        body=json.dumps({'version': VERSION, 'changes': CHANGES})
     )
-    if conn.getresponse().status != 200:
-        raise Exception('Failed to send Update Message to Discord')
+    response = conn.getresponse()
+    if response.status != 200:
+        content = response.read().decode()
+        headers = response.headers.as_string()
+        err_msg = f'Failed to send Update Message to Discord\n{content=}\n{headers=}'
+        raise Exception(err_msg)
+
 
 if __name__ == '__main__':
     main()
