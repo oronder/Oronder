@@ -147,7 +147,7 @@ def post_update(version):
             'Content-Type': 'application/json',
             'Authorization': UPDATE_DISCORD_KEY
         },
-        body=json.dumps({'version': VERSION, 'changes': CHANGES})
+        body=json.dumps({'version': version, 'changes': CHANGES})
     )
     response = conn.getresponse()
     if response.status != 200:
