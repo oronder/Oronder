@@ -1,6 +1,6 @@
 import {Logger} from "./util.mjs"
 import {registerSettings} from "./settings.mjs"
-import {AUTH, GUILD_ID, MODULE_ID, ORONDER_WS_URL} from "./constants.mjs"
+import {AUTH, MODULE_ID, ORONDER_WS_URL} from "./constants.mjs"
 import {del_actor, sync_actor} from "./sync.mjs"
 
 let socket
@@ -69,13 +69,12 @@ export function open_socket_with_oronder(update = false) {
         }
     }
 
-    const guild_id = game.settings.get(MODULE_ID, GUILD_ID)
     const authorization = game.settings.get(MODULE_ID, AUTH)
-    if (!guild_id || !authorization) return
+    if (!authorization) return
 
     socket = io(ORONDER_WS_URL, {
         transports: ["websocket"],
-        auth: {'Guild-Id': guild_id, 'Authorization': authorization}
+        auth: {'Authorization': authorization}
     })
 
     socket.on('connect', () => {

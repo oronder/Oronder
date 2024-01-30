@@ -1,6 +1,5 @@
 {
   "oronder.Auth-Token": "Auth Token",
-  "oronder.Discord-Server-Id": "Discord Server Id",
   "oronder.Fetch-Discord-User-Ids": "Fetch Discord User Ids",
   "oronder.Full-Sync": "Manually Sync All Actors",
   "oronder.Fetching-Discord-Ids": "Fetching Discord Ids",
@@ -10,7 +9,6 @@
   "oronder.Discord-Ids": "Discord Ids",
   "oronder.Oronder-Bot-Config": "Oronder Bot Config",
   "oronder.Invalid-Auth": "Invalid Server Id and/or Auth Token. Have you run \"/admin init\" in Discord?",
-  "oronder.Server-Id-NaN": "Discord Server Id must be a number.",
   "oronder.Unexpected-Error": "Unexpected Error Occurred!",
   "oronder.Could-Not-Be-Found": "could not be found in Discord server.",
   "oronder.Discord-Server-Link-Title": "Oronder Discord",

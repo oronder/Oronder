@@ -1,4 +1,4 @@
-import {ACTORS, AUTH, GUILD_ID, ID_MAP, MODULE_ID, ORONDER_BASE_URL} from "./constants.mjs";
+import {ACTORS, AUTH, ID_MAP, MODULE_ID, ORONDER_BASE_URL} from "./constants.mjs";
 import {hash, Logger} from "./util.mjs";
 
 function prune_roll_data(
@@ -152,12 +152,10 @@ export function enrich_actor(actor) {
 }
 
 function headers() {
-    const guild_id = game.settings.get(MODULE_ID, GUILD_ID)
     const authorization = game.settings.get(MODULE_ID, AUTH)
     return new Headers({
         "Accept": "application/json",
         "Content-Type": "application/json",
-        'Guild-Id': guild_id,
         'Authorization': authorization
     })
 }

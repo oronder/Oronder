@@ -1,63 +1,60 @@
 <form autocomplete="off">
-  <div>
-    {{#unless valid_config}}
-      <h2>Installation Instructions</h2>
-      <ol>
-        <li>Invite the <a
-            href="https://discord.com/oauth2/authorize?client_id=1064553830810923048&scope=bot+guilds.members.read&permissions=403761728512">
-          {{localize "oronder.Discord-Bot-Link-Title"}}</a> to your Discord.
-        </li>
-        <li>Subscribe to the <a href="https://discord.gg/27npDAXaCA\">
-          {{localize "oronder.Discord-Server-Link-Title"}}
-        </a> to gain access to advanced features.
-        </li>
-        <li>From your Discord, run "<code>/admin init</code>"</li>
-        <li>Copy your Discord server id, and the generated token into the fields below.</li>
-        <li>Clicking "<code>{{localize "oronder.Fetch-Discord-User-Ids"}}</code>" will populate Discord user ids for
-          players whose Discord name
-          matches their Foundry name. For everyone else, you will need to manually add their user id.
-        </li>
-      </ol>
-      <hr>
-    {{/unless}}
-
-  </div>
-  <div class="form-group">
-    <label for="guild_id">{{localize "oronder.Discord-Server-Id"}}</label>
-    <input type="text" name="guild_id" value="{{guild_id}}" required inputmode="numeric">
-  </div>
-
-  <div class="form-group">
-    <label for="auth">{{localize "oronder.Auth-Token"}}</label>
-    <input type="password" name="auth" value="{{auth}}" required>
-  </div>
-
-  <div class="form-group">
-    <button type="button" class='control' data-action='fetch' {{#if fetch_disabled}}disabled{{/if}}>
-      <i class="{{fetch_button_icon}}"></i> {{fetch_button_msg}}
-    </button>
-  </div>
-  <div class="form-group">
-    <button type="button" class='control' data-action='sync-all' {{#if full_sync_disabled}}disabled{{/if}}>
-      <i class="{{full_sync_button_icon}}"></i> {{full_sync_button_msg}}
-    </button>
-  </div>
-
-  {{#if players}}
-    <hr>
-    <h3 class="border">{{localize "oronder.Discord-Ids"}}</h3>
-  {{/if}}
-
-  {{#each players}}
-    <div class="form-group">
-      <label for="{{this.foundry_id}}">{{this.foundry_name}}</label>
-      <input type="text" name="{{this.foundry_id}}" inputmode="numeric" value="{{this.discord_id}}">
+    <div>
+        <h1>{{#if guild_name}}{{guild_name}}{{else}}No Discord Server Configured{{/if}}</h1>
+        {{#unless valid_config}}
+            <h2>Installation Instructions</h2>
+            <ol>
+                <li>Invite the <a
+                        href="https://discord.com/oauth2/authorize?client_id=1064553830810923048&scope=bot+guilds.members.read&permissions=403761728512">
+                    {{localize "oronder.Discord-Bot-Link-Title"}}</a> to your Discord.
+                </li>
+                <li>Subscribe to the <a href="https://discord.gg/27npDAXaCA\">
+                    {{localize "oronder.Discord-Server-Link-Title"}}
+                </a> to gain access to advanced features.
+                </li>
+                <li>From your Discord, run "<code>/admin init</code>"</li>
+                <li>Copy the generated token into the fields below.</li>
+                <li>Clicking "<code>{{localize "oronder.Fetch-Discord-User-Ids"}}</code>" will populate Discord user ids
+                    for
+                    players whose Discord name
+                    matches their Foundry name. For everyone else, you will need to manually add their user id.
+                </li>
+            </ol>
+            <hr>
+        {{/unless}}
     </div>
-  {{/each}}
+    <div class="form-group">
+        <label for="auth">{{localize "oronder.Auth-Token"}}</label>
+        <input type="password" autocomplete="off" name="auth" id="auth" value="{{auth}}" required>
+    </div>
 
-  <hr>
-  <button type="submit">
-    <i class="far fa-save"></i> {{ localize "Save Changes" }}
-  </button>
+    <div class="form-group">
+        <button type="button" class='control' data-action='fetch' {{#if fetch_disabled}}disabled{{/if}}>
+            <i class="{{fetch_button_icon}}"></i> {{fetch_button_msg}}
+        </button>
+    </div>
+    <div class="form-group">
+        <button type="button" class='control' data-action='sync-all' {{#if full_sync_disabled}}disabled{{/if}}>
+            <i class="{{full_sync_button_icon}}"></i> {{full_sync_button_msg}}
+        </button>
+    </div>
+
+    {{#if players}}
+        <hr>
+        <h3 class="border">{{localize "oronder.Discord-Ids"}}</h3>
+    {{/if}}
+
+    {{#each players}}
+        <div class="form-group">
+            <label for="{{this.foundry_id}}">{{this.foundry_name}}</label>
+            <input type="text" name="{{this.foundry_id}}" id="{{this.foundry_id}}" autocomplete="off"
+                   inputmode="numeric" value="{{this.discord_id}}">
+        </div>
+    {{/each}}
+
+    <hr>
+    <button type="submit">
+        <i class="far fa-save"></i> {{ localize "Save Changes" }}
+    </button>
 
 </form>
