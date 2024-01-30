@@ -1,5 +1,3 @@
-# Oronder
-
 Oronder provides deep Discord integration for Foundry Virtual Tabletop. Access your character sheets, roll for
 downtime activities, schedule sessions and reward exp all without needing to log back into Foundry.
 
