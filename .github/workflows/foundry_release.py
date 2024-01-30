@@ -16,11 +16,6 @@ FOUNDRY_PASSWORD = os.environ['FOUNDRY_PASSWORD']
 FOUNDRY_AUTHOR = os.environ['FOUNDRY_AUTHOR']
 UPDATE_DISCORD_KEY = os.environ['UPDATE_DISCORD_KEY']
 
-# GitHub Action Variables
-UPDATE_DESCRIPTION = bool(int(os.environ.get('UPDATE_DESCRIPTION', '0')))
-PUSH_RELEASE = bool(int(os.environ.get('PUSH_RELEASE', '0')))
-POST_UPDATE = bool(int(os.environ.get('POST_UPDATE', '0')))
-
 # Build Variables
 PROJECT_URL = os.environ['PROJECT_URL']
 CHANGES = os.environ['CHANGES']
@@ -162,27 +157,17 @@ def post_update(version):
 def main():
     with open('./module.json', 'r') as file:
         module_json = json.load(file)
+    push_release(module_json)
+    print('MODULE POSTED TO REPO')
 
-    if PUSH_RELEASE:
-        push_release(module_json)
-        print('MODULE POSTED TO REPO')
-    else:
-        print('SKIPPING RELEASE')
+    csrf_token, csrf_middleware_token = get_root()
+    session_id = post_auth_login(csrf_token, csrf_middleware_token)
+    readme = get_readme_as_html()
+    post_packages_oronder_edit(csrf_token, csrf_middleware_token, session_id, readme, module_json)
+    print('REPO DESCRIPTION UPDATED')
 
-    if UPDATE_DESCRIPTION:
-        csrf_token, csrf_middleware_token = get_root()
-        session_id = post_auth_login(csrf_token, csrf_middleware_token)
-        readme = get_readme_as_html()
-        post_packages_oronder_edit(csrf_token, csrf_middleware_token, session_id, readme, module_json)
-        print('REPO DESCRIPTION UPDATED')
-    else:
-        print('SKIPPING FOUNDRY REPO DESCRIPTION UPDATE')
-
-    if POST_UPDATE:
-        post_update(module_json['version'])
-        print('DISCORD NOTIFIED OF NEW RELEASE')
-    else:
-        print('SKIPPING POST TO DISCORD')
+    post_update(module_json['version'])
+    print('DISCORD NOTIFIED OF NEW RELEASE')
 
 
 if __name__ == '__main__':

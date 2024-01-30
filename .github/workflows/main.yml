@@ -1,8 +1,8 @@
 name: Create Module Files For GitHub Release
 env:
-  PROJECT_URL: "https://github.com/${{github.repository}}"
-  LATEST_MANIFEST_URL: "https://github.com/${{github.repository}}/releases/latest/download/module.json"
-  RELEASE_MODULE_URL: "https://github.com/${{github.repository}}/releases/download/${{github.event.release.tag_name || github.ref_name}}/module.zip"
+  PROJECT_URL: "https://github.com/${{ github.repository }}"
+  LATEST_MANIFEST_URL: "https://github.com/${{ github.repository }}/releases/latest/download/module.json"
+  RELEASE_MODULE_URL: "https://github.com/${{ github.repository }}/releases/download/${{ github.event.release.tag_name || github.ref_name }}/module.zip"
 
 on:
   release:
@@ -78,11 +78,10 @@ jobs:
           include-hashes: false
           tag-pattern: ^[0-9]+\.[0-9]+\.[0-9]+$
 
-      - name: Install Python Dependencies
-        run: pip install markdown-it-py linkify-it-py
-
       - name: Update Foundry VTT Module Repo
-        run: python .github/workflows/foundry_release.py
+        run: |
+          pip install markdown-it-py
+          python .github/workflows/foundry_release.py
         env:
           FOUNDRY_PACKAGE_RELEASE_TOKEN: ${{ secrets.FOUNDRY_PACKAGE_RELEASE_TOKEN }}
           FOUNDRY_USERNAME: ${{ secrets.FOUNDRY_USERNAME }}
