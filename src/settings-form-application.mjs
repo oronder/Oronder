@@ -189,13 +189,11 @@ export class OronderSettingsFormApplication extends FormApplication {
 
     async _handle_json_response(response) {
         if (!response.ok) {
-            const errorMessage = await response.text();
-            const errorDetails = `Status: ${response.status}, Message: ${errorMessage}`
-
             if (response.status === 401) {
-                throw new Error(game.i18n.localize("oronder.Invalid-Auth") + ". " + errorDetails)
+                throw new Error(game.i18n.localize("oronder.Invalid-Auth"))
             } else {
-                throw new Error(game.i18n.localize("oronder.Unexpected-Error") + ". " + errorDetails)
+                const errorMessage = await response.json()
+                throw new Error(game.i18n.localize("oronder.Unexpected-Error") + ' ' + errorMessage.detail)
             }
         }
 
