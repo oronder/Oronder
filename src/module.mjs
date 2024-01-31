@@ -77,6 +77,10 @@ export function open_socket_with_oronder(update = false) {
         auth: {'Authorization': authorization}
     })
 
+    socket.on('connect_error', (error) => {
+        Logger.warn(`Oronder Websocket connection failed: ${error.message}`);
+    })
+
     socket.on('connect', () => {
         Logger.info('Oronder Websocket connection established.')
     })

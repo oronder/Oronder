@@ -56,7 +56,7 @@ def get_root():
     conn.request('GET', '/', headers={})
     response = conn.getresponse()
     if response.status != 200:
-        raise Exception('csrf_tokens Fack')
+        raise Exception(response.reason)
     csrf_token = response.getheader('Set-Cookie').split('csrftoken=')[1].split(';')[0].strip()
     csrf_middleware_token = re.search(r'name="csrfmiddlewaretoken" value="([^"]+)"', response.read().decode()).group(1)
     return csrf_token, csrf_middleware_token
