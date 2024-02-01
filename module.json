@@ -1,7 +1,7 @@
 {
   "id": "oronder",
-  "title": "Oronder",
-  "description": "Deep Discord Integration for Foundry VTT",
+  "title": "Oronder | Discord Sync",
+  "description": "Bidirectional Discord Integration for Foundry VTT",
   "version": "#{VERSION}#",
   "library": "false",
   "manifestPlusVersion": "1.2.0",
