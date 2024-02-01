@@ -157,14 +157,15 @@ def post_update(version):
 def main():
     with open('./module.json', 'r') as file:
         module_json = json.load(file)
-    push_release(module_json)
-    print('MODULE POSTED TO REPO')
 
     csrf_token, csrf_middleware_token = get_root()
     session_id = post_auth_login(csrf_token, csrf_middleware_token)
     readme = get_readme_as_html()
     post_packages_oronder_edit(csrf_token, csrf_middleware_token, session_id, readme, module_json)
     print('REPO DESCRIPTION UPDATED')
+
+    push_release(module_json)
+    print('MODULE POSTED TO REPO')
 
     post_update(module_json['version'])
     print('DISCORD NOTIFIED OF NEW RELEASE')
