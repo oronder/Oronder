@@ -43,7 +43,7 @@
   "socket": true,
   "url": "#{URL}#",
   "bugs": "#{URL}#/issues",
-  "manifest": "#{URL}#/releases/latest/download/module.json#",
+  "manifest": "#{URL}#/releases/latest/download/module.json",
   "download": "#{URL}#/releases/download/#{VERSION}#/module.zip",
   "license": "LICENSE",
   "readme": "README.md",
