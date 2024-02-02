@@ -4,7 +4,7 @@ import os
 import re
 import sys
 from html.parser import HTMLParser
-from pprint import pprint
+from pprint import pprint, pformat
 from urllib.parse import urlencode
 
 from markdown_it import MarkdownIt
@@ -40,8 +40,9 @@ def push_release(module: dict) -> None:
         })
     )
     response_json = json.loads(conn.getresponse().read().decode())
+    pprint(response_json)
     if response_json['status'] != 'success':
-        raise Exception(pprint.pformat(response_json['errors']))
+        raise Exception(pformat(response_json['errors']))
 
 
 def get_readme_as_html() -> str:
@@ -135,7 +136,7 @@ def post_packages_oronder_edit(csrf_token, csrf_middleware_token, session_id, de
         raise Exception(f'Update Description Failed\n{extract_errorlist_text(content)}')
 
 
-def post_update(version) -> None:
+def post_update_to_discord(version) -> None:
     conn = http.client.HTTPSConnection("api.oronder.com")
     conn.request(
         "POST", '/update_discord',
@@ -165,7 +166,7 @@ def main():
     push_release(module_json)
     print('\n__MODULE POSTED TO REPO__\n')
 
-    post_update(module_json['version'])
+    post_update_to_discord(module_json['version'])
     print('\n__DISCORD NOTIFIED OF NEW RELEASE__\n')
 
 
