@@ -17,7 +17,7 @@ FOUNDRY_AUTHOR = os.environ['FOUNDRY_AUTHOR']
 UPDATE_DISCORD_KEY = os.environ['UPDATE_DISCORD_KEY']
 
 # Build Variables
-PROJECT_URL = os.environ['PROJECT_URL']
+URL = os.environ['URL']
 CHANGES = os.environ['CHANGES']
 
 
@@ -33,8 +33,8 @@ def push_release(module: dict) -> None:
             'id': module['id'],
             'release': {
                 'version': module['version'],
-                'manifest': f"{PROJECT_URL}/releases/download/{module['version']}/module.json",
-                'notes': f"{PROJECT_URL}/releases/tag/{module['version']}",
+                'manifest': f"{URL}/releases/download/{module['version']}/module.json",
+                'notes': f"{URL}/releases/tag/{module['version']}",
                 'compatibility': module['compatibility']
             }
         })
@@ -121,7 +121,7 @@ def post_packages_oronder_edit(csrf_token, csrf_middleware_token, session_id, de
         ('username', os.environ.get('FOUNDRY_USERNAME')),
         ('title', module['title']),
         ('description', description),
-        ('url', PROJECT_URL),
+        ('url', URL),
         ('csrfmiddlewaretoken', csrf_middleware_token),
         ('author', FOUNDRY_AUTHOR),
         ('secret-key', FOUNDRY_PACKAGE_RELEASE_TOKEN),
