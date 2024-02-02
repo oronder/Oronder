@@ -34,7 +34,6 @@ def push_release(module: dict) -> None:
     if response_json['status'] != 'success':
         pprint(module)
         raise Exception(pformat(response_json['errors']))
-    pprint(response_json)
     print('✅ MODULE POSTED TO REPO')
 
 
