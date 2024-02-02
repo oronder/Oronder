@@ -1,8 +1,10 @@
 name: Create Module Files For GitHub Release
 env:
-  PROJECT_URL: "https://github.com/${{ github.repository }}"
-  LATEST_MANIFEST_URL: "https://github.com/${{ github.repository }}/releases/latest/download/module.json"
-  RELEASE_MODULE_URL: "https://github.com/${{ github.repository }}/releases/download/${{ github.event.release.tag_name || github.ref_name }}/module.zip"
+  URL: "https://github.com/${{ github.repository }}"
+  MANIFEST: "https://github.com/${{ github.repository }}/releases/latest/download/module.json"
+  VERSION: "${{ github.event.release.tag_name || github.ref_name }}"
+  DOWNLOAD: "https://github.com/${{ github.repository }}/releases/download/${{ github.event.release.tag_name || github.ref_name }}/module.zip"
+  
 
 on:
   release:
@@ -28,11 +30,6 @@ jobs:
         uses: cschleiden/replace-tokens@v1.2
         with:
           files: 'module.json'
-        env:
-          VERSION: ${{ github.event.release.tag_name }}
-          URL: ${{ env.PROJECT_URL }}
-          MANIFEST: ${{ env.LATEST_MANIFEST_URL }}
-          DOWNLOAD: ${{ env.RELEASE_MODULE_URL }}
 
       - name: Downloading Dependencies
         run: npm install --omit=dev
