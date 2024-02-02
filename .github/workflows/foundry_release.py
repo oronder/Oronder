@@ -20,7 +20,7 @@ UPDATE_DISCORD_KEY = os.environ['UPDATE_DISCORD_KEY']
 CHANGES = os.environ['CHANGES']
 
 
-def push_release(module: dict) -> None:
+def push_release(module_json: dict) -> None:
     conn = http.client.HTTPSConnection("api.foundryvtt.com")
     conn.request(
         "POST", "/_api/packages/release_version/",
@@ -28,11 +28,18 @@ def push_release(module: dict) -> None:
             'Content-Type': 'application/json',
             'Authorization': FOUNDRY_PACKAGE_RELEASE_TOKEN
         },
-        body=json.dumps({'id': module['id'], 'release': module})
+        body=json.dumps({
+            'id': module_json['id'],
+            'release': {
+                **module_json,
+                'manifest': f"{module_json['url']}/releases/download/{module_json['version']}/module.json",
+                'notes': f"{module_json['url']}/releases/tag/{module_json['version']}"
+            }
+        })
     )
     response_json = json.loads(conn.getresponse().read().decode())
     if response_json['status'] != 'success':
-        pprint(module)
+        pprint(module_json)
         raise Exception(pformat(response_json['errors']))
     print('✅ MODULE POSTED TO REPO')
 
@@ -99,18 +106,18 @@ def extract_errorlist_text(html_string: str) -> str:
     return parser.errorlist_content
 
 
-def post_packages_oronder_edit(csrf_token, csrf_middleware_token, session_id, description, module) -> None:
+def post_packages_oronder_edit(csrf_token, csrf_middleware_token, session_id, description, module_json) -> None:
     conn = http.client.HTTPSConnection('foundryvtt.com')
     headers = {
-        'Referer': f"https://foundryvtt.com/packages/{module['id']}/edit",
+        'Referer': f"https://foundryvtt.com/packages/{module_json['id']}/edit",
         'Content-Type': 'application/x-www-form-urlencoded',
         'Cookie': f'csrftoken={csrf_token}; privacy-policy-accepted=accepted; sessionid={session_id}',
     }
     body = urlencode([
         ('username', FOUNDRY_USERNAME),
-        ('title', module['title']),
+        ('title', module_json['title']),
         ('description', description),
-        ('url', module['url']),
+        ('url', module_json['url']),
         ('csrfmiddlewaretoken', csrf_middleware_token),
         ('author', FOUNDRY_AUTHOR),
         ('secret-key', FOUNDRY_PACKAGE_RELEASE_TOKEN),
