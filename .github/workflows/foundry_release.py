@@ -127,6 +127,7 @@ def post_packages_oronder_edit(csrf_token, csrf_middleware_token, session_id, de
 
 
 def post_update_to_discord(version) -> None:
+    deduped_changes = '\n'.join(dict.fromkeys(CHANGES.split('\n')))
     conn = http.client.HTTPSConnection("api.oronder.com")
     conn.request(
         "POST", '/update_discord',
@@ -134,7 +135,7 @@ def post_update_to_discord(version) -> None:
             'Content-Type': 'application/json',
             'Authorization': UPDATE_DISCORD_KEY
         },
-        body=json.dumps({'version': version, 'changes': CHANGES})
+        body=json.dumps({'version': version, 'changes': deduped_changes})
     )
     response = conn.getresponse()
     if response.status != 200:
