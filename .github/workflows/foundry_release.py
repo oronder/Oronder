@@ -40,8 +40,8 @@ def push_release(module: dict) -> None:
         })
     )
     response_json = json.loads(conn.getresponse().read().decode())
-    pprint(response_json)
     if response_json['status'] != 'success':
+        pprint(module)
         raise Exception(pformat(response_json['errors']))
 
 
