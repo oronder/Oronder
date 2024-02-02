@@ -17,7 +17,6 @@ FOUNDRY_AUTHOR = os.environ['FOUNDRY_AUTHOR']
 UPDATE_DISCORD_KEY = os.environ['UPDATE_DISCORD_KEY']
 
 # Build Variables
-URL = os.environ['URL']
 CHANGES = os.environ['CHANGES']
 
 
@@ -29,20 +28,14 @@ def push_release(module: dict) -> None:
             'Content-Type': 'application/json',
             'Authorization': FOUNDRY_PACKAGE_RELEASE_TOKEN
         },
-        body=json.dumps({
-            'id': module['id'],
-            'release': {
-                'version': module['version'],
-                'manifest': f"{URL}/releases/download/{module['version']}/module.json",
-                'notes': f"{URL}/releases/tag/{module['version']}",
-                'compatibility': module['compatibility']
-            }
-        })
+        body=json.dumps({'id': module['id'], 'release': module})
     )
     response_json = json.loads(conn.getresponse().read().decode())
     if response_json['status'] != 'success':
         pprint(module)
         raise Exception(pformat(response_json['errors']))
+    pprint(response_json['message'])
+    print('✅ MODULE POSTED TO REPO')
 
 
 def get_readme_as_html() -> str:
@@ -80,10 +73,7 @@ def get_session_id(csrf_token: str, csrf_middleware_token: str) -> str:
     if response.status == 403:
         raise Exception(response.reason)
     cookies = response.getheader('Set-Cookie')
-
-    session_id = cookies.split('sessionid=')[1].split(';')[0].strip()
-
-    return session_id
+    return cookies.split('sessionid=')[1].split(';')[0].strip()
 
 
 def extract_errorlist_text(html_string: str) -> str:
@@ -113,15 +103,15 @@ def extract_errorlist_text(html_string: str) -> str:
 def post_packages_oronder_edit(csrf_token, csrf_middleware_token, session_id, description, module) -> None:
     conn = http.client.HTTPSConnection('foundryvtt.com')
     headers = {
-        'Referer': 'https://foundryvtt.com/packages/oronder/edit',
+        'Referer': f"https://foundryvtt.com/packages/{module['id']}/edit",
         'Content-Type': 'application/x-www-form-urlencoded',
         'Cookie': f'csrftoken={csrf_token}; privacy-policy-accepted=accepted; sessionid={session_id}',
     }
     body = urlencode([
-        ('username', os.environ.get('FOUNDRY_USERNAME')),
+        ('username', FOUNDRY_USERNAME),
         ('title', module['title']),
         ('description', description),
-        ('url', URL),
+        ('url', module['url']),
         ('csrfmiddlewaretoken', csrf_middleware_token),
         ('author', FOUNDRY_AUTHOR),
         ('secret-key', FOUNDRY_PACKAGE_RELEASE_TOKEN),
@@ -134,6 +124,7 @@ def post_packages_oronder_edit(csrf_token, csrf_middleware_token, session_id, de
     if response.status != 302:
         content = response.read().decode()
         raise Exception(f'Update Description Failed\n{extract_errorlist_text(content)}')
+    print('✅ REPO DESCRIPTION UPDATED')
 
 
 def post_update_to_discord(version) -> None:
@@ -151,6 +142,7 @@ def post_update_to_discord(version) -> None:
         content = response.read().decode()
         headers = response.headers.as_string()
         raise Exception(f'Failed to send Update Message to Discord\n{content=}\n{headers=}')
+    print('✅ DISCORD NOTIFIED OF NEW RELEASE')
 
 
 def main():
@@ -161,13 +153,8 @@ def main():
     session_id = get_session_id(csrf_token, csrf_middleware_token)
     readme = get_readme_as_html()
     post_packages_oronder_edit(csrf_token, csrf_middleware_token, session_id, readme, module_json)
-    print('\n__REPO DESCRIPTION UPDATED__\n')
-
     push_release(module_json)
-    print('\n__MODULE POSTED TO REPO__\n')
-
     post_update_to_discord(module_json['version'])
-    print('\n__DISCORD NOTIFIED OF NEW RELEASE__\n')
 
 
 if __name__ == '__main__':

@@ -1,10 +1,6 @@
 name: Create Module Files For GitHub Release
 env:
-  URL: "https://github.com/${{ github.repository }}"
-  MANIFEST: "https://github.com/${{ github.repository }}/releases/latest/download/module.json"
-  VERSION: "${{ github.event.release.tag_name || github.ref_name }}"
-  DOWNLOAD: "https://github.com/${{ github.repository }}/releases/download/${{ github.event.release.tag_name || github.ref_name }}/module.zip"
-  
+  TAG: ${{ github.event.release.tag_name || github.ref_name }}
 
 on:
   release:
@@ -26,10 +22,12 @@ jobs:
           fetch-depth: 0
 
       - name: Modify Module Manifest With Release-Specific Values
-        id: sub_manifest_link_version
         uses: cschleiden/replace-tokens@v1.2
         with:
           files: 'module.json'
+        env:
+          VERSION: ${{ env.TAG }}
+          URL: "https://github.com/${{ github.repository }}"
 
       - name: Downloading Dependencies
         run: npm install --omit=dev
@@ -61,7 +59,7 @@ jobs:
           prerelease: ${{ github.event.release.prerelease }}
           token: ${{ secrets.GITHUB_TOKEN }}
           artifacts: './module.json, ./module.zip'
-          tag: ${{ github.event.release.tag_name }}
+          tag: ${{ env.TAG }}
           body: ${{ github.event.release.body }}
 
       - name: Get Changes between Tags
@@ -73,7 +71,7 @@ jobs:
 
       - name: Update Foundry VTT Module Repo
         run: |
-          pip install markdown-it-py
+          pip install markdown-it-py --quiet
           python .github/workflows/foundry_release.py
         env:
           FOUNDRY_PACKAGE_RELEASE_TOKEN: ${{ secrets.FOUNDRY_PACKAGE_RELEASE_TOKEN }}
