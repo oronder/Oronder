@@ -31,9 +31,10 @@ def push_release(module_json: dict) -> None:
         body=json.dumps({
             'id': module_json['id'],
             'release': {
-                **module_json,
+                'version': module_json['version'],
                 'manifest': f"{module_json['url']}/releases/download/{module_json['version']}/module.json",
-                'notes': f"{module_json['url']}/releases/tag/{module_json['version']}"
+                'notes': f"{module_json['url']}/releases/tag/{module_json['version']}",
+                'compatability': module_json['compatability']
             }
         })
     )
