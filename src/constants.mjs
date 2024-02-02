@@ -4,7 +4,7 @@ export const MODULE_DEBUG_TAG = [
     `%c${MODULE_NAME}`,
     `color: #66023c; font-weight: bold;`,
     `|`,
-];
+]
 
 export const GUILD_NAME = "guild_name"
 export const AUTH = "auth"

@@ -78,20 +78,20 @@ export function open_socket_with_oronder(update = false) {
     })
 
     socket.on('connect_error', (error) => {
-        Logger.warn(`Oronder Websocket connection failed: ${error.message}`);
+        Logger.warn(`Oronder Websocket connection failed: ${error.message}`)
     })
 
     socket.on('connect', () => {
         Logger.info('Oronder Websocket connection established.')
     })
-    socket.on('xp', data => {
+    socket.on('xp', async data => {
         for (const [actor_id, xp] of Object.entries(data)) {
             const actor = game.actors.get(actor_id)
             if (actor === undefined) {
                 Logger.warn(`Failed to update XP. No Actor with ID ${actor_id} found!`)
             } else {
                 Logger.info(`${actor.name} xp: ${actor.system.details.xp.value} -> ${xp}`)
-                actor.update({"system.details.xp.value": xp})
+                await actor.update({"system.details.xp.value": xp})
             }
         }
     })
@@ -106,7 +106,7 @@ game.socket.on(SOCKET_NAME, data => {
         case 'session': {
             set_session(data.session)
         }
-            break;
+            break
     }
 })
 

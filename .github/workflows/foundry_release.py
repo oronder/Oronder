@@ -21,7 +21,7 @@ PROJECT_URL = os.environ['PROJECT_URL']
 CHANGES = os.environ['CHANGES']
 
 
-def push_release(module):
+def push_release(module: dict) -> None:
     conn = http.client.HTTPSConnection("api.foundryvtt.com")
     conn.request(
         "POST", "/_api/packages/release_version/",
@@ -44,14 +44,14 @@ def push_release(module):
         raise Exception(pprint.pformat(response_json['errors']))
 
 
-def get_readme_as_html():
+def get_readme_as_html() -> str:
     md = MarkdownIt('commonmark', {'html': True}).enable('table')
     with open('./README.md', 'r') as readme_file:
         readme = readme_file.read()
     return md.render(readme)
 
 
-def get_root():
+def get_tokens() -> (str, str):
     conn = http.client.HTTPSConnection('foundryvtt.com')
     conn.request('GET', '/', headers={})
     response = conn.getresponse()
@@ -62,7 +62,7 @@ def get_root():
     return csrf_token, csrf_middleware_token
 
 
-def post_auth_login(csrf_token, csrf_middleware_token):
+def get_session_id(csrf_token: str, csrf_middleware_token: str) -> str:
     body = urlencode({
         'csrfmiddlewaretoken': csrf_middleware_token,
         'username': FOUNDRY_USERNAME,
@@ -85,7 +85,7 @@ def post_auth_login(csrf_token, csrf_middleware_token):
     return session_id
 
 
-def extract_errorlist_text(html_string):
+def extract_errorlist_text(html_string: str) -> str:
     class ErrorListParser(HTMLParser):
         in_errorlist = False
         errorlist_content = []
@@ -109,7 +109,7 @@ def extract_errorlist_text(html_string):
     return parser.errorlist_content
 
 
-def post_packages_oronder_edit(csrf_token, csrf_middleware_token, session_id, description, module):
+def post_packages_oronder_edit(csrf_token, csrf_middleware_token, session_id, description, module) -> None:
     conn = http.client.HTTPSConnection('foundryvtt.com')
     headers = {
         'Referer': 'https://foundryvtt.com/packages/oronder/edit',
@@ -132,11 +132,10 @@ def post_packages_oronder_edit(csrf_token, csrf_middleware_token, session_id, de
     response = conn.getresponse()
     if response.status != 302:
         content = response.read().decode()
-        err_msg = f'Update Description Failed\n{extract_errorlist_text(content)}'
-        raise Exception(err_msg)
+        raise Exception(f'Update Description Failed\n{extract_errorlist_text(content)}')
 
 
-def post_update(version):
+def post_update(version) -> None:
     conn = http.client.HTTPSConnection("api.oronder.com")
     conn.request(
         "POST", '/update_discord',
@@ -150,25 +149,24 @@ def post_update(version):
     if response.status != 200:
         content = response.read().decode()
         headers = response.headers.as_string()
-        err_msg = f'Failed to send Update Message to Discord\n{content=}\n{headers=}'
-        raise Exception(err_msg)
+        raise Exception(f'Failed to send Update Message to Discord\n{content=}\n{headers=}')
 
 
 def main():
     with open('./module.json', 'r') as file:
         module_json = json.load(file)
 
-    csrf_token, csrf_middleware_token = get_root()
-    session_id = post_auth_login(csrf_token, csrf_middleware_token)
+    csrf_token, csrf_middleware_token = get_tokens()
+    session_id = get_session_id(csrf_token, csrf_middleware_token)
     readme = get_readme_as_html()
     post_packages_oronder_edit(csrf_token, csrf_middleware_token, session_id, readme, module_json)
-    print('REPO DESCRIPTION UPDATED')
+    print('\n__REPO DESCRIPTION UPDATED__\n')
 
     push_release(module_json)
-    print('MODULE POSTED TO REPO')
+    print('\n__MODULE POSTED TO REPO__\n')
 
     post_update(module_json['version'])
-    print('DISCORD NOTIFIED OF NEW RELEASE')
+    print('\n__DISCORD NOTIFIED OF NEW RELEASE__\n')
 
 
 if __name__ == '__main__':

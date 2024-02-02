@@ -1,5 +1,5 @@
-import {MODULE_DEBUG_TAG} from "./constants.mjs";
-import objectHash from 'object-hash';
+import {MODULE_DEBUG_TAG} from "./constants.mjs"
+import objectHash from 'object-hash'
 
 /**
  * Utility class to handle logging to console with an attached debug tag to identify module logs.
@@ -7,25 +7,25 @@ import objectHash from 'object-hash';
 export class Logger {
 
     static debug(logString) {
-        console.debug(..._processLog(logString));
+        console.debug(..._processLog(logString))
     }
 
     static info(logString) {
-        console.info(..._processLog(logString));
+        console.info(..._processLog(logString))
     }
 
     static log(logString) {
-        console.log(..._processLog(logString));
+        console.log(..._processLog(logString))
     }
 
     static warn(logString, options = {}) {
-        if (options.ui ?? true) ui.notifications.warn(logString, {console: false});
-        if (options.console ?? true) console.warn(..._processLog(logString));
+        if (options.ui ?? true) ui.notifications.warn(logString, {...options, console: false})
+        if (options.console ?? true) console.warn(..._processLog(logString))
     }
 
     static error(logString, options = {}) {
-        if (options.ui ?? true) ui.notifications.error(logString, {console: false});
-        if (options.console ?? true) console.error(..._processLog(logString));
+        if (options.ui ?? true) ui.notifications.error(logString, {...options, console: false})
+        if (options.console ?? true) console.error(..._processLog(logString))
     }
 }
 
@@ -36,7 +36,7 @@ export class Logger {
  * @private
  */
 function _processLog(logString) {
-    return [...MODULE_DEBUG_TAG, logString];
+    return [...MODULE_DEBUG_TAG, logString]
 }
 
 const hash_options = {unorderedArrays: true, respectType: false}

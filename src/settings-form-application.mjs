@@ -1,7 +1,7 @@
-import {Logger} from "./util.mjs";
-import {AUTH, GUILD_NAME, ID_MAP, MODULE_ID, ORONDER_BASE_URL, VALID_CONFIG} from "./constants.mjs";
-import {full_sync} from "./sync.mjs";
-import {open_socket_with_oronder} from "./module.mjs";
+import {Logger} from "./util.mjs"
+import {AUTH, GUILD_NAME, ID_MAP, MODULE_ID, ORONDER_BASE_URL, VALID_CONFIG} from "./constants.mjs"
+import {full_sync} from "./sync.mjs"
+import {open_socket_with_oronder} from "./module.mjs"
 
 export class OronderSettingsFormApplication extends FormApplication {
 
@@ -22,8 +22,8 @@ export class OronderSettingsFormApplication extends FormApplication {
                 foundry_id: user.id,
                 discord_id: id_map[user.id] ?? ''
             }))
-        });
-        super(object, options);
+        })
+        super(object, options)
     }
 
     static get defaultOptions() {
@@ -32,13 +32,13 @@ export class OronderSettingsFormApplication extends FormApplication {
             template: `modules/${MODULE_ID}/templates/settings-form-application.hbs`,
             width: 580,
             resizable: true
-        });
+        })
     }
 
 
     /** @override */
     get title() {
-        return game.i18n.localize("oronder.Oronder-Bot-Config");
+        return game.i18n.localize("oronder.Oronder-Bot-Config")
     }
 
     /** @override */
@@ -48,14 +48,14 @@ export class OronderSettingsFormApplication extends FormApplication {
 
     /** @override */
     activateListeners(html) {
-        super.activateListeners(html);
-        html.find(".control").on("click", this._onClickControl.bind(this));
+        super.activateListeners(html)
+        html.find(".control").on("click", this._onClickControl.bind(this))
     }
 
     _onClickControl(event) {
         switch (event.currentTarget.dataset.action) {
             case "fetch":
-                return this._fetch_discord_ids();
+                return this._fetch_discord_ids()
             case "sync-all":
                 return this._full_sync()
 
@@ -71,7 +71,7 @@ export class OronderSettingsFormApplication extends FormApplication {
             }),
             redirect: 'follow'
         }
-    };
+    }
 
     /** @override */
     async _updateObject(event, formData) {

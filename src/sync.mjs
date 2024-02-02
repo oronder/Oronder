@@ -1,5 +1,5 @@
-import {ACTORS, AUTH, ID_MAP, MODULE_ID, ORONDER_BASE_URL} from "./constants.mjs";
-import {hash, Logger} from "./util.mjs";
+import {ACTORS, AUTH, ID_MAP, MODULE_ID, ORONDER_BASE_URL} from "./constants.mjs"
+import {hash, Logger} from "./util.mjs"
 
 function prune_roll_data(
     {
@@ -116,7 +116,7 @@ export function enrich_actor(actor) {
     let currency = actor.system['currency']
     for (const key in currency) {
         if (currency.hasOwnProperty(key) && !currency[key]) {
-            currency[key] = 0;
+            currency[key] = 0
         }
     }
 
@@ -166,7 +166,7 @@ async function upload(pc) {
         headers: headers(),
         body: JSON.stringify(pc),
         redirect: 'follow'
-    };
+    }
 
     return await fetch(`${ORONDER_BASE_URL}/actor`, requestOptions)
 }
@@ -176,7 +176,7 @@ export async function del_actor(pc_id) {
         method: 'DELETE',
         headers: headers(),
         redirect: 'follow'
-    };
+    }
 
     return await fetch(`${ORONDER_BASE_URL}/actor/${pc_id}`, requestOptions)
 }
@@ -192,7 +192,7 @@ const actor_to_discord_ids = actor =>
 export async function full_sync() {
     game.actors
         .filter(_ => localStorage.getItem(`${ACTORS}.${_.id}`))
-        .forEach(_ => localStorage.removeItem(`${ACTORS}${_.id}`))
+        .forEach(_ => localStorage.removeItem(`${ACTORS}.${_.id}`))
     return Promise.all(game.actors.map(sync_actor))
 }
 
@@ -200,13 +200,13 @@ export async function sync_actor(actor) {
     if (actor.type !== "character") {
         Logger.info(
             `${game.i18n.localize("oronder.Skipping-Sync-For")} ${actor.name}. ${game.i18n.localize("oronder.NPC")}`
-        );
+        )
         return Promise.resolve()
     }
     if (!actor_to_discord_ids(actor).length) {
         Logger.info(
             `${game.i18n.localize("oronder.Skipping-Sync-For")} ${actor.name}. ${game.i18n.localize("oronder.No-Owner")}`
-        );
+        )
         return Promise.resolve()
     }
 
@@ -215,41 +215,45 @@ export async function sync_actor(actor) {
     const new_hash = hash(actor_obj)
 
     if (old_hash && old_hash === new_hash) {
-        Logger.info(`${game.i18n.localize("oronder.Skipping-Sync-For")} ${actor_obj.name}. ${game.i18n.localize("oronder.No-Change")}`);
+        Logger.info(`${game.i18n.localize("oronder.Skipping-Sync-For")} ${actor_obj.name}. ${game.i18n.localize("oronder.No-Change")}`)
         return Promise.resolve()
     }
     if (!actor_obj.details.level) {
-        Logger.info(`${game.i18n.localize("oronder.Skipping-Sync-For")} ${actor_obj.name}. ${game.i18n.localize("oronder.No-Level")}`);
+        Logger.info(`${game.i18n.localize("oronder.Skipping-Sync-For")} ${actor_obj.name}. ${game.i18n.localize("oronder.No-Level")}`)
         return Promise.resolve()
     }
     if (!actor_obj.details.race) {
-        Logger.info(`${game.i18n.localize("oronder.Skipping-Sync-For")} ${actor_obj.name}. ${game.i18n.localize("oronder.No-Race")}`);
+        Logger.info(`${game.i18n.localize("oronder.Skipping-Sync-For")} ${actor_obj.name}. ${game.i18n.localize("oronder.No-Race")}`)
         return Promise.resolve()
     }
     if (!actor_obj.details.background) {
-        Logger.info(`${game.i18n.localize("oronder.Skipping-Sync-For")} ${actor_obj.name}. ${game.i18n.localize("oronder.No-Background")}`);
+        Logger.info(`${game.i18n.localize("oronder.Skipping-Sync-For")} ${actor_obj.name}. ${game.i18n.localize("oronder.No-Background")}`)
         return Promise.resolve()
     }
     if (!Object.keys(actor_obj.classes).length) {
-        Logger.info(`${game.i18n.localize("oronder.Skipping-Sync-For")} ${actor_obj.name}. ${game.i18n.localize("oronder.No-Class")}`);
+        Logger.info(`${game.i18n.localize("oronder.Skipping-Sync-For")} ${actor_obj.name}. ${game.i18n.localize("oronder.No-Class")}`)
         return Promise.resolve()
     }
 
     return upload(actor_obj).then(response => {
         if (response.ok) {
             localStorage.setItem(`${ACTORS}.${actor.id}`, new_hash)
-            Logger.info(`${game.i18n.localize("oronder.Synced")} ${actor_obj.name}`);
+            Logger.info(`${game.i18n.localize("oronder.Synced")} ${actor_obj.name}`)
         } else if (response.status === 422) {
             response
                 .json()
                 .then(({detail}) => Logger.error(
-                    `${actor_obj.name} ${game.i18n.localize("oronder.Failed-To-Sync")}: ` +
+                    `${actor_obj.name} ${game.i18n.localize("oronder.Failed-To-Sync")} ` +
                     detail.flat().map(({loc, input, msg}) =>
-                        `${loc.filter(_ => _ !== 'body').join('->')}->${input} | ${msg}`
-                    ).join(' ')
+                        `❌ ${loc.filter(_ => _ !== 'body').join('>')}>${input} ${msg}`
+                    ).join(' '),
+                    {permanent: true}
                 ))
         } else {
-            Logger.error(`${actor_obj.name} ${game.i18n.localize("oronder.Failed-To-Sync")}: ${response.status} ${response.statusText}`);
+            Logger.error(
+                `${actor_obj.name} ${game.i18n.localize("oronder.Failed-To-Sync")}: ${response.status} ${response.statusText}`,
+                {permanent: true}
+            )
         }
     }).catch(Logger.error)
 }
