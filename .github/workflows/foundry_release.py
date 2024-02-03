@@ -126,7 +126,7 @@ def post_packages_oronder_edit(csrf_token, csrf_middleware_token, session_id, de
         ('tags', 15),
         ('tags', 17)
     ])
-    conn.request('POST', '/packages/oronder/edit', body, headers)
+    conn.request('POST', f'/packages/{module_json['id']}/edit', body, headers)
     response = conn.getresponse()
     if response.status != 302:
         content = response.read().decode()
