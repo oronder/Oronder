@@ -58,7 +58,7 @@ jobs:
           draft: ${{ github.event.release.unpublished }}
           prerelease: ${{ github.event.release.prerelease }}
           token: ${{ secrets.GITHUB_TOKEN }}
-          artifacts: './module.json, ./module.zip'
+          artifacts: './module.json, ./module.zip, ./LICENSE, ./README.md'
           tag: ${{ env.TAG }}
           body: ${{ github.event.release.body }}
 

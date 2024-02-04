@@ -50,8 +50,8 @@
   "bugs": "#{URL}#/issues",
   "manifest": "#{URL}#/releases/latest/download/module.json",
   "download": "#{URL}#/releases/download/#{VERSION}#/module.zip",
-  "license": "LICENSE",
-  "readme": "README.md",
+  "license": "#{URL}#/releases/download/#{VERSION}#/LICENSE",
+  "readme": "#{URL}#/releases/download/#{VERSION}#/README.md",
   "media": [
     {
       "type": "icon",
