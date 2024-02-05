@@ -7,14 +7,14 @@ export const registerSettings = async () => {
         scope: "world",
         type: String,
         config: false,
-        default:''
+        default: ''
     })
 
     game.settings.register(MODULE_ID, AUTH, {
         scope: "world",
         type: String,
         config: false,
-        default:''
+        default: ''
     })
 
     game.settings.register(MODULE_ID, ID_MAP, {

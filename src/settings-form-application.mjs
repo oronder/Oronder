@@ -105,7 +105,7 @@ export class OronderSettingsFormApplication extends FormApplication {
             .catch(Logger.error)
 
         if (!this.object.guild_name) {
-            this._set_guild_name(requestOptions)
+            await this._set_guild_name(requestOptions)
         }
 
         let updated = false
