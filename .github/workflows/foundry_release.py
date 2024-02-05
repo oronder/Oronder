@@ -1,8 +1,7 @@
-import http.client
 import json
 import os
 import re
-import sys
+from http.client import HTTPSConnection
 from html.parser import HTMLParser
 from pprint import pprint, pformat
 from time import sleep
@@ -23,7 +22,7 @@ FILES_CHANGED = os.environ['FILES_CHANGED']
 
 
 def push_release(module_json: dict) -> None:
-    conn = http.client.HTTPSConnection("api.foundryvtt.com")
+    conn = HTTPSConnection("api.foundryvtt.com")
     conn.request(
         "POST", "/_api/packages/release_version/",
         headers={
@@ -55,7 +54,7 @@ def get_readme_as_html() -> str:
 
 
 def get_tokens() -> (str, str):
-    conn = http.client.HTTPSConnection('foundryvtt.com')
+    conn = HTTPSConnection('foundryvtt.com')
     conn.request('GET', '/', headers={})
     response = conn.getresponse()
     if response.status != 200:
@@ -76,7 +75,7 @@ def get_session_id(csrf_token: str, csrf_middleware_token: str) -> str:
         'Content-Type': 'application/x-www-form-urlencoded',
         'Cookie': f'csrftoken={csrf_token}; privacy-policy-accepted=accepted'
     }
-    conn = http.client.HTTPSConnection('foundryvtt.com')
+    conn = HTTPSConnection('foundryvtt.com')
     conn.request('POST', '/auth/login/', body, headers)
     response = conn.getresponse()
     if response.status == 403:
@@ -110,7 +109,7 @@ def extract_errorlist_text(html_string: str) -> str:
 
 
 def post_packages_oronder_edit(csrf_token, csrf_middleware_token, session_id, description, module_json) -> None:
-    conn = http.client.HTTPSConnection('foundryvtt.com')
+    conn = HTTPSConnection('foundryvtt.com')
     headers = {
         'Referer': f"https://foundryvtt.com/packages/{module_json['id']}/edit",
         'Content-Type': 'application/x-www-form-urlencoded',
@@ -137,7 +136,7 @@ def post_packages_oronder_edit(csrf_token, csrf_middleware_token, session_id, de
 
 def post_update_to_discord(version) -> None:
     deduped_changes = '\n'.join(dict.fromkeys(CHANGES.split('\n')))
-    conn = http.client.HTTPSConnection("api.oronder.com")
+    conn = HTTPSConnection("api.oronder.com")
     conn.request(
         "POST", '/update_discord',
         headers={
