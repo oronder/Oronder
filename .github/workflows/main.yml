@@ -52,7 +52,6 @@ jobs:
             templates            \
             dist/                \
             styles/              \
-            packs/               \
             languages/
 
       - name: Update Release With Files
