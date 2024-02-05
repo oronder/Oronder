@@ -29,12 +29,6 @@ jobs:
           VERSION: ${{ env.TAG }}
           URL: "https://github.com/${{ github.repository }}"
 
-      - name: Get Changes between Tags
-        run: |
-          PREV_TAG=$(git describe --tags --abbrev=0 ${{ env.TAG }}^)
-          export FILES_CHANGED=$(git diff --name-only "$PREV_TAG" "${{ env.TAG }}")
-          export CHANGES=$(git log --pretty=format:%s "$PREV_TAG".."${{ env.TAG }}")
-
       - name: Downloading Dependencies
         run: npm install --omit=dev
 
@@ -70,6 +64,9 @@ jobs:
       - name: Update Foundry VTT Module Repo
         run: |
           pip install markdown-it-py --quiet
+          PREV_TAG=$(git describe --tags --abbrev=0 ${{ env.TAG }}^)
+          export FILES_CHANGED=$(git diff --name-only "$PREV_TAG" "${{ env.TAG }}")
+          export CHANGES=$(git log --pretty=format:%s "$PREV_TAG".."${{ env.TAG }}")
           python .github/workflows/foundry_release.py
         env:
           FOUNDRY_PACKAGE_RELEASE_TOKEN: ${{ secrets.FOUNDRY_PACKAGE_RELEASE_TOKEN }}
@@ -77,5 +74,3 @@ jobs:
           FOUNDRY_PASSWORD: ${{ secrets.FOUNDRY_PASSWORD }}
           FOUNDRY_AUTHOR: ${{ secrets.FOUNDRY_AUTHOR }}
           UPDATE_DISCORD_KEY: ${{ secrets.UPDATE_DISCORD_KEY }}
-          CHANGES: ${{ env.CHANGES }}
-          FILES_CHANGED: ${{ env.FILES_CHANGED }}
