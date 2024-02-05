@@ -170,7 +170,10 @@ def update_repo_description(module_json):
 
 def main():
     if all(f.startswith('.github') for f in FILES_CHANGED.split()):
-        print('⛔ SKIPPING DEPLOYMENT')
+        print('\n'.join([
+            f'⛔ SKIPPING DEPLOYMENT. ONLY RELEASE CONFIG MODIFIED',
+            *[f"- {f}" for f in FILES_CHANGED.split()]
+        ]))
         return
 
     with open('./module.json', 'r') as file:
