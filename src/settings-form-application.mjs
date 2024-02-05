@@ -210,7 +210,7 @@ export class OronderSettingsFormApplication extends FormApplication {
             const guild = await this._handle_json_response(response)
             this.object.guild_name = guild.name
         } catch (error) {
-            this.object.guild_name = undefined
+            this.object.guild_name = ''
             Logger.error(`Error setting guild name: ${error.message}`)
         }
     }

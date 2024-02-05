@@ -6,6 +6,7 @@
   "scripts": {
     "build": "esbuild src/module.mjs --bundle --minify --format=esm --outdir=dist",
     "build-dev": "esbuild src/module.mjs --bundle --sourcemap=inline --format=esm --outdir=dist",
-    "build-dev-with-copy": "esbuild src/module.mjs --bundle --sourcemap=inline --format=esm --outdir=dist && mkdir -p ../foundry_data/Data/modules/oronder/ && cp -r ./* ../foundry_data/Data/modules/oronder/"
+    "copy-11": "mkdir -p ../foundry_data/Data/modules/oronder/ && cp -r ./* ../foundry_data/Data/modules/oronder/",
+    "copy-12": "mkdir -p ../foundry_data_12/Data/modules/oronder/ && cp -r ./* ../foundry_data_12/Data/modules/oronder/"
   }
 }

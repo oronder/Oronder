@@ -6,13 +6,15 @@ export const registerSettings = async () => {
     game.settings.register(MODULE_ID, GUILD_NAME, {
         scope: "world",
         type: String,
-        config: false
+        config: false,
+        default:''
     })
 
     game.settings.register(MODULE_ID, AUTH, {
         scope: "world",
         type: String,
-        config: false
+        config: false,
+        default:''
     })
 
     game.settings.register(MODULE_ID, ID_MAP, {
