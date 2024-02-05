@@ -1,6 +1,6 @@
 {
   "id": "oronder",
-  "title": "Oronder | Discord Sync Tool",
+  "title": "Oronder | Discord Sync",
   "description": "Bidirectional Discord Integration for Foundry VTT",
   "version": "#{VERSION}#",
   "library": "false",
@@ -46,7 +46,7 @@
     }
   ],
   "socket": true,
-  "url": "#{URL}#",
+  "url": "https://discord.gg/ZggUCHsQqg",
   "bugs": "#{URL}#/issues",
   "manifest": "#{URL}#/releases/latest/download/module.json",
   "download": "#{URL}#/releases/download/#{VERSION}#/module.zip",
