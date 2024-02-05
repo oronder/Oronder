@@ -55,7 +55,11 @@
   "media": [
     {
       "type": "icon",
-      "url": "https://cdn.discordapp.com/icons/860520082697617468/52290de8705f48b10de24a272c552c9d.webp"
+      "url": "https://raw.githubusercontent.com/oronder/Oronder/main/icon.png"
+    },
+    {
+      "type": "cover",
+      "url": "https://raw.githubusercontent.com/oronder/Oronder/main/cover.png"
     }
   ]
 }
