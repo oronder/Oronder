@@ -27,14 +27,14 @@
      inkscape:pagecheckerboard="0"
      inkscape:deskcolor="#d1d1d1"
      inkscape:document-units="px"
-     inkscape:zoom="0.20352747"
-     inkscape:cx="51.590088"
-     inkscape:cy="481.50749"
+     inkscape:zoom="0.67400405"
+     inkscape:cx="187.68433"
+     inkscape:cy="241.83831"
      inkscape:window-width="1440"
      inkscape:window-height="813"
      inkscape:window-x="0"
-     inkscape:window-y="25"
-     inkscape:window-maximized="0"
+     inkscape:window-y="26"
+     inkscape:window-maximized="1"
      inkscape:current-layer="layer1" /><defs
      id="defs1"><marker
        id="DistanceX"
@@ -139,7 +139,7 @@
        height="1.3295793"><feFlood
          result="flood"
          in="SourceGraphic"
-         flood-opacity="1.000000"
+         flood-opacity="0.31325301204819278"
          flood-color="rgb(255,255,255)"
          id="feFlood5" /><feGaussianBlur
          result="blur"
@@ -325,7 +325,7 @@
        y="438.16528"
        id="text2"
        inkscape:label="text2"
-       transform="matrix(1.2407675,0,0,1.2407675,126.98314,63.972192)"><tspan
+       transform="matrix(1.2407675,0,0,1.2407675,126.98314,63.471872)"><tspan
          sodipodi:role="line"
          id="tspan2"
          x="66.590454"
