@@ -29,6 +29,12 @@ jobs:
           VERSION: ${{ env.TAG }}
           URL: "https://github.com/${{ github.repository }}"
 
+      - name: Get Changes between Tags
+        run: |
+          PREV_TAG=$(git describe --tags --abbrev=0 ${{ env.TAG }}^)
+          export FILES_CHANGED=$(git diff --name-only "$PREV_TAG" "${{ env.TAG }}")
+          export CHANGES=$(git log --pretty=format:%s "$PREV_TAG".."${{ env.TAG }}")
+
       - name: Downloading Dependencies
         run: npm install --omit=dev
 
@@ -62,13 +68,6 @@ jobs:
           tag: ${{ env.TAG }}
           body: ${{ github.event.release.body }}
 
-      - name: Get Changes between Tags
-        id: changes
-        uses: simbo/changes-between-tags-action@v1
-        with:
-          include-hashes: false
-          tag-pattern: ^[0-9]+\.[0-9]+\.[0-9]+$
-
       - name: Update Foundry VTT Module Repo
         run: |
           pip install markdown-it-py --quiet
@@ -79,4 +78,5 @@ jobs:
           FOUNDRY_PASSWORD: ${{ secrets.FOUNDRY_PASSWORD }}
           FOUNDRY_AUTHOR: ${{ secrets.FOUNDRY_AUTHOR }}
           UPDATE_DISCORD_KEY: ${{ secrets.UPDATE_DISCORD_KEY }}
-          CHANGES: ${{ steps.changes.outputs.changes }}
+          CHANGES: ${{ env.CHANGES }}
+          FILES_CHANGED: ${{ env.FILES_CHANGED }}

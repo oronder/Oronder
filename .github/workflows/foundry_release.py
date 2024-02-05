@@ -5,6 +5,7 @@ import re
 import sys
 from html.parser import HTMLParser
 from pprint import pprint, pformat
+from time import sleep
 from urllib.parse import urlencode
 
 from markdown_it import MarkdownIt
@@ -18,6 +19,7 @@ UPDATE_DISCORD_KEY = os.environ['UPDATE_DISCORD_KEY']
 
 # Build Variables
 CHANGES = os.environ['CHANGES']
+FILES_CHANGED = os.environ['FILES_CHANGED']
 
 
 def push_release(module_json: dict) -> None:
@@ -131,7 +133,6 @@ def post_packages_oronder_edit(csrf_token, csrf_middleware_token, session_id, de
     if response.status != 302:
         content = response.read().decode()
         raise Exception(f'Update Description Failed\n{extract_errorlist_text(content)}')
-    print('✅ REPO DESCRIPTION UPDATED')
 
 
 def post_update_to_discord(version) -> None:
@@ -153,14 +154,28 @@ def post_update_to_discord(version) -> None:
     print('✅ DISCORD NOTIFIED OF NEW RELEASE')
 
 
+def update_repo_description(module_json):
+    if any(f in FILES_CHANGED for f in ['README.md', 'module.json']):
+        csrf_token, csrf_middleware_token = get_tokens()
+        session_id = get_session_id(csrf_token, csrf_middleware_token)
+        readme = get_readme_as_html()
+        post_packages_oronder_edit(csrf_token, csrf_middleware_token, session_id, readme, module_json)
+        print('✅ REPO DESCRIPTION UPDATED')
+        for i in range(10):
+            print('💤' * (10 - i))
+            sleep(1)
+    else:
+        print('🪧 SKIPPING REPO DESCRIPTION UPDATE')
+
+
 def main():
+    if all(f.startswith('.github') for f in FILES_CHANGED.split()):
+        print('⛔ SKIPPING DEPLOYMENT')
+
     with open('./module.json', 'r') as file:
         module_json = json.load(file)
 
-    csrf_token, csrf_middleware_token = get_tokens()
-    session_id = get_session_id(csrf_token, csrf_middleware_token)
-    readme = get_readme_as_html()
-    post_packages_oronder_edit(csrf_token, csrf_middleware_token, session_id, readme, module_json)
+    update_repo_description(module_json)
     push_release(module_json)
     post_update_to_discord(module_json['version'])
 
