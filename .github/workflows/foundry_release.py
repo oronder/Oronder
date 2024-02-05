@@ -174,6 +174,7 @@ def main():
             f'⛔ SKIPPING DEPLOYMENT. ONLY RELEASE CONFIG MODIFIED',
             *[f"- {f}" for f in FILES_CHANGED.split()]
         ]))
+        print(FILES_CHANGED)
         return
 
     with open('./module.json', 'r') as file:
