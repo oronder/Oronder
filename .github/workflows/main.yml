@@ -61,15 +61,12 @@ jobs:
           tag: ${{ env.TAG }}
           body: ${{ github.event.release.body }}
 
-      - name: Get Changes between Tags
-        run: |
-          PREV_TAG=$(git describe --tags --abbrev=0 ${{ env.TAG }}^)
-          echo "FILES_CHANGED=$(git diff --name-only $PREV_TAG ${{ env.TAG }})" >> $GITHUB_ENV
-          echo "CHANGES=$(git log --pretty=format:%s $PREV_TAG..${{ env.TAG }})" >> $GITHUB_ENV
-
       - name: Update Foundry VTT Module Repo
         run: |
           pip install markdown-it-py --quiet
+          PREV_TAG=$(git describe --tags --abbrev=0 ${{ env.TAG }}^)
+          export FILES_CHANGED=$(git diff --name-only "$PREV_TAG" "${{ env.TAG }}")
+          export CHANGES=$(git log --pretty=format:%s "$PREV_TAG".."${{ env.TAG }}")
           python .github/workflows/foundry_release.py
         env:
           FOUNDRY_PACKAGE_RELEASE_TOKEN: ${{ secrets.FOUNDRY_PACKAGE_RELEASE_TOKEN }}
