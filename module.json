@@ -2,7 +2,7 @@
   "id": "oronder",
   "title": "Oronder | Discord Sync",
   "description": "Bidirectional Discord Integration for Foundry VTT",
-  "version": "#{VERSION}#",
+  "version": "#{TAG}#",
   "library": "false",
   "manifestPlusVersion": "1.2.0",
   "compatibility": {
@@ -47,11 +47,11 @@
   ],
   "socket": true,
   "url": "https://discord.gg/ZggUCHsQqg",
-  "bugs": "#{URL}#/issues",
-  "manifest": "#{URL}#/releases/latest/download/module.json",
-  "download": "#{URL}#/releases/download/#{VERSION}#/module.zip",
-  "license": "#{URL}#/releases/download/#{VERSION}#/LICENSE",
-  "readme": "#{URL}#/releases/download/#{VERSION}#/README.md",
+  "bugs": "#{GITHUB_URL}#/issues",
+  "manifest": "#{GITHUB_URL}#/releases/latest/download/module.json",
+  "download": "#{GITHUB_URL}#/releases/download/#{TAG}#/module.zip",
+  "license": "#{GITHUB_URL}#/releases/download/#{TAG}#/LICENSE",
+  "readme": "#{GITHUB_URL}#/releases/download/#{TAG}#/README.md",
   "media": [
     {
       "type": "icon",

@@ -1,5 +1,6 @@
 name: Create Module Files For GitHub Release
 env:
+  GITHUB_URL: "https://github.com/${{ github.repository }}"
   TAG: ${{ github.event.release.tag_name || github.ref_name }}
 
 on:
@@ -25,9 +26,7 @@ jobs:
         uses: cschleiden/replace-tokens@v1.2
         with:
           files: 'module.json'
-        env:
-          VERSION: ${{ env.TAG }}
-          URL: "https://github.com/${{ github.repository }}"
+
 
       - name: Downloading Dependencies
         run: npm install --omit=dev
