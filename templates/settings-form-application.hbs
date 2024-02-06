@@ -39,6 +39,128 @@
         </button>
     </div>
 
+
+    {{#if guild}}
+        <hr>
+        <div class="form-group">
+            <label for="gm-xp">GM XP</label>
+            <input type="text" title="How much experience a GM may reward one of their PCs for running a session."
+                   min="0" id="gm-xp" inputmode="numeric" value="{{guild.gm_xp}}">
+        </div>
+        <div class="form-group">
+            <label for="starting-level">Starting Level</label>
+            <input type="text" title="Starting level for new PCs. Override by assigning a PC to a Campaign." min="1"
+                   max="20" id="starting-level" inputmode="numeric"
+                   value="{{guild.starting_level}}">
+        </div>
+        <div class="form-group">
+            <label for="timezone" title="Default timezone for scheduling and roll calls.">Timezone</label>
+            <select id="timezone">
+                {{#each timezones}}
+                    <option value="{{this}}"  {{#if (eq this ../guild.timezone)}}selected{{/if}}>
+                        {{this}}</option>
+                {{/each}}
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="gm-role" title="Discord Role for GMs.">GM Role</label>
+            <select id="gm-role">
+                {{#each guild.roles}}
+                    <option value="{{id}}"  {{#if (eq id ../guild.gm_role_id)}}selected{{/if}}>{{name}}</option>
+                {{/each}}
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="subscription">Subscription</label>
+            <input type="text" disabled id="subscription" value="{{guild.subscription}}">
+        </div>
+        <hr>
+        <h3 class="border">Channels</h3>
+        <div class="form-group">
+            <label for="session-channel">Session Channel</label>
+            <select id="session-channel">
+                {{#each (catArrs guild.forum_channels guild.text_channels)}}
+                    <option value="{{id}}"  {{#if (eq id ../guild.session_channel_id)}}selected{{/if}}>
+                        #{{name}}</option>
+                {{/each}}
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="downtime-channel">Downtime Channel</label>
+            <select id="downtime-channel">
+                {{#each guild.text_channels}}
+                    <option value="{{id}}"  {{#if (eq id ../guild.downtime_channel_id)}}selected{{/if}}>
+                        #{{name}}</option>
+                {{/each}}
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="downtime-gm-channel">Downtime GM Channel</label>
+            <select id="downtime-gm-channel">
+                <option value=""  {{#if (eq "" guild.downtime_gm_channel_id)}}selected{{/if}}>❌ DISABLE</option>
+                {{#each guild.text_channels}}
+                    <option value="{{id}}"  {{#if (eq id ../guild.downtime_gm_channel_id)}}selected{{/if}}>
+                        #{{name}}</option>
+                {{/each}}
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="voice-channel">Voice Channel</label>
+            <select id="voice-channel">
+                {{#each guild.voice_channels}}
+                    <option value="{{id}}"  {{#if (eq id ../guild.voice_channel_id)}}selected{{/if}}>#{{name}}</option>
+                {{/each}}
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="scheduling-channel">Scheduling Channel</label>
+            <select id="scheduling-channel">
+                {{#each guild.text_channels}}
+                    <option value="{{id}}"  {{#if (eq id ../guild.scheduling_channel_id)}}selected{{/if}}>
+                        #{{name}}</option>
+                {{/each}}
+            </select>
+        </div>
+        <hr>
+        <h3 class="border">Rollcall</h3>
+        <div class="form-group">
+            <label for="rollcall-role">Role</label>
+            <select id="rollcall-role">
+                <option value=""  {{#if (eq "" guild.rollcall_role_id)}}selected{{/if}}>❌ DISABLE</option>
+                {{#each guild.roles}}
+                    <option value="{{id}}"  {{#if (eq id ../guild.rollcall_role_id)}}selected{{/if}}>{{name}}</option>
+                {{/each}}
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="rollcall-channel">Channel</label>
+            <select id="rollcall-channel">
+                <option value=""  {{#if (eq "" guild.rollcall_channel_id)}}selected{{/if}}>❌ DISABLE</option>
+                {{#each guild.text_channels}}
+                    <option value="{{id}}"  {{#if (eq id ../guild.rollcall_channel_id)}}selected{{/if}}>
+                        #{{name}}</option>
+                {{/each}}
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="rollcall-day">Day</label>
+            <select id="rollcall-day">
+                <option value=""  {{#if (eq "" guild.days_of_week)}}selected{{/if}}>❌ DISABLE</option>
+                {{#each days_of_week}}
+                    <option value="{{this}}"  {{#if (eq this ../guild.days_of_week)}}selected{{/if}}>{{this}}</option>
+                {{/each}}
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="rollcall-time">Time</label>
+            <input type="text" id="rollcall-time" value="{{guild.rollcall_time}}">
+        </div>
+    {{/if}}
+
+
+
+
+
     {{#if players}}
         <hr>
         <h3 class="border">{{localize "oronder.Discord-Ids"}}</h3>

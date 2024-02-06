@@ -1,5 +1,14 @@
-import {Logger} from "./util.mjs"
-import {AUTH, GUILD_NAME, ID_MAP, MODULE_ID, ORONDER_BASE_URL, VALID_CONFIG} from "./constants.mjs"
+import {get_guild, getRequestOptions, handle_json_response, Logger} from "./util.mjs"
+import {
+    AUTH,
+    DAYS_OF_WEEK,
+    GUILD_NAME,
+    ID_MAP,
+    MODULE_ID,
+    ORONDER_BASE_URL,
+    TIMEZONES,
+    VALID_CONFIG
+} from "./constants.mjs"
 import {full_sync} from "./sync.mjs"
 import {open_socket_with_oronder} from "./module.mjs"
 
@@ -9,6 +18,9 @@ export class OronderSettingsFormApplication extends FormApplication {
         const id_map = game.settings.get(MODULE_ID, ID_MAP)
         foundry.utils.mergeObject(object, {
             guild_name: game.settings.get(MODULE_ID, GUILD_NAME),
+            guild: undefined,
+            timezones: TIMEZONES,
+            days_of_week: DAYS_OF_WEEK,
             auth: game.settings.get(MODULE_ID, AUTH),
             valid_config: game.settings.get(MODULE_ID, VALID_CONFIG),
             fetch_button_icon: "fa-solid fa-rotate",
@@ -43,6 +55,10 @@ export class OronderSettingsFormApplication extends FormApplication {
 
     /** @override */
     async getData(options = {}) {
+        Logger.info('getData()')
+        if (this.object.auth) {
+            this.object.guild = await get_guild(this.object.auth)
+        }
         return this.object
     }
 
@@ -62,18 +78,8 @@ export class OronderSettingsFormApplication extends FormApplication {
         }
     }
 
-    _getRequestOptions(auth) {
-        return {
-            method: 'GET',
-            headers: new Headers({
-                "Accept": "application/json",
-                'Authorization': auth
-            }),
-            redirect: 'follow'
-        }
-    }
-
     /** @override */
+    //Save Changes
     async _updateObject(event, formData) {
         this.object.auth = this.form.elements.auth.value
 
@@ -86,26 +92,31 @@ export class OronderSettingsFormApplication extends FormApplication {
                 id_map[p.foundry_id] = p.discord_id
             }
         })
-        const requestOptions = this._getRequestOptions(this.object.auth)
+        const requestOptions = getRequestOptions(this.object.auth)
         let valid_config = false
         await fetch(`${ORONDER_BASE_URL}/validate_discord_ids?${queryParams}`, requestOptions)
-            .then(this._handle_json_response)
+            .then(response => {
+                this.throw_on_401(response);
+                return handle_json_response(response)
+            })
             .then(invalid_discord_ids => {
                 const invalid_player_names = invalid_discord_ids.map(invalid_discord_id => {
                     return this.object.players.find(p => p.discord_id === invalid_discord_id).foundry_name
                 })
-                if (invalid_player_names.length === 1) {
-                    Logger.error(
-                        `${invalid_player_names[0]} ${game.i18n.localize("oronder.Could-Not-Be-Found")}`
-                    )
+
+                if (invalid_player_names.length > 1) {
+                    invalid_player_names.forEach(name => Logger.error(
+                        `${name} ${game.i18n.localize("oronder.Could-Not-Be-Found")}`
+                    ))
                 } else {
                     valid_config = true
                 }
             })
             .catch(Logger.error)
 
-        if (!this.object.guild_name) {
-            await this._set_guild_name(requestOptions)
+        if (!this.object.guild_name && this.object.auth) {
+            const guild = await get_guild(this.object.auth)
+            this.object.guild_name = guild?.name ?? ''
         }
 
         let updated = false
@@ -121,6 +132,14 @@ export class OronderSettingsFormApplication extends FormApplication {
         open_socket_with_oronder(updated)
 
         this.render()
+    }
+
+    throw_on_401(response) {
+        if (response.status === 401) {
+            this.object.guild_name = ''
+            this.object.auth = ''
+            throw new Error(game.i18n.localize("oronder.Invalid-Auth"))
+        }
     }
 
     async _full_sync() {
@@ -170,9 +189,14 @@ export class OronderSettingsFormApplication extends FormApplication {
         )
         const requestOptions = this._getRequestOptions(this.object.auth)
 
-        const p1 = this._set_guild_name(requestOptions)
+        const p1 = get_guild(this.object.auth)
+            .then(guild => this.object.guild_name = guild?.name ?? '')
+
         const p2 = fetch(`${ORONDER_BASE_URL}/discord_id?${queryParams}`, requestOptions)
-            .then(this._handle_json_response)
+            .then(response => {
+                this.throw_on_401(response);
+                return handle_json_response(response)
+            })
             .then(result => {
                 for (const [foundry_name, discord_user_id] of Object.entries(result)) {
                     this.object.players.find(p => p.foundry_name === foundry_name).discord_id = discord_user_id
@@ -185,33 +209,5 @@ export class OronderSettingsFormApplication extends FormApplication {
         this.object.fetch_button_icon = "fa-solid fa-rotate"
         this.object.fetch_sync_disabled = false
         this.render()
-    }
-
-    async _handle_json_response(response) {
-        if (!response.ok) {
-            if (response.status === 401) {
-                throw new Error(game.i18n.localize("oronder.Invalid-Auth"))
-            } else {
-                const errorMessage = await response.json()
-                throw new Error(game.i18n.localize("oronder.Unexpected-Error") + ' ' + errorMessage.detail)
-            }
-        }
-
-        try {
-            return await response.json()
-        } catch (error) {
-            throw new Error(`Failed to parse JSON response. Error: ${error.message}`)
-        }
-    }
-
-    async _set_guild_name(requestOptions) {
-        try {
-            const response = await fetch(`${ORONDER_BASE_URL}/guild`, requestOptions)
-            const guild = await this._handle_json_response(response)
-            this.object.guild_name = guild.name
-        } catch (error) {
-            this.object.guild_name = ''
-            Logger.error(`Error setting guild name: ${error.message}`)
-        }
     }
 }

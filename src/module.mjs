@@ -26,6 +26,9 @@ function set_session(session) {
 
 Hooks.once("ready", async () => {
     if (game.user.isGM) {
+        Handlebars.registerHelper('catArrs', (a, b) => a.concat(b))
+        Handlebars.registerHelper("log", Logger.info)
+
         await registerSettings()
         open_socket_with_oronder()
         monks_token_bar_hooks();
