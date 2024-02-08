@@ -1,55 +1,40 @@
 <form autocomplete="off">
     <div>
-        <h1>{{#if guild_name}}{{guild_name}}{{else}}No Discord Server Configured{{/if}}</h1>
-        {{#unless valid_config}}
-            <h2>Installation Instructions</h2>
-            <ol>
-                <li>Invite the <a
-                        href="https://discord.com/oauth2/authorize?client_id=1064553830810923048&scope=bot+guilds.members.read&permissions=403761728512">
-                    {{localize "oronder.Discord-Bot-Link-Title"}}</a> to your Discord.
-                </li>
-                <li>Subscribe to the <a href="https://discord.gg/27npDAXaCA\">
-                    {{localize "oronder.Discord-Server-Link-Title"}}
-                </a> to gain access to advanced features.
-                </li>
-                <li>From your Discord, run "<code>/admin init</code>"</li>
-                <li>Copy the generated token into the fields below.</li>
-                <li>Clicking "<code>{{localize "oronder.Fetch-Discord-User-Ids"}}</code>" will populate Discord user ids
-                    for
-                    players whose Discord name
-                    matches their Foundry name. For everyone else, you will need to manually add their user id.
-                </li>
-            </ol>
-            <hr>
-        {{/unless}}
+        {{#if guild}}
+            <h1>{{guild.name}}</h1>
+        {{else}}
+            <h2>No Discord Server Connection Found.</h2>
+        {{/if}}
     </div>
-    <div class="form-group">
-        <label for="auth">{{localize "oronder.Auth-Token"}}</label>
-        <input type="password" autocomplete="off" name="auth" id="auth" value="{{auth}}" required>
-    </div>
-
-    <div class="form-group">
-        <button type="button" class='control' data-action='fetch' {{#if fetch_disabled}}disabled{{/if}}>
-            <i class="{{fetch_button_icon}}"></i> {{fetch_button_msg}}
-        </button>
-    </div>
-    <div class="form-group">
-        <button type="button" class='control' data-action='sync-all' {{#if full_sync_disabled}}disabled{{/if}}>
-            <i class="{{full_sync_button_icon}}"></i> {{full_sync_button_msg}}
-        </button>
-    </div>
-
-
     {{#if guild}}
-        <hr>
+        <!--        <div class="form-group">-->
+        <!--            <label for="appt">Choose a time for your meeting:</label>-->
+        <!--            <input type="time" id="appt" name="appt" min="09:00" max="18:00" required/>-->
+        <!--        </div>-->
+
+        <!--        <div class="form-group">-->
+        <!--            <multi-checkbox name="check-many-boxes">-->
+        <!--                <optgroup label="Basic Options">-->
+        <!--                    <option value="foo">Foo</option>-->
+        <!--                    <option value="bar">Bar</option>-->
+        <!--                    <option value="baz">Baz</option>-->
+        <!--                </optgroup>-->
+        <!--                <optgroup label="Advanced Options">-->
+        <!--                    <option value="fizz">Fizz</option>-->
+        <!--                    <option value="buzz">Buzz</option>-->
+        <!--                </optgroup>-->
+        <!--            </multi-checkbox>-->
+        <!--        </div>-->
+
         <div class="form-group">
-            <label for="gm-xp">GM XP</label>
-            <input type="text" title="How much experience a GM may reward one of their PCs for running a session."
-                   min="0" id="gm-xp" inputmode="numeric" value="{{guild.gm_xp}}">
+            <label for="gm-xp" title="How much experience a GM may reward one of their PCs for running a session.">GM
+                XP</label>
+            <input type="text" min="0" id="gm-xp" inputmode="numeric" value="{{guild.gm_xp}}">
         </div>
         <div class="form-group">
-            <label for="starting-level">Starting Level</label>
-            <input type="text" title="Starting level for new PCs. Override by assigning a PC to a Campaign." min="1"
+            <label for="starting-level" title="Starting level for new PCs. Override by assigning a PC to a Campaign.">Starting
+                Level</label>
+            <input type="text" min="1"
                    max="20" id="starting-level" inputmode="numeric"
                    value="{{guild.starting_level}}">
         </div>
@@ -71,7 +56,7 @@
             </select>
         </div>
         <div class="form-group">
-            <label for="subscription">Subscription</label>
+            <label for="subscription"><a href="https://discord.gg/ZggUCHsQqg">Discord Status</a></label>
             <input type="text" disabled id="subscription" value="{{guild.subscription}}">
         </div>
         <hr>
@@ -108,7 +93,8 @@
             <label for="voice-channel">Voice Channel</label>
             <select id="voice-channel">
                 {{#each guild.voice_channels}}
-                    <option value="{{id}}"  {{#if (eq id ../guild.voice_channel_id)}}selected{{/if}}>#{{name}}</option>
+                    <option value="{{id}}"  {{#if (eq id ../guild.voice_channel_id)}}selected{{/if}}>
+                        #{{name}}</option>
                 {{/each}}
             </select>
         </div>
@@ -121,62 +107,101 @@
                 {{/each}}
             </select>
         </div>
+        {{#if players}}
+            <hr>
+            <h3 class="border">{{localize "oronder.Foundry-to-Discord-Ids"}}</h3>
+        {{/if}}
+        {{#each players}}
+            <div class="form-group">
+                <label for="{{foundry_id}}">{{foundry_name}}</label>
+                <select id="{{foundry_id}}">
+                    <option value=""  {{#if (eq "" discord_id)}}selected{{/if}}></option>
+                    {{#each ../guild.members}}
+                        <option value="{{id}}"  {{#if (eq id ../discord_id)}}selected{{/if}}>
+                            {{name}}</option>
+                    {{/each}}
+                </select>
+            </div>
+
+
+
+        {{/each}}
         <hr>
-        <h3 class="border">Rollcall</h3>
         <div class="form-group">
-            <label for="rollcall-role">Role</label>
-            <select id="rollcall-role">
-                <option value=""  {{#if (eq "" guild.rollcall_role_id)}}selected{{/if}}>❌ DISABLE</option>
-                {{#each guild.roles}}
-                    <option value="{{id}}"  {{#if (eq id ../guild.rollcall_role_id)}}selected{{/if}}>{{name}}</option>
-                {{/each}}
-            </select>
+            <label for="rollcall-enabled" title="If enabled, Oronder will mention the provided at the specified time.">
+                Rollcall
+            </label>
+            <!--            <p class="hint">If enabled, Oronder will @ mention the provided at the specified time.</p>-->
+            <input type="checkbox" id='rollcall-enabled' class='control' data-action='rollcall-enabled'
+                {{checked guild.rollcall_enabled}}>
         </div>
+        {{#if guild.rollcall_enabled}}
+            <div class="form-group">
+                <label for="rollcall-role">Role</label>
+                <select id="rollcall-role">
+                    <option value=""  {{#if (eq "" guild.rollcall_role_id)}}selected{{/if}}></option>
+                    {{#each guild.roles}}
+                        <option value="{{id}}"
+                                {{#if (eq id ../guild.rollcall_role_id)}}selected{{/if}}>{{name}}</option>
+                    {{/each}}
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="rollcall-channel">Channel</label>
+                <select id="rollcall-channel">
+                    <option value=""  {{#if (eq "" guild.rollcall_channel_id)}}selected{{/if}}></option>
+                    {{#each guild.text_channels}}
+                        <option value="{{id}}"  {{#if (eq id ../guild.rollcall_channel_id)}}selected{{/if}}>
+                            #{{name}}</option>
+                    {{/each}}
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="rollcall-day">Day</label>
+                <select id="rollcall-day">
+                    <option value=""  {{#if (eq "" guild.rollcall_day)}}selected{{/if}}></option>
+                    {{#each days_of_week}}
+                        <option value="{{this}}"
+                                {{#if (eq this ../guild.days_of_week)}}selected{{/if}}>{{this}}</option>
+                    {{/each}}
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="rollcall-time">Time</label>
+                <input type="time" id="rollcall-time"
+                       {{#if (eq "" guild.rollcall_time)}}value="{{guild.rollcall_time}}"{{/if}}>
+            </div>
+        {{/if}}
+
+
         <div class="form-group">
-            <label for="rollcall-channel">Channel</label>
-            <select id="rollcall-channel">
-                <option value=""  {{#if (eq "" guild.rollcall_channel_id)}}selected{{/if}}>❌ DISABLE</option>
-                {{#each guild.text_channels}}
-                    <option value="{{id}}"  {{#if (eq id ../guild.rollcall_channel_id)}}selected{{/if}}>
-                        #{{name}}</option>
-                {{/each}}
-            </select>
+            <label for='show-advanced'>Advanced Options</label>
+            <input type="checkbox" id='show-advanced' class='control' data-action='show-advanced'
+                {{checked show_advanced}}>
         </div>
+
+        {{#if show_advanced}}
+            <div class="form-group">
+                <button type="button" class='control' data-action='sync-all' {{#if buttons_disabled}}disabled{{/if}}>
+                    <i class="{{full_sync_button_icon}}"></i> {{full_sync_button_msg}}
+                </button>
+            </div>
+            <div class="form-group">
+                <button type="button" class='control' data-action='init' {{#if buttons_disabled}}disabled{{/if}}>
+                    <i class="{{init_button_icon}}"></i>{{re_init_button_msg}}
+                </button>
+            </div>
+        {{/if}}
+
+        <hr>
+        <button type="submit" {{#if buttons_disabled}}disabled{{/if}}>
+            <i class="far fa-save"></i> {{ localize "Save Changes" }}
+        </button>
+    {{else}}
         <div class="form-group">
-            <label for="rollcall-day">Day</label>
-            <select id="rollcall-day">
-                <option value=""  {{#if (eq "" guild.days_of_week)}}selected{{/if}}>❌ DISABLE</option>
-                {{#each days_of_week}}
-                    <option value="{{this}}"  {{#if (eq this ../guild.days_of_week)}}selected{{/if}}>{{this}}</option>
-                {{/each}}
-            </select>
-        </div>
-        <div class="form-group">
-            <label for="rollcall-time">Time</label>
-            <input type="text" id="rollcall-time" value="{{guild.rollcall_time}}">
+            <button type="button" class='control' data-action='init' {{#if buttons_disabled}}disabled{{/if}}>
+                <i class="{{init_button_icon}}"></i> {{init_button_msg}}
+            </button>
         </div>
     {{/if}}
-
-
-
-
-
-    {{#if players}}
-        <hr>
-        <h3 class="border">{{localize "oronder.Discord-Ids"}}</h3>
-    {{/if}}
-
-    {{#each players}}
-        <div class="form-group">
-            <label for="{{this.foundry_id}}">{{this.foundry_name}}</label>
-            <input type="text" name="{{this.foundry_id}}" id="{{this.foundry_id}}" autocomplete="off"
-                   inputmode="numeric" value="{{this.discord_id}}">
-        </div>
-    {{/each}}
-
-    <hr>
-    <button type="submit">
-        <i class="far fa-save"></i> {{ localize "Save Changes" }}
-    </button>
-
 </form>
