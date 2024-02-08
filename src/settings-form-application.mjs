@@ -131,37 +131,6 @@ export class OronderSettingsFormApplication extends FormApplication {
             }).catch(Logger.error)
 
 
-        // this.render()
-
-        //     const queryParams = new URLSearchParams()
-        //     players_without_discord_ids.forEach(p =>
-        //         queryParams.append('p', p.foundry_name)
-        //     )
-        //     const requestOptions = getRequestOptions(this.object.auth)
-        //
-        //     await fetch(`${ORONDER_BASE_URL}/discord_id?${queryParams}`, requestOptions)
-        //         .then(response => {
-        //             this.throw_on_401(response);
-        //             return handle_json_response(response)
-        //         })
-        //         .then(result => {
-        //             for (const [foundry_name, discord_user_id] of Object.entries(result)) {
-        //                 this.object.players.find(p => p.foundry_name === foundry_name).discord_id = discord_user_id
-        //             }
-        //         })
-        //         .catch(Logger.error)
-        //
-        //     this.object.fetch_button_icon = "fa-solid fa-rotate"
-        //     this.object.buttons_disabled = false
-        //     this.render()
-    }
-
-    throw_on_401(response) {
-        if (response.status === 401) {
-            this.object.guild = undefined
-            this.object.auth = ''
-            throw new Error(game.i18n.localize("oronder.Invalid-Auth"))
-        }
     }
 
     async _full_sync(clear_cache = false) {
@@ -197,24 +166,28 @@ export class OronderSettingsFormApplication extends FormApplication {
             popup.postMessage('', ORONDER_BASE_URL)
         }, 500)
         const event_listener = event => {
-            if (event.data.auth && event.data.guild) {
+            if (event.data.status_code) {
                 clearInterval(message_interval)
                 this.init_waiting = undefined
                 popup.close()
+                if (event.data.status_code === 200) {
+                    this.object.auth = event.data.auth
+                    this.object.guild = event.data.guild
+                    this.object.players
+                        .filter(p => !p.discord_id)
+                        .forEach(p =>
+                            p.discord_id = this.object.guild.members.find(m =>
+                                m.name.toLowerCase() === p.foundry_name.toLowerCase()
+                            )?.id ?? ''
+                        )
 
-                this.object.auth = event.data.auth
-                this.object.guild = event.data.guild
-                this.object.players
-                    .filter(p => !p.discord_id)
-                    .forEach(p =>
-                        p.discord_id = this.object.guild.members.find(m =>
-                            m.name.toLowerCase() === p.foundry_name.toLowerCase()
-                        )?.id ?? ''
-                    )
+                    this._full_sync(false)
+                } else {
+                    Logger.error(event.data.detail)
+                }
                 this.object.init_button_icon = 'fa-brands fa-discord'
                 this.object.buttons_disabled = false
                 this.render()
-                this._full_sync(false)
             }
         }
 
