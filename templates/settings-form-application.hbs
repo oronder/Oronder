@@ -128,17 +128,21 @@
         {{/each}}
         <hr>
         <div class="form-group">
-            <label for="rollcall-enabled" title="If enabled, Oronder will mention the provided at the specified time.">
-                Rollcall
-            </label>
-            <!--            <p class="hint">If enabled, Oronder will @ mention the provided at the specified time.</p>-->
-            <input type="checkbox" id='rollcall-enabled' class='control' data-action='rollcall-enabled'
-                {{checked guild.rollcall_enabled}}>
+            <h3>
+                <label for="rollcall-enabled"
+                       title="If enabled, Oronder will mention the provided at the specified time.">
+                    Rollcall
+                </label>
+                <!--            <p class="hint">If enabled, Oronder will @ mention the provided at the specified time.</p>-->
+                <input type="checkbox" id='rollcall-enabled' class='control' data-action='rollcall-enabled'
+                       style='float:right'
+                    {{checked guild.rollcall_enabled}}>
+            </h3>
         </div>
         {{#if guild.rollcall_enabled}}
             <div class="form-group">
                 <label for="rollcall-role">Role</label>
-                <select id="rollcall-role">
+                <select id="rollcall-role" required>
                     <option value=""  {{#if (eq "" guild.rollcall_role_id)}}selected{{/if}}></option>
                     {{#each guild.roles}}
                         <option value="{{id}}"
@@ -148,7 +152,7 @@
             </div>
             <div class="form-group">
                 <label for="rollcall-channel">Channel</label>
-                <select id="rollcall-channel">
+                <select id="rollcall-channel" required>
                     <option value=""  {{#if (eq "" guild.rollcall_channel_id)}}selected{{/if}}></option>
                     {{#each guild.text_channels}}
                         <option value="{{id}}"  {{#if (eq id ../guild.rollcall_channel_id)}}selected{{/if}}>
@@ -158,7 +162,7 @@
             </div>
             <div class="form-group">
                 <label for="rollcall-day">Day</label>
-                <select id="rollcall-day">
+                <select id="rollcall-day" required>
                     <option value=""  {{#if (eq "" guild.rollcall_day)}}selected{{/if}}></option>
                     {{#each days_of_week}}
                         <option value="{{this}}"
@@ -168,16 +172,18 @@
             </div>
             <div class="form-group">
                 <label for="rollcall-time">Time</label>
-                <input type="time" id="rollcall-time"
+                <input type="time" id="rollcall-time" required
                        {{#if (eq "" guild.rollcall_time)}}value="{{guild.rollcall_time}}"{{/if}}>
             </div>
         {{/if}}
 
 
         <div class="form-group">
-            <label for='show-advanced'>Advanced Options</label>
-            <input type="checkbox" id='show-advanced' class='control' data-action='show-advanced'
-                {{checked show_advanced}}>
+            <h3>
+                <label for='show-advanced'>Advanced Options</label>
+                <input type="checkbox" id='show-advanced' class='control' data-action='show-advanced'
+                    {{checked show_advanced}} style='float:right'>
+            </h3>
         </div>
 
         {{#if show_advanced}}

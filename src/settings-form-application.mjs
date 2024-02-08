@@ -102,6 +102,23 @@ export class OronderSettingsFormApplication extends FormApplication {
         )
         game.settings.set(MODULE_ID, ID_MAP, id_map)
 
+        this.object.guild.gm_role_id = Array.from(this.form.elements['gm-role']).find(o => o.selected).value
+        this.object.guild.gm_xp = this.form.elements['gm-xp'].value
+        this.object.guild.session_channel_id = Array.from(this.form.elements['session-channel']).find(c => c.selected).value
+        this.object.guild.downtime_channel_id = Array.from(this.form.elements['downtime-channel']).find(c => c.selected).value
+        this.object.guild.downtime_gm_channel_id = Array.from(this.form.elements['downtime-gm-channel']).find(c => c.selected).value
+        this.object.guild.voice_channel_id = Array.from(this.form.elements['voice-channel']).find(c => c.selected).value
+        this.object.guild.scheduling_channel_id = Array.from(this.form.elements['scheduling-channel']).find(c => c.selected).value
+        this.object.guild.timezone = Array.from(this.form.elements['timezone']).find(c => c.selected).value
+        this.object.guild.starting_level = this.form.elements['starting-level'].value
+        this.object.guild.rollcall_enabled = this.form.elements['rollcall-enabled'].checked
+        if (this.object.guild.rollcall_enabled) {
+            this.object.guild.rollcall_channel_id = Array.from(this.form.elements['rollcall-channel']).find(c => c.selected)?.value
+            this.object.guild.rollcall_role_id = Array.from(this.form.elements['rollcall-role']).find(c => c.selected)?.value
+            this.object.guild.rollcall_day = this.form.elements['rollcall-day'].value
+            this.object.guild.rollcall_time = this.form.elements['rollcall-time'].value
+        }
+
 
         await fetch(
             `${ORONDER_BASE_URL}/guild`, {
