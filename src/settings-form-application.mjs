@@ -197,9 +197,9 @@ export class OronderSettingsFormApplication extends FormApplication {
         const close_interval = setInterval(() => {
             if (popup.closed) {
                 clearInterval(close_interval)
+                window.removeEventListener('message', event_listener)
                 if (this.init_waiting) { //if init_waiting is false we have don't need to do anything
                     this.init_waiting = undefined
-                    window.removeEventListener('message', event_listener)
                     this.object.init_button_icon = 'fa-brands fa-discord'
                     this.object.buttons_disabled = false
                     this.render()
