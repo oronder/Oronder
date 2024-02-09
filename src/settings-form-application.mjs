@@ -1,28 +1,29 @@
-import {Logger} from "./util.mjs"
-import {AUTH, GUILD_NAME, ID_MAP, MODULE_ID, ORONDER_BASE_URL, VALID_CONFIG} from "./constants.mjs"
+import {get_guild, handle_json_response, Logger} from "./util.mjs"
+import {AUTH, DAYS_OF_WEEK, DISCORD_INIT_LINK, ID_MAP, MODULE_ID, ORONDER_BASE_URL, TIMEZONES} from "./constants.mjs"
 import {full_sync} from "./sync.mjs"
 import {open_socket_with_oronder} from "./module.mjs"
 
 export class OronderSettingsFormApplication extends FormApplication {
-
     constructor(object = {}, options = {}) {
         const id_map = game.settings.get(MODULE_ID, ID_MAP)
         foundry.utils.mergeObject(object, {
-            guild_name: game.settings.get(MODULE_ID, GUILD_NAME),
+            guild: undefined,
+            timezones: TIMEZONES,
+            days_of_week: DAYS_OF_WEEK,
             auth: game.settings.get(MODULE_ID, AUTH),
-            valid_config: game.settings.get(MODULE_ID, VALID_CONFIG),
-            fetch_button_icon: "fa-solid fa-rotate",
-            fetch_button_msg: game.i18n.localize("oronder.Fetch-Discord-User-Ids"),
-            fetch_sync_disabled: false,
-            full_sync_button_icon: "fa-solid fa-users",
-            full_sync_button_msg: game.i18n.localize("oronder.Full-Sync"),
-            full_sync_disabled: false,
+            buttons_disabled: false,
+            full_sync_active: false,
+            init_active: false,
+            show_advanced: false,
             players: game.users.filter(user => user.role < 3).map(user => ({
                 foundry_name: user.name,
                 foundry_id: user.id,
                 discord_id: id_map[user.id] ?? ''
             }))
         })
+
+        foundry.utils.mergeObject(options, {height: "auto"})
+
         super(object, options)
     }
 
@@ -43,6 +44,13 @@ export class OronderSettingsFormApplication extends FormApplication {
 
     /** @override */
     async getData(options = {}) {
+        if (this.object.auth && !this.object.guild) {
+            this.object.guild = await get_guild(this.object.auth)
+            if (!this.object.guild) {
+                this.object.auth = ''
+                game.settings.set(MODULE_ID, AUTH, this.object.auth)
+            }
+        }
         return this.object
     }
 
@@ -54,164 +62,142 @@ export class OronderSettingsFormApplication extends FormApplication {
 
     _onClickControl(event) {
         switch (event.currentTarget.dataset.action) {
-            case "fetch":
-                return this._fetch_discord_ids()
             case "sync-all":
-                return this._full_sync()
-
+                return this._full_sync(true)
+            case "init":
+                return this._init()
+            case "checkbox":
+                this.render()
+                return Promise.resolve()
         }
+
     }
 
-    _getRequestOptions(auth) {
-        return {
-            method: 'GET',
-            headers: new Headers({
-                "Accept": "application/json",
-                'Authorization': auth
-            }),
-            redirect: 'follow'
+    render(force = false, options = {}) {
+        if (this.object.guild) {
+            this.object.guild.gm_role_id = Array.from(this.form.elements.gm_role).find(o => o.selected).value
+            this.object.guild.gm_xp = this.form.elements.gm_xp.value
+            this.object.guild.session_channel_id = Array.from(this.form.elements.session_channel).find(c => c.selected).value
+            this.object.guild.downtime_channel_id = Array.from(this.form.elements.downtime_channel).find(c => c.selected).value
+            this.object.guild.downtime_gm_channel_id = Array.from(this.form.elements.downtime_gm_channel).find(c => c.selected).value
+            this.object.guild.voice_channel_id = Array.from(this.form.elements.voice_channel).find(c => c.selected).value
+            this.object.guild.scheduling_channel_id = Array.from(this.form.elements.scheduling_channel).find(c => c.selected).value
+            this.object.guild.timezone = Array.from(this.form.elements.timezone).find(c => c.selected).value
+            this.object.guild.starting_level = this.form.elements.starting_level.value
+            this.object.guild.rollcall_enabled = this.form.elements.rollcall_enabled.checked
+            if (this.object.guild.rollcall_enabled) {
+                if (this.form.elements.rollcall_channel)
+                    this.object.guild.rollcall_channel_id = Array.from(this.form.elements.rollcall_channel).find(c => c.selected)?.value
+                if (this.form.elements.rollcall_role)
+                    this.object.guild.rollcall_role_id = Array.from(this.form.elements.rollcall_role).find(c => c.selected)?.value
+                if (this.form.elements.rollcall_day)
+                    this.object.guild.rollcall_day = this.form.elements.rollcall_day.value
+                if (this.form.elements.rollcall_time)
+                    this.object.guild.rollcall_time = this.form.elements.rollcall_time.value
+            }
+            this.object.show_advanced = this.form.elements.show_advanced.checked
         }
+
+
+        return super.render(force, options);
     }
 
     /** @override */
+    //Save Changes
     async _updateObject(event, formData) {
-        this.object.auth = this.form.elements.auth.value
+        game.settings.set(MODULE_ID, ID_MAP, Object.fromEntries(
+            this.object.players.map(p => [
+                p.foundry_id,
+                Array.from(this.form.elements[p.foundry_id].options).find(o => o.selected).value
+            ])
+        ))
 
-        const id_map = {}
-        const queryParams = new URLSearchParams()
-        this.object.players.forEach(p => {
-            p.discord_id = this.form.elements[p.foundry_id].value
-            if (p.discord_id) {
-                queryParams.append('i', p.discord_id)
-                id_map[p.foundry_id] = p.discord_id
-            }
-        })
-        const requestOptions = this._getRequestOptions(this.object.auth)
-        let valid_config = false
-        await fetch(`${ORONDER_BASE_URL}/validate_discord_ids?${queryParams}`, requestOptions)
-            .then(this._handle_json_response)
-            .then(invalid_discord_ids => {
-                const invalid_player_names = invalid_discord_ids.map(invalid_discord_id => {
-                    return this.object.players.find(p => p.discord_id === invalid_discord_id).foundry_name
-                })
-                if (invalid_player_names.length === 1) {
-                    Logger.error(
-                        `${invalid_player_names[0]} ${game.i18n.localize("oronder.Could-Not-Be-Found")}`
-                    )
+        this.render()
+
+        await fetch(
+            `${ORONDER_BASE_URL}/guild`, {
+                method: 'POST',
+                headers: new Headers({
+                    "Content-Type": "application/json", 'Authorization': this.object.auth
+                }),
+                redirect: 'follow',
+                body: JSON.stringify(this.object.guild)
+            })
+            .then(handle_json_response)
+            .then(({errs}) => errs.forEach(e => Logger.error(e, {permanent: true})))
+            .catch(Logger.error)
+    }
+
+    async _full_sync(clear_cache = false) {
+        this.object.full_sync_active = true
+        this.object.buttons_disabled = true
+        this.render()
+
+        await full_sync(clear_cache).catch(Logger.error)
+
+        this.object.full_sync_active = false
+        this.object.buttons_disabled = false
+        this.render()
+    }
+
+
+    async _init() {
+        this.object.init_active = true
+        this.object.buttons_disabled = true
+        this.render()
+
+        const params = Object.entries({
+            scrollbars: 'no', resizable: 'no', status: 'no', location: 'no', toolbar: 'no', menubar: 'no',
+            width: 400, height: 1280, left: '50%', top: '50%'
+        }).map(([k, v]) => `${k}=${v}`).join(',')
+
+        const popup = window.open(DISCORD_INIT_LINK, 'Discord Auth', params)
+        if (popup && !popup.closed && popup.focus) {
+            popup.focus()
+        }
+
+        const message_interval = setInterval(() => {
+            popup.postMessage('', ORONDER_BASE_URL)
+        }, 500)
+        const event_listener = async event => {
+            if (event.data.status_code) {
+                clearInterval(message_interval)
+                this.init_active = false
+                popup.close()
+                event.data.errs.forEach(e => Logger.error(e, {permanent: true}))
+                if (event.data.auth && event.data.guild) {
+                    this.object.auth = event.data.auth
+                    await game.settings.set(MODULE_ID, AUTH, this.object.auth)
+                    open_socket_with_oronder(true)
+                    this.object.guild = event.data.guild
+                    this.object.players
+                        .filter(p => !p.discord_id)
+                        .forEach(p =>
+                            p.discord_id = this.object.guild.members.find(m =>
+                                m.name.toLowerCase() === p.foundry_name.toLowerCase()
+                            )?.id ?? ''
+                        )
+                    await this._full_sync(false) // enabling buttons and rendering is handled here
                 } else {
-                    valid_config = true
+                    this.object.buttons_disabled = false
+                    this.render()
                 }
-            })
-            .catch(Logger.error)
-
-        if (!this.object.guild_name) {
-            await this._set_guild_name(requestOptions)
-        }
-
-        let updated = false
-
-        if (game.settings.get(MODULE_ID, AUTH) !== this.object.auth) {
-            game.settings.set(MODULE_ID, AUTH, this.object.auth)
-            updated = true
-        }
-        game.settings.set(MODULE_ID, GUILD_NAME, this.object.guild_name)
-        game.settings.set(MODULE_ID, VALID_CONFIG, valid_config)
-        game.settings.set(MODULE_ID, ID_MAP, id_map)
-
-        open_socket_with_oronder(updated)
-
-        this.render()
-    }
-
-    async _full_sync() {
-        this.object.full_sync_button_icon = 'fa-solid fa-spinner fa-spin'
-        this.object.full_sync_sync_disabled = true
-        this.render()
-
-        await full_sync().catch(Logger.error)
-
-        this.object.full_sync_button_icon = "fa-solid fa-users"
-        this.object.full_sync_sync_disabled = false
-        this.render()
-    }
-
-    async _fetch_discord_ids() {
-        this.object.auth = this.form.elements.auth.value
-        this.object.players.forEach(p =>
-            p.discord_id = this.form.elements[p.foundry_id].value
-        )
-
-        const players_without_discord_ids = this.object.players.filter(p =>
-            !this.form.elements[p.foundry_id].value
-        )
-        let err = false
-
-        if (!this.object.auth) {
-            err = true
-            Logger.error(game.i18n.localize("oronder.Auth-Token-Empty"))
-        }
-        if (!players_without_discord_ids.length) {
-            err = true
-            Logger.warn(game.i18n.localize("oronder.No-Players-To-Sync"))
-        }
-
-        if (err) {
-            this.render()
-            return
-        }
-
-        this.object.fetch_button_icon = 'fa-solid fa-spinner fa-spin'
-        this.object.fetch_sync_disabled = true
-        this.render()
-
-        const queryParams = new URLSearchParams()
-        players_without_discord_ids.forEach(p =>
-            queryParams.append('p', p.foundry_name)
-        )
-        const requestOptions = this._getRequestOptions(this.object.auth)
-
-        const p1 = this._set_guild_name(requestOptions)
-        const p2 = fetch(`${ORONDER_BASE_URL}/discord_id?${queryParams}`, requestOptions)
-            .then(this._handle_json_response)
-            .then(result => {
-                for (const [foundry_name, discord_user_id] of Object.entries(result)) {
-                    this.object.players.find(p => p.foundry_name === foundry_name).discord_id = discord_user_id
-                }
-            })
-            .catch(Logger.error)
-
-        await Promise.all([p1, p2])
-
-        this.object.fetch_button_icon = "fa-solid fa-rotate"
-        this.object.fetch_sync_disabled = false
-        this.render()
-    }
-
-    async _handle_json_response(response) {
-        if (!response.ok) {
-            if (response.status === 401) {
-                throw new Error(game.i18n.localize("oronder.Invalid-Auth"))
-            } else {
-                const errorMessage = await response.json()
-                throw new Error(game.i18n.localize("oronder.Unexpected-Error") + ' ' + errorMessage.detail)
             }
         }
 
-        try {
-            return await response.json()
-        } catch (error) {
-            throw new Error(`Failed to parse JSON response. Error: ${error.message}`)
-        }
-    }
+        window.addEventListener('message', event_listener)
 
-    async _set_guild_name(requestOptions) {
-        try {
-            const response = await fetch(`${ORONDER_BASE_URL}/guild`, requestOptions)
-            const guild = await this._handle_json_response(response)
-            this.object.guild_name = guild.name
-        } catch (error) {
-            this.object.guild_name = ''
-            Logger.error(`Error setting guild name: ${error.message}`)
-        }
+        // In case of error or if closed prematurely
+        const close_interval = setInterval(() => {
+            if (popup.closed) {
+                clearInterval(close_interval)
+                window.removeEventListener('message', event_listener)
+                if (this.init_active) { //if init_waiting is false we have don't need to do anything
+                    this.init_active = false
+                    this.object.buttons_disabled = false
+                    this.render()
+                }
+            }
+        }, 501)
     }
 }

@@ -1,4 +1,4 @@
-import {MODULE_DEBUG_TAG} from "./constants.mjs"
+import {MODULE_DEBUG_TAG, ORONDER_BASE_URL} from "./constants.mjs"
 import objectHash from 'object-hash'
 
 /**
@@ -43,4 +43,39 @@ const hash_options = {unorderedArrays: true, respectType: false}
 
 export function hash(obj) {
     return objectHash(obj, hash_options)
+}
+
+export function requestOptions(auth) {
+    return {
+        method: 'GET', headers: new Headers({
+            "Accept": "application/json", 'Authorization': auth
+        }), redirect: 'follow'
+    }
+}
+
+export async function get_guild(auth) {
+    try {
+        Logger.info(`get_guild()`)
+        const response = await fetch(`${ORONDER_BASE_URL}/guild`, requestOptions(auth))
+        if (response.status !== 401) {
+            return await handle_json_response(response)
+        }
+    } catch (error) {
+        Logger.error(`Error getting Discord Guild: ${error.message}`)
+    }
+    return undefined
+}
+
+
+export async function handle_json_response(response) {
+    if (!response.ok) {
+        const errorMessage = await response.json()
+        throw new Error(game.i18n.localize("oronder.Unexpected-Error") + ' ' + errorMessage.detail)
+    }
+
+    try {
+        return await response.json()
+    } catch (error) {
+        throw new Error(`Failed to parse JSON response. Error: ${error.message}`)
+    }
 }

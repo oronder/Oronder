@@ -189,10 +189,12 @@ const actor_to_discord_ids = actor =>
         .filter(discord_id => discord_id)
 
 
-export async function full_sync() {
-    game.actors
-        .filter(_ => localStorage.getItem(`${ACTORS}.${_.id}`))
-        .forEach(_ => localStorage.removeItem(`${ACTORS}.${_.id}`))
+export async function full_sync(clear_cache) {
+    if (clear_cache) {
+        game.actors
+            .filter(_ => localStorage.getItem(`${ACTORS}.${_.id}`))
+            .forEach(_ => localStorage.removeItem(`${ACTORS}.${_.id}`))
+    }
     return Promise.all(game.actors.map(sync_actor))
 }
 
@@ -249,9 +251,13 @@ export async function sync_actor(actor) {
                     ).join(' '),
                     {permanent: true}
                 ))
+        } else if (response.status === 401) {
+            Logger.error(
+                `${game.i18n.localize("oronder.Invalid-Auth")} ${actor_obj.name} ${game.i18n.localize("oronder.Failed-To-Sync")}`
+            )
         } else {
             Logger.error(
-                `${actor_obj.name} ${game.i18n.localize("oronder.Failed-To-Sync")}: ${response.status} ${response.statusText}`,
+                `${actor_obj.name} ${game.i18n.localize("oronder.Failed-To-Sync")} ${response.statusText}`,
                 {permanent: true}
             )
         }
