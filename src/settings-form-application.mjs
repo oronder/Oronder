@@ -74,7 +74,7 @@ export class OronderSettingsFormApplication extends FormApplication {
     }
 
     render(force = false, options = {}) {
-        if (this.object.guild) {
+        if (this.object.guild && !this.form.elements.init) {
             this.object.guild.gm_role_id = Array.from(this.form.elements.gm_role).find(o => o.selected).value
             this.object.guild.gm_xp = this.form.elements.gm_xp.value
             this.object.guild.session_channel_id = Array.from(this.form.elements.session_channel).find(c => c.selected).value

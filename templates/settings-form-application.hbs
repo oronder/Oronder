@@ -205,7 +205,7 @@
         </button>
     {{else}}
         <div class="form-group">
-            <button type="button" class='control' data-action='init' {{#if buttons_disabled}}disabled{{/if}}>
+            <button type="button" id='init' class='control' data-action='init' {{#if buttons_disabled}}disabled{{/if}}>
                 <i class="{{#if init_active}}fa-solid fa-spinner fa-spin{{else}}fa-brands fa-discord{{/if}}"></i>
                 {{#if init_active}}{{localize "oronder.Init-Pending"}}{{else}}{{localize "oronder.Init"}}{{/if}}
             </button>
