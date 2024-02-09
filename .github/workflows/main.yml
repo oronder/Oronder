@@ -23,7 +23,7 @@ jobs:
           fetch-depth: 0
 
       - name: Modify Module Manifest With Release-Specific Values
-        uses: cschleiden/replace-tokens@v1.2
+        uses: cschleiden/replace-tokens@v1.3
         with:
           files: 'module.json'
 
