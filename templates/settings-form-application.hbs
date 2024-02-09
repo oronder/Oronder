@@ -64,7 +64,7 @@
         <div class="form-group">
             <label for="session_channel">Session Channel</label>
             <select id="session_channel">
-                {{#each (catArrs guild.forum_channels guild.text_channels)}}
+                {{#each guild.forum_and_text_channels}}
                     <option value="{{id}}"  {{#if (eq id ../guild.session_channel_id)}}selected{{/if}}>
                         #{{name}}</option>
                 {{/each}}

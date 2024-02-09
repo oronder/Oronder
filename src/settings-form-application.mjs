@@ -170,6 +170,7 @@ export class OronderSettingsFormApplication extends FormApplication {
                     await game.settings.set(MODULE_ID, AUTH, this.object.auth)
                     open_socket_with_oronder(true)
                     this.object.guild = event.data.guild
+                    this.object.guild.forum_and_text_channels = this.object.guild.forum_channels.concat(this.object.guild.text_channels)
                     this.object.players
                         .filter(p => !p.discord_id)
                         .forEach(p =>
