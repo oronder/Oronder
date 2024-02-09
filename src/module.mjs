@@ -54,11 +54,11 @@ export function open_socket_with_oronder(update = false) {
     })
 
     socket.on('connect_error', (error) => {
-        Logger.warn(`Oronder Websocket connection failed: ${error.message}`)
+        Logger.warn(`Oronder connection failed: ${error.message}`)
     })
 
     socket.on('connect', () => {
-        Logger.info('Oronder Websocket connection established.')
+        Logger.info('Oronder connection established.')
     })
     socket.on('xp', async data => {
         for (const [actor_id, xp] of Object.entries(data)) {

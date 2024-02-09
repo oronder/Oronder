@@ -3,7 +3,7 @@
         {{#if guild}}
             <h1>{{guild.name}}</h1>
         {{else}}
-            <h2>No Discord Server Connection Found.</h2>
+            <h2>{{localize "oronder.No-Guild"}}</h2>
         {{/if}}
     </div>
     {{#if guild}}
@@ -27,15 +27,15 @@
         <!--        </div>-->
 
         <div class="form-group">
-            <label for="gm-xp" title="How much experience a GM may reward one of their PCs for running a session.">GM
+            <label for="gm_xp" title="How much experience a GM may reward one of their PCs for running a session.">GM
                 XP</label>
-            <input type="text" min="0" id="gm-xp" inputmode="numeric" value="{{guild.gm_xp}}">
+            <input type="text" min="0" id="gm_xp" inputmode="numeric" value="{{guild.gm_xp}}">
         </div>
         <div class="form-group">
-            <label for="starting-level" title="Starting level for new PCs. Override by assigning a PC to a Campaign.">Starting
+            <label for="starting_level" title="Starting level for new PCs. Override by assigning a PC to a Campaign.">Starting
                 Level</label>
             <input type="text" min="1"
-                   max="20" id="starting-level" inputmode="numeric"
+                   max="20" id="starting_level" inputmode="numeric"
                    value="{{guild.starting_level}}">
         </div>
         <div class="form-group">
@@ -48,8 +48,8 @@
             </select>
         </div>
         <div class="form-group">
-            <label for="gm-role" title="Discord Role for GMs.">GM Role</label>
-            <select id="gm-role">
+            <label for="gm_role" title="Discord Role for GMs.">GM Role</label>
+            <select id="gm_role">
                 {{#each guild.roles}}
                     <option value="{{id}}"  {{#if (eq id ../guild.gm_role_id)}}selected{{/if}}>{{name}}</option>
                 {{/each}}
@@ -62,8 +62,8 @@
         <hr>
         <h3 class="border">Channels</h3>
         <div class="form-group">
-            <label for="session-channel">Session Channel</label>
-            <select id="session-channel">
+            <label for="session_channel">Session Channel</label>
+            <select id="session_channel">
                 {{#each (catArrs guild.forum_channels guild.text_channels)}}
                     <option value="{{id}}"  {{#if (eq id ../guild.session_channel_id)}}selected{{/if}}>
                         #{{name}}</option>
@@ -71,8 +71,8 @@
             </select>
         </div>
         <div class="form-group">
-            <label for="downtime-channel">Downtime Channel</label>
-            <select id="downtime-channel">
+            <label for="downtime_channel">Downtime Channel</label>
+            <select id="downtime_channel">
                 {{#each guild.text_channels}}
                     <option value="{{id}}"  {{#if (eq id ../guild.downtime_channel_id)}}selected{{/if}}>
                         #{{name}}</option>
@@ -80,9 +80,9 @@
             </select>
         </div>
         <div class="form-group">
-            <label for="downtime-gm-channel">Downtime GM Channel</label>
-            <select id="downtime-gm-channel">
-                <option value=""  {{#if (eq "" guild.downtime_gm_channel_id)}}selected{{/if}}>❌ DISABLE</option>
+            <label for="downtime_gm_channel">Downtime GM Channel</label>
+            <select id="downtime_gm_channel">
+                <option value="">❌ DISABLED</option>
                 {{#each guild.text_channels}}
                     <option value="{{id}}"  {{#if (eq id ../guild.downtime_gm_channel_id)}}selected{{/if}}>
                         #{{name}}</option>
@@ -90,8 +90,8 @@
             </select>
         </div>
         <div class="form-group">
-            <label for="voice-channel">Voice Channel</label>
-            <select id="voice-channel">
+            <label for="voice_channel">Voice Channel</label>
+            <select id="voice_channel">
                 {{#each guild.voice_channels}}
                     <option value="{{id}}"  {{#if (eq id ../guild.voice_channel_id)}}selected{{/if}}>
                         #{{name}}</option>
@@ -99,8 +99,8 @@
             </select>
         </div>
         <div class="form-group">
-            <label for="scheduling-channel">Scheduling Channel</label>
-            <select id="scheduling-channel">
+            <label for="scheduling_channel">Scheduling Channel</label>
+            <select id="scheduling_channel">
                 {{#each guild.text_channels}}
                     <option value="{{id}}"  {{#if (eq id ../guild.scheduling_channel_id)}}selected{{/if}}>
                         #{{name}}</option>
@@ -115,35 +115,32 @@
             <div class="form-group">
                 <label for="{{foundry_id}}">{{foundry_name}}</label>
                 <select id="{{foundry_id}}">
-                    <option value=""  {{#if (eq "" discord_id)}}selected{{/if}}></option>
+                    <option value=""></option>
                     {{#each ../guild.members}}
                         <option value="{{id}}"  {{#if (eq id ../discord_id)}}selected{{/if}}>
                             {{name}}</option>
                     {{/each}}
                 </select>
             </div>
-
-
-
         {{/each}}
         <hr>
         <div class="form-group">
             <h3>
-                <label for="rollcall-enabled"
+                <label for="rollcall_enabled"
                        title="If enabled, Oronder will mention the provided at the specified time.">
                     Rollcall
                 </label>
                 <!--            <p class="hint">If enabled, Oronder will @ mention the provided at the specified time.</p>-->
-                <input type="checkbox" id='rollcall-enabled' class='control' data-action='rollcall-enabled'
+                <input type="checkbox" id='rollcall_enabled' class='control' data-action='checkbox'
                        style='float:right'
                     {{checked guild.rollcall_enabled}}>
             </h3>
         </div>
         {{#if guild.rollcall_enabled}}
             <div class="form-group">
-                <label for="rollcall-role">Role</label>
-                <select id="rollcall-role" required>
-                    <option value=""  {{#if (eq "" guild.rollcall_role_id)}}selected{{/if}}></option>
+                <label for="rollcall_role">Role</label>
+                <select id="rollcall_role" required>
+                    <option value=""></option>
                     {{#each guild.roles}}
                         <option value="{{id}}"
                                 {{#if (eq id ../guild.rollcall_role_id)}}selected{{/if}}>{{name}}</option>
@@ -151,9 +148,9 @@
                 </select>
             </div>
             <div class="form-group">
-                <label for="rollcall-channel">Channel</label>
-                <select id="rollcall-channel" required>
-                    <option value=""  {{#if (eq "" guild.rollcall_channel_id)}}selected{{/if}}></option>
+                <label for="rollcall_channel">Channel</label>
+                <select id="rollcall_channel" required>
+                    <option value=""></option>
                     {{#each guild.text_channels}}
                         <option value="{{id}}"  {{#if (eq id ../guild.rollcall_channel_id)}}selected{{/if}}>
                             #{{name}}</option>
@@ -161,27 +158,26 @@
                 </select>
             </div>
             <div class="form-group">
-                <label for="rollcall-day">Day</label>
-                <select id="rollcall-day" required>
-                    <option value=""  {{#if (eq "" guild.rollcall_day)}}selected{{/if}}></option>
+                <label for="rollcall_day">Day</label>
+                <select id="rollcall_day" required>
+                    <option value=""></option>
                     {{#each days_of_week}}
                         <option value="{{this}}"
-                                {{#if (eq this ../guild.days_of_week)}}selected{{/if}}>{{this}}</option>
+                                {{#if (eq this ../guild.rollcall_day)}}selected{{/if}}>{{this}}</option>
                     {{/each}}
                 </select>
             </div>
             <div class="form-group">
-                <label for="rollcall-time">Time</label>
-                <input type="time" id="rollcall-time" required
-                       {{#if (eq "" guild.rollcall_time)}}value="{{guild.rollcall_time}}"{{/if}}>
+                <label for="rollcall_time">Time</label>
+                <input type="time" id="rollcall_time" required value="{{guild.rollcall_time}}">
             </div>
         {{/if}}
 
 
         <div class="form-group">
             <h3>
-                <label for='show-advanced'>Advanced Options</label>
-                <input type="checkbox" id='show-advanced' class='control' data-action='show-advanced'
+                <label for='show_advanced'>Advanced Options</label>
+                <input type="checkbox" id='show_advanced' class='control' data-action='checkbox'
                     {{checked show_advanced}} style='float:right'>
             </h3>
         </div>
@@ -189,12 +185,16 @@
         {{#if show_advanced}}
             <div class="form-group">
                 <button type="button" class='control' data-action='sync-all' {{#if buttons_disabled}}disabled{{/if}}>
-                    <i class="{{full_sync_button_icon}}"></i> {{full_sync_button_msg}}
+                    <i class="{{#if full_sync_active}}fa-solid fa-spinner fa-spin{{else}}fa-solid fa-rotate{{/if}}"></i>
+                    {{#if full_sync_active}}{{localize "oronder.Full-Sync"}}{{else}}
+                        {{localize "oronder.Full-Sync-Pending"}}{{/if}}
                 </button>
             </div>
             <div class="form-group">
                 <button type="button" class='control' data-action='init' {{#if buttons_disabled}}disabled{{/if}}>
-                    <i class="{{init_button_icon}}"></i>{{re_init_button_msg}}
+                    <i class="{{#if init_active}}fa-solid fa-spinner fa-spin{{else}}fa-brands fa-discord{{/if}}"></i>
+                    {{#if init_active}}{{localize "oronder.Init-Pending"}}{{else}}
+                        {{localize "oronder.Re-Init"}}{{/if}}
                 </button>
             </div>
         {{/if}}
@@ -206,7 +206,8 @@
     {{else}}
         <div class="form-group">
             <button type="button" class='control' data-action='init' {{#if buttons_disabled}}disabled{{/if}}>
-                <i class="{{init_button_icon}}"></i> {{init_button_msg}}
+                <i class="{{#if init_active}}fa-solid fa-spinner fa-spin{{else}}fa-brands fa-discord{{/if}}"></i>
+                {{#if init_active}}{{localize "oronder.Init-Pending"}}{{else}}{{localize "oronder.Init"}}{{/if}}
             </button>
         </div>
     {{/if}}
