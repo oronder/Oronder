@@ -4,7 +4,7 @@
   "oronder.Re-Init": "Reset Connection to Discord",
   "oronder.Full-Sync": "Manually Sync All Actors",
   "oronder.Full-Sync-Pending": "Syncing Actors",
-  "oronder.No-Guild": "Discord Server Connection Not Found.",
+  "oronder.No-Guild": "Discord Server Not Found.",
   "oronder.Oronder-Configuration": "Oronder Configuration",
   "oronder.Configure-Oronder": "Configure Oronder",
   "oronder.Configure-Hint": "CURRENTLY UNSET",

@@ -75,7 +75,7 @@ export class OronderSettingsFormApplication extends FormApplication {
             this.object.guild.gm_xp = this.form.elements.gm_xp.value
             this.object.guild.session_channel_id = Array.from(this.form.elements.session_channel).find(c => c.selected).value
             this.object.guild.downtime_channel_id = Array.from(this.form.elements.downtime_channel).find(c => c.selected).value
-            this.object.guild.downtime_gm_channel_id = Array.from(this.form.elements.downtime_gm_channel).find(c => c.selected)?.value ?? ''
+            this.object.guild.downtime_gm_channel_id = Array.from(this.form.elements.downtime_gm_channel).find(c => c.selected)?.value || undefined
             this.object.guild.voice_channel_id = Array.from(this.form.elements.voice_channel).find(c => c.selected).value
             this.object.guild.scheduling_channel_id = Array.from(this.form.elements.scheduling_channel).find(c => c.selected).value
             this.object.guild.timezone = Array.from(this.form.elements.timezone).find(c => c.selected).value
@@ -83,13 +83,13 @@ export class OronderSettingsFormApplication extends FormApplication {
             this.object.guild.rollcall_enabled = this.form.elements.rollcall_enabled.checked
             if (this.object.guild.rollcall_enabled) {
                 if (this.form.elements.rollcall_channel)
-                    this.object.guild.rollcall_channel_id = Array.from(this.form.elements.rollcall_channel).find(c => c.selected).value
+                    this.object.guild.rollcall_channel_id = Array.from(this.form.elements.rollcall_channel).find(c => c.selected).value || undefined
                 if (this.form.elements.rollcall_role)
-                    this.object.guild.rollcall_role_id = Array.from(this.form.elements.rollcall_role).find(c => c.selected).value
+                    this.object.guild.rollcall_role_id = Array.from(this.form.elements.rollcall_role).find(c => c.selected).value || undefined
                 if (this.form.elements.rollcall_day)
-                    this.object.guild.rollcall_day = this.form.elements.rollcall_day?.value ?? ''
+                    this.object.guild.rollcall_day = this.form.elements.rollcall_day?.value
                 if (this.form.elements.rollcall_time)
-                    this.object.guild.rollcall_time = this.form.elements.rollcall_time?.value ?? ''
+                    this.object.guild.rollcall_time = this.form.elements.rollcall_time?.value
             }
             this.object.show_advanced = this.form.elements.show_advanced.checked
             this.object.players.forEach(p =>
@@ -103,7 +103,10 @@ export class OronderSettingsFormApplication extends FormApplication {
         return super.render(force, options);
     }
 
-    combine_forum_channels(guild) {
+    format_channels(guild) {
+        guild.text_channels.forEach(c => c.name = `# ${c.name}`)
+        guild.voice_channels.forEach(c => c.name = `🔈 ${c.name}`)
+        guild.forum_channels.forEach(c => c.name = `💬 ${c.name}`)
         guild.forum_and_text_channels = guild.forum_channels.concat(guild.text_channels)
         return guild
     }
@@ -123,7 +126,7 @@ export class OronderSettingsFormApplication extends FormApplication {
                         redirect: 'follow'
                     }
                 ).then(this.handle_json_response)
-                return this.combine_forum_channels(guild)
+                return this.format_channels(guild)
             } catch (error) {
                 Logger.error(error.message)
             }
@@ -146,7 +149,7 @@ export class OronderSettingsFormApplication extends FormApplication {
                 response_json.detail
                     .flat()
                     .map(({loc, input, msg}) =>
-                        `${loc.filter(_ => _ !== 'body').join('.')}.${input}: ${msg}`)
+                        `${loc.filter(_ => _ !== 'body').join('.')}.${input || '<EMPTY>'}: ${msg}`)
                     .join(' ')
             )
         } else {
@@ -178,12 +181,32 @@ export class OronderSettingsFormApplication extends FormApplication {
             )
         )
 
+        const guild = (({
+                            name,
+                            id,
+                            roles,
+                            members,
+                            text_channels,
+                            voice_channels,
+                            forum_channels,
+                            forum_and_text_channels,
+                            subscription,
+                            ...o
+                        }
+        ) => o)(this.object.guild)
+        if (!guild.rollcall_enabled) {
+            delete guild.rollcall_day
+            delete guild.rollcall_time
+            delete guild.rollcall_channel_id
+            delete guild.rollcall_role_id
+        }
+
         await fetch(
             `${ORONDER_BASE_URL}/guild`, {
                 method: 'POST',
                 headers: new Headers({"Content-Type": "application/json", 'Authorization': auth}),
                 redirect: 'follow',
-                body: JSON.stringify(this.object.guild)
+                body: JSON.stringify(guild)
             })
             .then(this.handle_json_response)
             .then(({errs}) => errs.forEach(e => Logger.error(e, {permanent: true})))
@@ -218,6 +241,8 @@ export class OronderSettingsFormApplication extends FormApplication {
         const popup = window.open(DISCORD_INIT_LINK, 'Discord Auth', params)
         if (popup && !popup.closed && popup.focus) {
             popup.focus()
+        } else {
+            Logger.error("Could not launch Discord Authentication window! Check your browser's popup settings.")
         }
 
         const message_interval = setInterval(() => {
@@ -232,7 +257,7 @@ export class OronderSettingsFormApplication extends FormApplication {
                 if (event.data.auth && event.data.guild) {
                     await game.settings.set(MODULE_ID, AUTH, event.data.auth)
                     open_socket_with_oronder(true)
-                    this.object.guild = this.combine_forum_channels(event.data.guild)
+                    this.object.guild = this.format_channels(event.data.guild)
                     this.object.players
                         .filter(p => !p.discord_id)
                         .forEach(p =>
