@@ -247,13 +247,13 @@ export async function sync_actor(actor) {
                 .then(({detail}) => Logger.error(
                     `${actor_obj.name} ${game.i18n.localize("oronder.Failed-To-Sync")} ` +
                     detail.flat().map(({loc, input, msg}) =>
-                        `❌ ${loc.filter(_ => _ !== 'body').join('>')}>${input} ${msg}`
+                        `❌ ${loc.filter(_ => _ !== 'body').join('.')}.${input} ${msg}`
                     ).join(' '),
                     {permanent: true}
                 ))
         } else if (response.status === 401) {
             Logger.error(
-                `${game.i18n.localize("oronder.Invalid-Auth")} ${actor_obj.name} ${game.i18n.localize("oronder.Failed-To-Sync")}`
+                `${game.i18n.localize("oronder.Invalid-Auth")}: ${actor_obj.name} ${game.i18n.localize("oronder.Failed-To-Sync")}`
             )
         } else {
             Logger.error(

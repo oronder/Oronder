@@ -9,9 +9,9 @@ but also shines for single party campaigns.
 _The following must be done by the owner of the Discord server you'd like to integrate with._
 
 1. From Foundry, select **Game Settings > Configure Settings > Oronder > Configure Oronder**.
-    - Invite Oronder's Bot to your Discord Server.
+    - Click the button to invite Oronder's Bot to your Discord Server.
+      - A popup will ask you to select the server and verify permissions.
     - Associate Foundry Names to Discord Names and Configure Channels.
-    - Under Advanced Options, Select Manual Sync Actors.
     - Click `Save Changes`.
 2. Subscribe to the [Oronder Discord](https://discord.gg/27npDAXaCA) to gain access to advanced features.
 
