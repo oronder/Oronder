@@ -30,6 +30,28 @@ Hooks.once("ready", async () => {
         open_socket_with_oronder()
         monks_token_bar_hooks();
     }
+
+    game.socket.on(SOCKET_NAME, data => {
+        switch (data.action) {
+            case 'session': {
+                set_session(data.session)
+            }
+                break
+        }
+    })
+
+    Hooks.on("updateActor", async (actor, data, options, userId) => {
+        if (game.user.id === userId && !data?.system?.details?.xp?.value) {
+            await sync_actor(actor)
+        }
+    })
+
+    Hooks.on("deleteActor", async (actor, data, options, userId) => {
+        if (game.user.id === userId) {
+            await del_actor(actor.id)
+        }
+    })
+
     Logger.info('Ready')
 })
 
@@ -74,25 +96,7 @@ export function open_socket_with_oronder(update = false) {
     })
 }
 
-game.socket.on(SOCKET_NAME, data => {
-    switch (data.action) {
-        case 'session': {
-            set_session(data.session)
-        }
-            break
-    }
-})
 
-Hooks.on("updateActor", async (actor, data, options, userId) => {
-    if (game.user.id === userId && !data?.system?.details?.xp?.value) {
-        await sync_actor(actor)
-    }
-})
-Hooks.on("deleteActor", async (actor, data, options, userId) => {
-    if (game.user.id === userId) {
-        await del_actor(actor.id)
-    }
-})
 // Hooks.on("createItem", async (item, data, options, userId) => {
 //     if (game.user.id === userId) {
 //         //handle actor updates
