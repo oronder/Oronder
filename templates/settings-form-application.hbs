@@ -107,9 +107,11 @@
                 {{/each}}
             </select>
         </div>
+        <hr>
         {{#if players}}
-            <hr>
             <h3 class="border">{{localize "oronder.Foundry-to-Discord-Ids"}}</h3>
+        {{else}}
+            <h3 class="border">{{localize "oronder.No-Players-Found"}}</h3>
         {{/if}}
         {{#each players}}
             <div class="form-group">

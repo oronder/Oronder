@@ -9,6 +9,7 @@
   "oronder.Configure-Oronder": "Configure Oronder",
   "oronder.Configure-Hint": "CURRENTLY UNSET",
   "oronder.Foundry-to-Discord-Ids": "Foundry to Discord Ids",
+  "oronder.No-Players-Found": "No Players or Trusted Players Found!",
   "oronder.Oronder-Bot-Config": "Oronder Bot Config",
   "oronder.Invalid-Auth": "Invalid Auth Token",
   "oronder.Unexpected-Error": "Unexpected Error Occurred!",
