@@ -131,7 +131,7 @@ def push_release(module_json: dict) -> None:
 
 def post_update_to_discord() -> None:
     INFO('Notifying Discord of new release')
-    deduped_changes = list(dict.fromkeys(CHANGES))
+    deduped_changes = list(dict.fromkeys(CHANGES.split('\n')))
     conn = HTTPSConnection("api.oronder.com")
     conn.request(
         "POST", '/update_discord',

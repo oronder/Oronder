@@ -10,6 +10,12 @@ import click
               type=click.Choice(['major', 'minor', 'revision'])
               )
 def run_release(release):
+    has_uncommited_changes = bool(subprocess.run(
+        'git add . && git diff && git diff --cached',
+        capture_output=True, shell=True, text=True).stdout)
+    if has_uncommited_changes:
+        subprocess.run('git stash', shell=True)
+
     subprocess.run('git pull', shell=True)
     major, minor, revision = max(
         [
@@ -36,6 +42,8 @@ def run_release(release):
 
     tag = f'{major}.{minor}.{revision}'
     subprocess.run(f'git tag {tag} && git push origin {tag}', shell=True)
+    if has_uncommited_changes:
+        subprocess.run('git stash pop', shell=True)
 
 
 if __name__ == '__main__':
