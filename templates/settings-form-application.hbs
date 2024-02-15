@@ -92,7 +92,7 @@
         <div class="form-group">
             <label for="voice_channel">Voice Channel</label>
             <select id="voice_channel">
-                {{#each guild.voice_channels}}
+                {{#each guild.voice_and_stage_channels}}
                     <option value="{{id}}"  {{#if (eq id ../guild.voice_channel_id)}}selected{{/if}}>
                         {{name}}</option>
                 {{/each}}

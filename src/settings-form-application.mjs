@@ -106,8 +106,10 @@ export class OronderSettingsFormApplication extends FormApplication {
     format_channels(guild) {
         guild.text_channels.forEach(c => c.name = `# ${c.name}`)
         guild.voice_channels.forEach(c => c.name = `🔈 ${c.name}`)
+        guild.stage_channels.forEach(c => c.name = `🎭 ${c.name}`)
         guild.forum_channels.forEach(c => c.name = `💬 ${c.name}`)
         guild.forum_and_text_channels = guild.forum_channels.concat(guild.text_channels)
+        guild.voice_and_stage_channels = guild.voice_channels.concat(guild.stage_channels)
         return guild
     }
 
@@ -190,6 +192,7 @@ export class OronderSettingsFormApplication extends FormApplication {
                             voice_channels,
                             forum_channels,
                             forum_and_text_channels,
+                            voice_and_stage_channels,
                             subscription,
                             ...o
                         }

@@ -4,6 +4,7 @@ import re
 from html.parser import HTMLParser
 from http.client import HTTPSConnection
 from pprint import pformat
+from typing import List
 from urllib.parse import urlencode
 
 from markdown_it import MarkdownIt
@@ -98,7 +99,8 @@ def update_repo_description(module_json):
                  ]))
     response = conn.getresponse()
     if response.status != 302:
-        BAD(f'Update Description Failed\n{extract_errorlist_text(response.read().decode())}')
+        errs = ''.join([f'\n- {c}' for c in extract_errorlist_text(response.read().decode())])
+        BAD(f'Update Description Failed{errs}')
     GOOD('REPO DESCRIPTION UPDATED')
 
 
@@ -129,7 +131,7 @@ def push_release(module_json: dict) -> None:
 
 def post_update_to_discord() -> None:
     INFO('Notifying Discord of new release')
-    deduped_changes = '\n'.join(dict.fromkeys(CHANGES.split('\n')))
+    deduped_changes = list(dict.fromkeys(CHANGES))
     conn = HTTPSConnection("api.oronder.com")
     conn.request(
         "POST", '/update_discord',
@@ -147,7 +149,7 @@ def post_update_to_discord() -> None:
     GOOD('DISCORD NOTIFIED OF NEW RELEASE')
 
 
-def extract_errorlist_text(html_string: str) -> str:
+def extract_errorlist_text(html_string: str) -> List[str]:
     class ErrorListParser(HTMLParser):
         in_errorlist = False
         errorlist_content = []
