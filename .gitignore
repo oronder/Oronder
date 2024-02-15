@@ -1,0 +1,5 @@
+/node_modules/
+.github/workflows/.env
+.idea/
+dist/
+static/
