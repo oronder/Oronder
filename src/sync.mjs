@@ -103,6 +103,11 @@ function gen_item_deets(item, actor_lvl) {
     }
 }
 
+function fix_relative_url(url) {
+    return url.indexOf('http://') === 0 || url.indexOf('https://') === 0 ?
+        url : new URL(url, window.location.origin).href
+}
+
 export function enrich_actor(actor) {
     const weapons = actor.items
         .filter(item => item.hasAttack && item.type !== 'consumable')
@@ -112,6 +117,12 @@ export function enrich_actor(actor) {
         .filter(item => item.type === "equipment" && item.system?.rarity)
         .map(item => item.name)
 
+    const clone_spells = JSON.parse(JSON.stringify(
+        actor.items.filter(item => item.type === 'spell')
+    )).map(spell =>
+        (({name, img, system}) => ({name, img: fix_relative_url(img), ability: system.ability}))(spell)
+    )
+
 
     let currency = actor.system['currency']
     for (const key in currency) {
@@ -120,8 +131,7 @@ export function enrich_actor(actor) {
         }
     }
 
-    let portrait_url = actor.img.indexOf('http://') === 0 || actor.img.indexOf('https://') === 0 ?
-        actor.img : new URL(actor.img, window.location.origin).href
+    let portrait_url = fix_relative_url(actor.img)
 
     const clone_pc = JSON.parse(JSON.stringify(
         actor.getRollData(),
@@ -140,6 +150,9 @@ export function enrich_actor(actor) {
             actor.system.details.race.name :
             ''
 
+    clone_pc.attributes.spellcaster = Boolean(Object.values(clone_pc.spells).map(s => s.max ?? 0).sum())
+
+
     return {
         ...prune_roll_data(clone_pc),
         name: actor.name,
@@ -147,7 +160,8 @@ export function enrich_actor(actor) {
         discord_ids: actor_to_discord_ids(actor),
         weapons: weapons,
         equipment: equipment,
-        portrait_url: portrait_url
+        portrait_url: portrait_url,
+        spells: clone_spells
     }
 }
 
