@@ -150,7 +150,7 @@ export function enrich_actor(actor) {
             actor.system.details.race.name :
             ''
 
-    clone_pc.attributes.spellcaster = Boolean(Object.values(actor.system?.spells).map(s => s?.max ?? 0).sum())
+    clone_pc.attributes.spellcaster = Object.values(actor.system?.spells || {}).some(s => s?.max > 0)
 
 
     return {
