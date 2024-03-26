@@ -31,7 +31,7 @@ function prune_roll_data(
 
     pc.details = (({originalClass, ...o}) => o)(pc.details)
     pc.details.xp = (({pct, ...o}) => o)(pc.details.xp)
-    pc.attributes = (({init, death, encumbrance, ...o}) => o)(pc.attributes)
+    pc.attributes = (({death, encumbrance, ...o}) => o)(pc.attributes)
     pc.attributes.ac = (({equippedArmor, equippedShield, ...o}) => o)(pc.attributes.ac)
     pc.attributes.hp = (({value, temp, tempmax, bonuses, ...o}) => o)(pc.attributes.hp)
 
@@ -151,7 +151,6 @@ export function enrich_actor(actor) {
             ''
 
     clone_pc.attributes.spellcaster = Object.values(actor.system?.spells || {}).some(s => s?.max > 0)
-
 
     return {
         ...prune_roll_data(clone_pc),
