@@ -14,10 +14,10 @@ export function monks_token_bar_hooks() {
                 game.user.role >= CONST.USER_ROLES.ASSISTANT &&
                 message['timestamp'] > last_xp_ts
             ) {
-                if (!mtb.actors.map(a => a.xp).every(xp => xp === mtb.actors[0].xp)) {
-                    Logger.warn('Oronder does not currently support unequal XP distribution :(')
-                } else if (!mtb.actors.length) {
+                if (!mtb.actors.length) {
                     Logger.warn('No actors to reward xp to')
+                } else if (!mtb.actors.map(a => a.xp).every(xp => xp === mtb.actors[0].xp)) {
+                    Logger.warn('Oronder does not currently support unequal XP distribution :(')
                 } else if (session_id === undefined) {
                     Logger.warn('No Session Found')
                 } else if (message['timestamp'] < session_ts) {
