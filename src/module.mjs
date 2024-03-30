@@ -29,8 +29,6 @@ Hooks.once("ready", async () => {
     if (game.user.isGM) {
         await registerSettings()
         open_socket_with_oronder()
-        monks_token_bar_hooks()
-        handle_incoming_rolls()
     }
 
     game.socket.on(SOCKET_NAME, data => {
@@ -96,6 +94,9 @@ export function open_socket_with_oronder(update = false) {
         set_session(session)
         game.socket.emit(SOCKET_NAME, {action: 'session', session: session})
     })
+
+    monks_token_bar_hooks()
+    handle_incoming_rolls()
 }
 
 

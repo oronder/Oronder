@@ -1,11 +1,21 @@
 import {item_roll, Logger} from "./util.mjs";
-import {session_id, socket} from "./module.mjs";
+import {socket} from "./module.mjs";
 import {ID_MAP, MODULE_ID} from "./constants.mjs";
 
-export function combat_hooks() {
-    Logger.info("Monk's Tokenbar found.")
-    socket.emit('combat', {session_id: session_id, id_to_xp: mtb.actors.map(a => ([a['id'], a['xp']]))})
 
+//TODO: Include some logic to set/remove these hooks when combat_tracking_enabled is changed
+export function set_combat_hooks() {
+    Logger.info("Setting Combat Hooks.")
+
+    Hooks.on("combatStart", async (combat, updateData) => {
+        socket.emit('combat', combat.toJSON())
+    })
+    Hooks.on("combatTurn", async (combat, updateData) => {
+        socket.emit('combat', combat.toJSON())
+    })
+    Hooks.on("combatRound", async (combat, updateData) => {
+        socket.emit('combat', combat.toJSON())
+    })
 }
 
 export function handle_incoming_rolls() {
