@@ -14,7 +14,7 @@ _The following must be done by the owner of the Discord server you'd like to int
         - A popup will ask you to select the server and verify permissions.
     2. Associate Foundry Names to Discord Names.
         - Oronder will automatically assign names that match, but the rest are up to you.
-    3. Configure Channels. Leaving them all to #general is ok
+    3. Configure Channels. Leaving them all set to #general is ok.
         - **_NOTE:_** Oronder will not work if you use private channels the bot has not been invited to!
     4. Click `Save Changes`.
 

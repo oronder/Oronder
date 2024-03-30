@@ -3,6 +3,7 @@ import {registerSettings} from "./settings.mjs"
 import {AUTH, MODULE_ID, ORONDER_WS_URL} from "./constants.mjs"
 import {del_actor, sync_actor} from "./sync.mjs"
 import {monks_token_bar_hooks} from "./monks_token_bar_hooks.mjs";
+import {handle_incoming_rolls} from "./combat.mjs";
 
 export let socket
 export let session_id
@@ -28,7 +29,8 @@ Hooks.once("ready", async () => {
     if (game.user.isGM) {
         await registerSettings()
         open_socket_with_oronder()
-        monks_token_bar_hooks();
+        monks_token_bar_hooks()
+        handle_incoming_rolls()
     }
 
     game.socket.on(SOCKET_NAME, data => {

@@ -1,5 +1,5 @@
 import {ACTORS, AUTH, ID_MAP, MODULE_ID, ORONDER_BASE_URL} from "./constants.mjs"
-import {hash, Logger} from "./util.mjs"
+import {hash, item_roll, Logger} from "./util.mjs"
 
 function prune_roll_data(
     {
@@ -71,17 +71,7 @@ function prune_roll_data(
 
 
 function gen_item_deets(item, actor_lvl) {
-    const attack_to_hit = item.getAttackToHit()
-    const attack_parts = attack_to_hit.parts
-        .map(p => attack_to_hit.rollData[p.slice(1)] || p)
-        .map(s => s.toString().replaceAll('+', '').replaceAll(' ', ''))
-        .filter(s => s !== '0')
-
-    let attack = new Roll(
-        ["1d20", ...attack_parts].join(" + ").replace(' + -', ' - '),
-        item.getRollData()
-    )
-
+    const attack = item_roll(item)
     let damage_type_pair = item.system.damage.parts.map(part => {
         let damage = new Roll(part[0], item.getRollData()).formula
         if (item?.system?.scaling?.mode === 'cantrip') {
@@ -97,6 +87,7 @@ function gen_item_deets(item, actor_lvl) {
 
     return {
         name: item.name,
+        id: item.id,
         damage: damage_type_pair,
         attack: attack.formula,
         type: item.type
@@ -197,7 +188,7 @@ export async function del_actor(pc_id) {
 
 const actor_to_discord_ids = actor =>
     Object.entries(actor.ownership)
-        .filter(([_, perm_lvl]) => perm_lvl === 3)
+        .filter(([_, perm_lvl]) => perm_lvl === CONST.DOCUMENT_OWNERSHIP_LEVELS.OWNER)
         .map(([owner_id, _]) => game.settings.get(MODULE_ID, ID_MAP)[owner_id])
         .filter(discord_id => discord_id)
 

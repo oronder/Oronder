@@ -78,6 +78,10 @@ export class OronderSettingsFormApplication extends FormApplication {
             this.object.guild.downtime_gm_channel_id = Array.from(this.form.elements.downtime_gm_channel).find(c => c.selected)?.value || undefined
             this.object.guild.voice_channel_id = Array.from(this.form.elements.voice_channel).find(c => c.selected).value
             this.object.guild.scheduling_channel_id = Array.from(this.form.elements.scheduling_channel).find(c => c.selected).value
+
+            this.object.guild.combat_channel_id = Array.from(this.form.elements.combat_channel).find(c => c.selected)?.value || undefined
+            this.object.guild.combat_tracking_enabled = this.form.elements.combat_tracking_enabled.checked
+
             this.object.guild.timezone = Array.from(this.form.elements.timezone).find(c => c.selected).value
             this.object.guild.starting_level = this.form.elements.starting_level.value
             this.object.guild.rollcall_enabled = this.form.elements.rollcall_enabled.checked
@@ -179,7 +183,7 @@ export class OronderSettingsFormApplication extends FormApplication {
 
         const actors_to_sync = game.actors.filter(actor =>
             Object.entries(actor.ownership).some(([user, perm_lvl]) =>
-                changed_player_ids.includes(user) && perm_lvl === 3
+                changed_player_ids.includes(user) && perm_lvl === CONST.DOCUMENT_OWNERSHIP_LEVELS.OWNER
             )
         )
 

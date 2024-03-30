@@ -42,3 +42,20 @@ function _processLog(logString) {
 export function hash(obj) {
     return objectHash(obj, {unorderedArrays: true, respectType: false})
 }
+
+/**
+ *
+ * \s*\+?\s* matches 0 or more whitespace optionally followed by a plus signs followed by zero or more whitespace
+ * (?:(?:-\s*)?(?<!\d)0)? optionally matches a zero optionally proceeded by a minus sign and/or white space
+ * (?:<previous two lines>)* matches the above 0 or more times
+ * ([+\-])\s* matches and captures a plus or minus sign in addition to matching zero or more whitespace
+ *
+ @param {Item5e} item
+ @returns {Roll}
+ */
+export function item_roll(item) {
+    const formula = `1d20 + ${item.getAttackToHit().parts.join('+')}`
+        .replace(/(?:\s*\+?\s*(?:(?:-\s*)?(?<!\d)0)?)*([+\-])\s*/g, ' $1 ')
+
+    return new Roll(formula, item.getRollData())
+}
