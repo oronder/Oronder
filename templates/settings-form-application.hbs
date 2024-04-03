@@ -107,16 +107,6 @@
                 {{/each}}
             </select>
         </div>
-        <div class="form-group">
-            <label for="combat_channel">Combat Channel</label>
-            <select id="combat_channel">
-                <option value="">❌ DISABLED</option>
-                {{#each guild.forum_and_text_channels}}
-                    <option value="{{id}}"  {{#if (eq id ../guild.combat_channel_id)}}selected{{/if}}>
-                        {{name}}</option>
-                {{/each}}
-            </select>
-        </div>
         <hr>
         {{#if players}}
             <h3 class="border">{{localize "oronder.Foundry-to-Discord-Ids"}}</h3>
@@ -136,18 +126,6 @@
             </div>
         {{/each}}
         <hr>
-        <div class="form-group">
-            <h3>
-                <label for="combat_tracking_enabled"
-                       title="If enabled, Oronder will post rolls from Discord to Foundry if a GM is logged into Foundry.">
-                    Publish Discord Rolls
-                </label>
-                <!--            <p class="hint">If enabled, Oronder will @ mention the provided at the specified time.</p>-->
-                <input type="checkbox" id='combat_tracking_enabled' class='control' data-action='checkbox'
-                       style='float:right'
-                    {{checked guild.combat_tracking_enabled}}>
-            </h3>
-        </div>
         <div class="form-group">
             <h3>
                 <label for="rollcall_enabled"
@@ -207,6 +185,28 @@
         </div>
 
         {{#if show_advanced}}
+            <div class="form-group">
+                <h3>
+                    <label for="combat_tracking_enabled"
+                           title="(Under Development) Oronder will post rolls from Discord to Foundry if a GM is logged into Foundry.">
+                        Publish Discord Rolls
+                    </label>
+                    <input type="checkbox" id='combat_tracking_enabled' class='control' data-action='checkbox'
+                           style='float:right'
+                        {{checked guild.combat_tracking_enabled}}>
+                </h3>
+            </div>
+            <div class="form-group">
+                <label for="combat_channel">Combat Channel (Under Development) </label>
+                <select id="combat_channel">
+                    <option value="">❌ DISABLED</option>
+                    {{#each guild.forum_and_text_channels}}
+                        <option value="{{id}}"  {{#if (eq id ../guild.combat_channel_id)}}selected{{/if}}>
+                            {{name}}</option>
+                    {{/each}}
+                </select>
+
+            </div>
             <div class="form-group">
                 <button type="button" class='control' data-action='sync-all' {{#if buttons_disabled}}disabled{{/if}}>
                     <i class="{{#if full_sync_active}}fa-solid fa-spinner fa-spin{{else}}fa-solid fa-rotate{{/if}}"></i>

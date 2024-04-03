@@ -69,23 +69,25 @@ export class OronderSettingsFormApplication extends FormApplication {
 
     }
 
+    /**
+     * TODO: This rebinds everything on any change. Reconsider this pattern if moving to AppV2 post V11.
+     * https://foundryvtt.com/api/v12/classes/foundry.applications.api.ApplicationV2.html
+     */
     bind() {
         if (this.object.guild && !this.form.elements.init) {
             this.object.guild.gm_role_id = Array.from(this.form.elements.gm_role).find(o => o.selected).value
             this.object.guild.gm_xp = this.form.elements.gm_xp.value
+
             this.object.guild.session_channel_id = Array.from(this.form.elements.session_channel).find(c => c.selected).value
             this.object.guild.downtime_channel_id = Array.from(this.form.elements.downtime_channel).find(c => c.selected).value
             this.object.guild.downtime_gm_channel_id = Array.from(this.form.elements.downtime_gm_channel).find(c => c.selected)?.value || undefined
             this.object.guild.voice_channel_id = Array.from(this.form.elements.voice_channel).find(c => c.selected).value
             this.object.guild.scheduling_channel_id = Array.from(this.form.elements.scheduling_channel).find(c => c.selected).value
 
-            this.object.guild.combat_channel_id = Array.from(this.form.elements.combat_channel).find(c => c.selected)?.value || undefined
-            this.object.guild.combat_tracking_enabled = this.form.elements.combat_tracking_enabled.checked
-
             this.object.guild.timezone = Array.from(this.form.elements.timezone).find(c => c.selected).value
             this.object.guild.starting_level = this.form.elements.starting_level.value
             this.object.guild.rollcall_enabled = this.form.elements.rollcall_enabled.checked
-            if (this.object.guild.rollcall_enabled) {
+            if (this.object.guild.rollcall_enabled && this.form.elements.rollcall_enabled.checked) {
                 if (this.form.elements.rollcall_channel)
                     this.object.guild.rollcall_channel_id = Array.from(this.form.elements.rollcall_channel).find(c => c.selected).value || undefined
                 if (this.form.elements.rollcall_role)
@@ -95,7 +97,13 @@ export class OronderSettingsFormApplication extends FormApplication {
                 if (this.form.elements.rollcall_time)
                     this.object.guild.rollcall_time = this.form.elements.rollcall_time?.value
             }
+
+            if (this.object.show_advanced && this.form.elements.show_advanced.checked) {
+                this.object.guild.combat_channel_id = Array.from(this.form.elements.combat_channel).find(c => c.selected)?.value || undefined
+                this.object.guild.combat_tracking_enabled = this.form.elements.combat_tracking_enabled.checked
+            }
             this.object.show_advanced = this.form.elements.show_advanced.checked
+
             this.object.players.forEach(p =>
                 p.discord_id = Array.from(this.form.elements[p.foundry_id].options).find(o => o.selected)?.value ?? ''
             )
