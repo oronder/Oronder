@@ -1,30 +1,72 @@
 import {item_roll, Logger} from "./util.mjs";
 import {socket} from "./module.mjs";
 import {COMBAT_HEALTH_ESTIMATE, ID_MAP, MODULE_ID} from "./constants.mjs";
+import { actor_to_discord_ids } from "./sync.mjs";
 
 
 export function set_combat_hooks() {
     Logger.info("Setting Combat Hooks.")
 
     Hooks.on("combatStart", async (combat, updateData) => {
-        const renderForDiscord = parseCombatRound({ ...combat, ...updateData })
-        socket.emit('combat', renderForDiscord)
+        const roundRender = parseCombatRound({ ...combat, ...updateData })
+        const turnRender = parseTurn(combat, updateData) 
+        socket.emit('combat', roundRender+turnRender)
     })
     Hooks.on("combatTurn", async (combat, updateData, updateOptions) => {
         if (updateOptions.direction < 1) return
-
-        Logger.info("COMBAT TURN HOOK")
-        Logger.info(combat)
-        Logger.info(updateData)
-
-        socket.emit('combat', combat.toJSON())
+        const turnRender = parseTurn(combat, updateData) 
+        socket.emit('combat', turnRender)
     })
     Hooks.on("combatRound", async (combat, updateData, updateOptions) => {
         if (updateOptions.direction < 1) return
-
-        const renderForDiscord = parseCombatRound({ ...combat, ...updateData }, updateOptions)
-        socket.emit('combat', renderForDiscord)
+        const roundRender = parseCombatRound({ ...combat, ...updateData }, updateOptions)
+        const turnRender = parseTurn(combat, updateData) 
+        socket.emit('combat', roundRender+turnRender)
     })
+}
+
+function getEffectsInMarkdown(actor, token) {
+    let markdown = ''
+    const effects = (token.actorlink) ? actor.effects : token.document.delta.effects
+    effects.forEach(val => {
+        markdown += `${'-'.padStart(4)} ${val.name}\n`
+    })
+    return markdown
+}
+
+function parseTurn(combat, updateData) {
+    const c = Object.assign(combat, updateData)
+    const turn = c.turns[c.turn]
+    const actor = Object.assign(
+        game.actors.find(a => a.id === turn.actorId), 
+        combat.combatants.find(cb => cb.tokenId === turn.tokenId))
+
+    if (actor.hidden) return
+
+    const token = canvas.tokens.placeables.find(p => p.id == turn.tokenId)
+    const discordId = actor_to_discord_ids(actor)
+    const healthSetting = game.settings.get(MODULE_ID, COMBAT_HEALTH_ESTIMATE)
+
+    let output = ''
+    if(discordId.length)
+        output += `It's your turn <@${discordId[0]}>\n`
+    output += '```md\n'
+    output += `# Initiative ${actor.initiative} Round ${c.round}\n`
+    if(turn.defeated) {
+        output += `${actor.name} <Defeated>\n`
+    } else if (token.document.hidden) {
+        output += `${actor.name} <Hidden>\n`
+    } else {
+        const hp = getHealth(
+            { ...actor.system.attributes.hp, ...token.document.delta?.system?.attributes?.hp },
+            healthSetting, 
+            actor.type
+        )
+        output += `${actor.name} <${hp}>\n`
+        output += getEffectsInMarkdown(actor, token)
+    }
+    output += '```\n'
+    return output
 }
 
 function parseCombatRound(combat) {
@@ -64,16 +106,12 @@ function parseCombatRound(combat) {
             const ac = `AC ${c.actor.system.attributes.ac.value}`
 
             let line = `${init}: ${c.name} <${hp}> (${ac})\n`
-
-            const effects = (c.token.actorlink) ? c.actor.effects : c.token.document.delta.effects
-            effects.forEach(val => {
-                line += `${'-'.padStart(6)} ${val.name}\n`
-            })
+            line += getEffectsInMarkdown(c.actor, c.token)
 
             return acc + line
         }
     }, '')
-    output += "```"
+    output += "```\n"
     return output
 }
 

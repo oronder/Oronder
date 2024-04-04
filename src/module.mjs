@@ -29,7 +29,6 @@ Hooks.once("ready", async () => {
     if (game.user.isGM) {
         await registerSettings()
         open_socket_with_oronder()
-        set_combat_hooks()
     }
 
     game.socket.on(SOCKET_NAME, data => {
