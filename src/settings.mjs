@@ -1,4 +1,11 @@
-import {AUTH, ID_MAP, MODULE_ID, ORONDER_CONFIGURATION_FORM} from './constants.mjs'
+import {
+    AUTH,
+    COMBAT_HEALTH_ESTIMATE,
+    COMBAT_HEALTH_ESTIMATE_TYPE,
+    ID_MAP,
+    MODULE_ID,
+    ORONDER_CONFIGURATION_FORM
+} from './constants.mjs'
 import {Logger} from './util.mjs'
 import {OronderSettingsFormApplication} from './settings-form-application.mjs'
 
@@ -14,6 +21,12 @@ export const registerSettings = async () => {
         type: Object,
         config: false,
         default: {}
+    })
+    game.settings.register(MODULE_ID, COMBAT_HEALTH_ESTIMATE, {
+        scope: 'world',
+        type: Number,
+        config: false,
+        default: COMBAT_HEALTH_ESTIMATE_TYPE.none
     })
     game.settings.registerMenu(MODULE_ID, ORONDER_CONFIGURATION_FORM, {
         name: 'oronder.Oronder-Configuration',

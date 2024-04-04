@@ -1,6 +1,6 @@
 import {item_roll, Logger} from "./util.mjs";
 import {socket} from "./module.mjs";
-import {ID_MAP, MODULE_ID} from "./constants.mjs";
+import {COMBAT_HEALTH_ESTIMATE, ID_MAP, MODULE_ID} from "./constants.mjs";
 
 
 export function set_combat_hooks() {
@@ -37,6 +37,7 @@ function parseCombatRound(combat) {
             token: canvas.tokens.placeables.find(p => p.id == c.tokenId) 
         }
     })
+    const healthSetting = game.settings.get(MODULE_ID, COMBAT_HEALTH_ESTIMATE)
 
     let output = "```md\n"
     output += `Current Round: ${combat.round}\n`
@@ -59,7 +60,7 @@ function parseCombatRound(combat) {
             let line = `${init}: ${c.name} <Hidden>\n`
             return acc + line
         } else {
-            const hp = (c.actor.type === "character") ? `${rawHp.value}/${rawHp.max}${rawHp.temp ? `(${rawHp.temp})`:''}` : getHealthEstimate(rawHp)
+            const hp = getHealth(rawHp, healthSetting, c.actor.type)
             const ac = `AC ${c.actor.system.attributes.ac.value}`
 
             let line = `${init}: ${c.name} <${hp}> (${ac})\n`
@@ -76,18 +77,38 @@ function parseCombatRound(combat) {
     return output
 }
 
-function getHealthEstimate(hp) {
-    const pct = Math.round(hp.effectiveMax ? (hp.value / hp.effectiveMax) * 100 : 0, 0, 100);
-    switch (true) {
-        case pct > 99: return "Unharmed";
-        case pct > 75: return "Healthy";
-        case pct > 50: return "Injured";
-        case pct > 25: return "Bloodied";
-        case pct > 10: return "Severe";
-        case pct > 0: return "Critical";
-        default: return "Dead";
+function getHealth(hp, combatHealthSetting, actorType) {
+    const formatHealth = (hpObj) => {
+        return `${hpObj.value}/${hpObj.max}${hpObj.temp ? `(${hpObj.temp})`:''}` 
+    }
+
+    const getHealthEstimate = (hp) => {
+        const pct = Math.round(hp.effectiveMax ? (hp.value / hp.effectiveMax) * 100 : 0, 0, 100);
+        switch (true) {
+            case pct > 99: return "Unharmed";
+            case pct > 75: return "Healthy";
+            case pct > 50: return "Injured";
+            case pct > 25: return "Bloodied";
+            case pct > 10: return "Severe";
+            case pct > 0: return "Critical";
+            default: return "Dead";
+        }
+    }
+
+    switch (combatHealthSetting) {
+        case 0: // Monsters Only
+            return (actorType === "character") 
+                ? formatHealth(hp)
+                : getHealthEstimate(hp)
+        case 1: // All
+            return getHealthEstimate(hp)
+        case 2: // None
+            return formatHealth(hp)
+        default:
+            console.error(`Combat Health Setting(${combatHealthSetting}) is not supported.`)
     }
 }
+
 
 export function handle_incoming_rolls() {
     socket.on('roll', async data => {
