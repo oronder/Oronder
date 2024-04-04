@@ -10,7 +10,6 @@ export function set_combat_hooks() {
     Hooks.on("combatStart", async (combat, updateData) => {
         const roundRender = parseCombatRound({ ...combat, ...updateData })
         const turnRender = parseTurn(combat, updateData) 
-        Logger.info(turnRender)
         socket.emit('combat', roundRender+turnRender)
     })
     Hooks.on("combatTurn", async (combat, updateData, updateOptions) => {
@@ -22,7 +21,6 @@ export function set_combat_hooks() {
         if (updateOptions.direction < 1) return
         const roundRender = parseCombatRound({ ...combat, ...updateData }, updateOptions)
         const turnRender = parseTurn(combat, updateData) 
-        Logger.info(turnRender)
         socket.emit('combat', roundRender+turnRender)
     })
 }
@@ -49,15 +47,12 @@ function parseTurn(combat, updateData) {
     const discordId = actor_to_discord_ids(actor)
     const healthSetting = game.settings.get(MODULE_ID, COMBAT_HEALTH_ESTIMATE)
 
-    Logger.info("before")
     let output = ''
     if(discordId.length)
         output += `It's your turn <@${discordId[0]}>\n`
     output += '```md\n'
     output += `# Initiative ${actor.initiative} Round ${c.round}\n`
 
-    Logger.info("1")
-    Logger.info(output)
     if(turn.defeated) {
         output += `${actor.name} <Defeated>\n`
     } else if (token.document.hidden) {
@@ -72,8 +67,6 @@ function parseTurn(combat, updateData) {
         output += getEffectsInMarkdown(actor, token)
     }
     output += '```\n'
-    Logger.info("final")
-    Logger.info(output)
     return output
 }
 
