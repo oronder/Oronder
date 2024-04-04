@@ -98,6 +98,7 @@ export function open_socket_with_oronder(update = false) {
 
     monks_token_bar_hooks()
     handle_incoming_rolls()
+    set_combat_hooks()
 }
 
 

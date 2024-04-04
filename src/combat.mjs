@@ -3,19 +3,90 @@ import {socket} from "./module.mjs";
 import {ID_MAP, MODULE_ID} from "./constants.mjs";
 
 
-//TODO: Include some logic to set/remove these hooks when combat_tracking_enabled is changed
 export function set_combat_hooks() {
     Logger.info("Setting Combat Hooks.")
 
     Hooks.on("combatStart", async (combat, updateData) => {
+        const renderForDiscord = parseCombatRound({ ...combat, ...updateData })
+        socket.emit('combat', renderForDiscord)
+    })
+    Hooks.on("combatTurn", async (combat, updateData, updateOptions) => {
+        if (updateOptions.direction < 1) return
+
+        Logger.info("COMBAT TURN HOOK")
+        Logger.info(combat)
+        Logger.info(updateData)
+
         socket.emit('combat', combat.toJSON())
     })
-    Hooks.on("combatTurn", async (combat, updateData) => {
-        socket.emit('combat', combat.toJSON())
+    Hooks.on("combatRound", async (combat, updateData, updateOptions) => {
+        if (updateOptions.direction < 1) return
+
+        const renderForDiscord = parseCombatRound({ ...combat, ...updateData }, updateOptions)
+        socket.emit('combat', renderForDiscord)
     })
-    Hooks.on("combatRound", async (combat, updateData) => {
-        socket.emit('combat', combat.toJSON())
+}
+
+function parseCombatRound(combat) {
+    // Get actors and token for each combatant by turn order
+    const parsed = combat.turns.map((c) => { 
+        return { 
+            ...c, 
+            ix: c._id, 
+            actor: game.actors.find(a => a.id === c.actorId), 
+            token: canvas.tokens.placeables.find(p => p.id == c.tokenId) 
+        }
     })
+
+    let output = "```md\n"
+    output += `Current Round: ${combat.round}\n`
+    output += "==================\n"
+
+    // Parse each combatant
+    output += parsed.reduce((acc,c) => {
+        // Hidden from Initiative
+        if (c.hidden) return acc
+
+        const rawHp = { ...c.actor.system.attributes.hp, ...c.token.document.delta?.system?.attributes?.hp }
+        const init = `${c.initiative || "XX"}`.padStart(3)
+
+        // Combatant is marked as defeated in initative
+        if(c.defeated) {
+            let line = `${init}: ${c.name} <Defeated>\n`
+            return acc + line
+        // Combatant is shown in initiative but the token is hidden
+        } else if (c.token.document.hidden) {
+            let line = `${init}: ${c.name} <Hidden>\n`
+            return acc + line
+        } else {
+            const hp = (c.actor.type === "character") ? `${rawHp.value}/${rawHp.max}${rawHp.temp ? `(${rawHp.temp})`:''}` : getHealthEstimate(rawHp)
+            const ac = `AC ${c.actor.system.attributes.ac.value}`
+
+            let line = `${init}: ${c.name} <${hp}> (${ac})\n`
+
+            const effects = (c.token.actorlink) ? c.actor.effects : c.token.document.delta.effects
+            effects.forEach(val => {
+                line += `${'-'.padStart(6)} ${val.name}\n`
+            })
+
+            return acc + line
+        }
+    }, '')
+    output += "```"
+    return output
+}
+
+function getHealthEstimate(hp) {
+    const pct = Math.round(hp.effectiveMax ? (hp.value / hp.effectiveMax) * 100 : 0, 0, 100);
+    switch (true) {
+        case pct > 99: return "Unharmed";
+        case pct > 75: return "Healthy";
+        case pct > 50: return "Injured";
+        case pct > 25: return "Bloodied";
+        case pct > 10: return "Severe";
+        case pct > 0: return "Critical";
+        default: return "Dead";
+    }
 }
 
 export function handle_incoming_rolls() {
