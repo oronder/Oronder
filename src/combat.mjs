@@ -43,7 +43,7 @@ function parseTurn(combat, updateData) {
 
     if (actor.hidden) return ''
 
-    const token = canvas.tokens.placeables.find(p => p.id == turn.tokenId)
+    const token = canvas.tokens.placeables.find(p => p.id === turn.tokenId)
     const discordId = actor_to_discord_ids(actor)
     const healthSetting = game.settings.get(MODULE_ID, COMBAT_HEALTH_ESTIMATE)
 
@@ -77,7 +77,7 @@ function parseCombatRound(combat) {
             ...c, 
             ix: c._id, 
             actor: game.actors.find(a => a.id === c.actorId), 
-            token: canvas.tokens.placeables.find(p => p.id == c.tokenId) 
+            token: canvas.tokens.placeables.find(p => p.id === c.tokenId) 
         }
     })
     const healthSetting = game.settings.get(MODULE_ID, COMBAT_HEALTH_ESTIMATE)
