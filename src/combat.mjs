@@ -1,12 +1,33 @@
 import {item_roll, Logger} from "./util.mjs";
 import {socket} from "./module.mjs";
+<<<<<<< HEAD
 import {COMBAT_HEALTH_ESTIMATE, ID_MAP, MODULE_ID} from "./constants.mjs";
+=======
+import {COMBAT_ENABLED, COMBAT_HOOKS, COMBAT_HEALTH_ESTIMATE, ID_MAP, MODULE_ID} from "./constants.mjs";
+>>>>>>> 977b6e4 (feat(roll-initiative): added refreshing combat hooks)
 import { actor_to_discord_ids } from "./sync.mjs";
 
+const onCombatStart = async (combat, updateData) =>  {
+    const roundRender = parseCombatRound({ ...combat, ...updateData })
+    const turnRender = parseTurn(combat, updateData) 
+    socket.emit('combat', roundRender+turnRender)
+}
+const onCombatTurn = async (combat, updateData, updateOptions) => {
+    if (updateOptions.direction < 1) return
+    const turnRender = parseTurn(combat, updateData) 
+    socket.emit('combat', turnRender)
+}
+const onCombatRound = async (combat, updateData, updateOptions) => {
+    if (updateOptions.direction < 1) return
+    const roundRender = parseCombatRound({ ...combat, ...updateData }, updateOptions)
+    const turnRender = parseTurn(combat, updateData) 
+    socket.emit('combat', roundRender+turnRender)
+}
 
 export function set_combat_hooks() {
     Logger.info("Setting Combat Hooks.")
 
+<<<<<<< HEAD
     Hooks.on("combatStart", async (combat, updateData) => {
         const roundRender = parseCombatRound({ ...combat, ...updateData })
         const turnRender = parseTurn(combat, updateData) 
@@ -23,6 +44,32 @@ export function set_combat_hooks() {
         const turnRender = parseTurn(combat, updateData) 
         socket.emit('combat', roundRender+turnRender)
     })
+=======
+    let combatHooks = game.settings.get(MODULE_ID, COMBAT_HOOKS)
+
+    const turnOffHook = (key) => {
+        if (combatHooks[key] > -1) {
+            Hooks.off(key, combatHooks[key])
+            combatHooks[key] = -1
+        }
+    }
+
+    // Turn off hooks
+    ["combatStart", "combatTurn", "combatRound"].forEach(key => turnOffHook(key))
+
+    // Turn them back on
+    if (game.settings.get(MODULE_ID, COMBAT_ENABLED))
+    {
+        combatHooks = {
+            combatStart: Hooks.on("combatStart", onCombatStart),
+            combatTurn: Hooks.on("combatTurn", onCombatTurn),
+            combatRound: Hooks.on("combatRound", onCombatTurn)
+        }
+    }
+
+    // update settings with function ids
+    game.settings.set(MODULE_ID, COMBAT_HOOKS, combatHooks)
+>>>>>>> 977b6e4 (feat(roll-initiative): added refreshing combat hooks)
 }
 
 function getEffectsInMarkdown(actor, token) {

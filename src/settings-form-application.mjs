@@ -1,6 +1,10 @@
 import {Logger} from "./util.mjs"
 import {
     AUTH, 
+<<<<<<< HEAD
+=======
+    COMBAT_ENABLED,
+>>>>>>> 977b6e4 (feat(roll-initiative): added refreshing combat hooks)
     COMBAT_HEALTH_ESTIMATE,
     COMBAT_HEALTH_ESTIMATE_TYPE,
     DAYS_OF_WEEK,
@@ -12,6 +16,7 @@ import {
 } from "./constants.mjs"
 import {full_sync, sync_actor} from "./sync.mjs"
 import {open_socket_with_oronder} from "./module.mjs"
+import { set_combat_hooks } from "./combat.mjs"
 
 export class OronderSettingsFormApplication extends FormApplication {
     constructor(object = {}, options = {}) {
@@ -194,6 +199,10 @@ export class OronderSettingsFormApplication extends FormApplication {
 
         this.bind()
 
+<<<<<<< HEAD
+=======
+        await game.settings.set(MODULE_ID, COMBAT_ENABLED, this.object.guild.combat_tracking_enabled)
+>>>>>>> 977b6e4 (feat(roll-initiative): added refreshing combat hooks)
         await game.settings.set(MODULE_ID, COMBAT_HEALTH_ESTIMATE, this.object.combat_health_estimate)
 
         const updated_id_map = await game.settings.set(MODULE_ID, ID_MAP,
@@ -243,6 +252,8 @@ export class OronderSettingsFormApplication extends FormApplication {
             .catch(Logger.error)
 
         await Promise.all(actors_to_sync.map(sync_actor)).catch(Logger.error)
+
+        set_combat_hooks()
     }
 
     async _full_sync(clear_cache = false) {
