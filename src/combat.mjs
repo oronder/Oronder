@@ -28,16 +28,24 @@ export function set_combat_hooks() {
 function getEffectsInMarkdown(actor, token) {
     // Merge Actor effects and token.delta effects
     let effects = new Map()
-    actor.effects.forEach((v, k) => {
-        if (!effects.has(v._id)) effects.set(v._id,v)
-    })
-    token.document.delta.effects.forEach((v, k) => {
-        if (!effects.has(v._id)) effects.set(v._id,v)
-    })
+    Logger.info(token)
+    if (token.document.actorLink) {
+        for(const e of actor.allApplicableEffects()) {
+            if (e.disabled) continue
+            // Ignore passive effects without attached statuses
+            if (e.duration.type === 'none' && e.statuses.size === 0) continue
+            if (!effects.has(e._id)) effects.set(e._id,e.name)
+        }
+    }
+    else {
+        token.document.delta.effects.forEach((v) => {
+            if (!effects.has(v._id)) effects.set(v._id,v.name)
+        })
+    }
 
     let markdown = ''
     effects.forEach(val => {
-        markdown += `${'-'.padStart(4)} ${val.name}\n`
+        markdown += `${'-'.padStart(4)} ${val}\n`
     })
     return markdown
 }
@@ -54,9 +62,6 @@ function parseTurn(combat, updateData) {
     const token = canvas.tokens.placeables.find(p => p.id === turn.tokenId)
     const discordId = actor_to_discord_ids(actor)
     const healthSetting = game.settings.get(MODULE_ID, COMBAT_HEALTH_ESTIMATE)
-
-    Logger.info(actor)
-    Logger.info(token)
 
     let output = ''
     if(discordId.length)
