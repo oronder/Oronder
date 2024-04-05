@@ -26,25 +26,20 @@ export function set_combat_hooks() {
 }
 
 function getEffectsInMarkdown(actor, token) {
-    let effects = new Map()
-    if (token.document.actorLink) {
-        for(const e of actor.allApplicableEffects()) {
-            if (e.disabled) continue
-            // Ignore passive effects without attached statuses
-            if (e.duration.type === 'none' && e.statuses.size === 0) continue
-            if (!effects.has(e._id)) effects.set(e._id,e.name)
+    let a = (token.document.actorLink) ? actor : token.actor
+
+    let addedEffects = new Map()
+    let markdown = ''
+    for(const e of a.allApplicableEffects()) {
+        if (e.disabled) continue
+        // Ignore passive effects without attached statuses
+        if (e.duration.type === 'none' && e.statuses.size === 0) continue
+        if (!addedEffects.has(e._id)) {
+            markdown += `${'-'.padStart(4)} ${e.name}\n`
+            addedEffects.set(e._id,e.name)
         }
     }
-    else {
-        token.document.delta.effects.forEach((v) => {
-            if (!effects.has(v._id)) effects.set(v._id,v.name)
-        })
-    }
 
-    let markdown = ''
-    effects.forEach(val => {
-        markdown += `${'-'.padStart(4)} ${val}\n`
-    })
     return markdown
 }
 
