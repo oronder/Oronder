@@ -1,27 +1,27 @@
 import {item_roll, Logger} from "./util.mjs";
 import {socket} from "./module.mjs";
 import {COMBAT_HEALTH_ESTIMATE, ID_MAP, MODULE_ID} from "./constants.mjs";
-import { actor_to_discord_ids } from "./sync.mjs";
+import {actor_to_discord_ids} from "./sync.mjs";
 
 
 export function set_combat_hooks() {
     Logger.info("Setting Combat Hooks.")
 
     Hooks.on("combatStart", async (combat, updateData) => {
-        const roundRender = parseCombatRound({ ...combat, ...updateData })
-        const turnRender = parseTurn(combat, updateData) 
-        socket.emit('combat', roundRender+turnRender)
+        const roundRender = parseCombatRound({...combat, ...updateData})
+        const turnRender = parseTurn(combat, updateData)
+        socket.emit('combat', roundRender + turnRender)
     })
     Hooks.on("combatTurn", async (combat, updateData, updateOptions) => {
         if (updateOptions.direction < 1) return
-        const turnRender = parseTurn(combat, updateData) 
+        const turnRender = parseTurn(combat, updateData)
         socket.emit('combat', turnRender)
     })
     Hooks.on("combatRound", async (combat, updateData, updateOptions) => {
         if (updateOptions.direction < 1) return
-        const roundRender = parseCombatRound({ ...combat, ...updateData }, updateOptions)
-        const turnRender = parseTurn(combat, updateData) 
-        socket.emit('combat', roundRender+turnRender)
+        const roundRender = parseCombatRound({...combat, ...updateData}, updateOptions)
+        const turnRender = parseTurn(combat, updateData)
+        socket.emit('combat', roundRender + turnRender)
     })
 }
 
@@ -30,13 +30,13 @@ function getEffectsInMarkdown(actor, token) {
 
     let addedEffects = new Map()
     let markdown = ''
-    for(const e of a.allApplicableEffects()) {
+    for (const e of a.allApplicableEffects()) {
         if (e.disabled) continue
         // Ignore passive effects without attached statuses
         if (e.duration.type === 'none' && e.statuses.size === 0) continue
         if (!addedEffects.has(e._id)) {
             markdown += `${'-'.padStart(4)} ${e.name}\n`
-            addedEffects.set(e._id,e.name)
+            addedEffects.set(e._id, e.name)
         }
     }
 
@@ -47,7 +47,7 @@ function parseTurn(combat, updateData) {
     const c = Object.assign(combat, updateData)
     const turn = c.turns[c.turn]
     const actor = Object.assign(
-        game.actors.find(a => a.id === turn.actorId), 
+        game.actors.find(a => a.id === turn.actorId),
         combat.combatants.find(cb => cb.tokenId === turn.tokenId))
 
     if (actor.hidden) return ''
@@ -57,19 +57,19 @@ function parseTurn(combat, updateData) {
     const healthSetting = game.settings.get(MODULE_ID, COMBAT_HEALTH_ESTIMATE)
 
     let output = ''
-    if(discordId.length)
+    if (discordId.length)
         output += `It's your turn <@${discordId[0]}>\n`
     output += '```md\n'
     output += `# Initiative ${actor.initiative} Round ${c.round}\n`
 
-    if(turn.defeated) {
+    if (turn.defeated) {
         output += `${actor.name} <Defeated>\n`
     } else if (token.document.hidden) {
         output += `${actor.name} <Hidden>\n`
     } else {
         const hp = getHealth(
-            { ...actor.system.attributes.hp, ...token.document.delta?.system?.attributes?.hp },
-            healthSetting, 
+            {...actor.system.attributes.hp, ...token.document.delta?.system?.attributes?.hp},
+            healthSetting,
             actor.type
         )
         output += `${actor.name} <${hp}>\n`
@@ -81,12 +81,12 @@ function parseTurn(combat, updateData) {
 
 function parseCombatRound(combat) {
     // Get actors and token for each combatant by turn order
-    const parsed = combat.turns.map((c) => { 
-        return { 
-            ...c, 
-            ix: c._id, 
-            actor: game.actors.find(a => a.id === c.actorId), 
-            token: canvas.tokens.placeables.find(p => p.id === c.tokenId) 
+    const parsed = combat.turns.map((c) => {
+        return {
+            ...c,
+            ix: c._id,
+            actor: game.actors.find(a => a.id === c.actorId),
+            token: canvas.tokens.placeables.find(p => p.id === c.tokenId)
         }
     })
     const healthSetting = game.settings.get(MODULE_ID, COMBAT_HEALTH_ESTIMATE)
@@ -96,18 +96,18 @@ function parseCombatRound(combat) {
     output += "==================\n"
 
     // Parse each combatant
-    output += parsed.reduce((acc,c) => {
+    output += parsed.reduce((acc, c) => {
         // Hidden from Initiative
         if (c.hidden) return acc
 
-        const rawHp = { ...c.actor.system.attributes.hp, ...c.token.document.delta?.system?.attributes?.hp }
+        const rawHp = {...c.actor.system.attributes.hp, ...c.token.document.delta?.system?.attributes?.hp}
         const init = `${c.initiative || "XX"}`.padStart(3)
 
         // Combatant is marked as defeated in initative
-        if(c.defeated) {
+        if (c.defeated) {
             let line = `${init}: ${c.name} <Defeated>\n`
             return acc + line
-        // Combatant is shown in initiative but the token is hidden
+            // Combatant is shown in initiative but the token is hidden
         } else if (c.token.document.hidden) {
             let line = `${init}: ${c.name} <Hidden>\n`
             return acc + line
@@ -127,25 +127,32 @@ function parseCombatRound(combat) {
 
 function getHealth(hp, combatHealthSetting, actorType) {
     const formatHealth = (hpObj) => {
-        return `${hpObj.value}/${hpObj.max}${hpObj.temp ? `(${hpObj.temp})`:''}` 
+        return `${hpObj.value}/${hpObj.max}${hpObj.temp ? `(${hpObj.temp})` : ''}`
     }
 
     const getHealthEstimate = (hp) => {
         const pct = Math.round(hp.effectiveMax ? (hp.value / hp.effectiveMax) * 100 : 0, 0, 100);
         switch (true) {
-            case pct > 99: return "Unharmed";
-            case pct > 75: return "Healthy";
-            case pct > 50: return "Injured";
-            case pct > 25: return "Bloodied";
-            case pct > 10: return "Severe";
-            case pct > 0: return "Critical";
-            default: return "Dead";
+            case pct > 99:
+                return "Unharmed";
+            case pct > 75:
+                return "Healthy";
+            case pct > 50:
+                return "Injured";
+            case pct > 25:
+                return "Bloodied";
+            case pct > 10:
+                return "Severe";
+            case pct > 0:
+                return "Critical";
+            default:
+                return "Dead";
         }
     }
 
     switch (combatHealthSetting) {
         case 0: // Monsters Only
-            return (actorType === "character") 
+            return (actorType === "character")
                 ? formatHealth(hp)
                 : getHealthEstimate(hp)
         case 1: // All

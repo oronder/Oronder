@@ -1,6 +1,6 @@
 import {Logger} from "./util.mjs"
 import {
-    AUTH, 
+    AUTH,
     COMBAT_HEALTH_ESTIMATE,
     COMBAT_HEALTH_ESTIMATE_TYPE,
     DAYS_OF_WEEK,
