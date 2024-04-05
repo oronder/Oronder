@@ -209,7 +209,7 @@
             </div>
              <div class="form-group">
                 <label for="combat_health_estimate">Combat Health Estimate</label>
-                <select id="combat_health_estimate" title="Describe what All, None, Monsters only means ">
+                <select id="combat_health_estimate" title="Select whose health will be described(i.e. Healthy) rather than shown (HP 8/9).">
                     {{#each combat_health_estimate_type}}
                         <option value={{this}} {{#if
                                 (eq this ../combat_health_estimate)}}selected{{/if}}>{{@key}}</option>
