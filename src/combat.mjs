@@ -26,8 +26,16 @@ export function set_combat_hooks() {
 }
 
 function getEffectsInMarkdown(actor, token) {
+    // Merge Actor effects and token.delta effects
+    let effects = new Map()
+    actor.effects.forEach((v, k) => {
+        if (!effects.has(v._id)) effects.set(v._id,v)
+    })
+    token.document.delta.effects.forEach((v, k) => {
+        if (!effects.has(v._id)) effects.set(v._id,v)
+    })
+
     let markdown = ''
-    const effects = (token.actorlink) ? actor.effects : token.document.delta.effects
     effects.forEach(val => {
         markdown += `${'-'.padStart(4)} ${val.name}\n`
     })
@@ -46,6 +54,9 @@ function parseTurn(combat, updateData) {
     const token = canvas.tokens.placeables.find(p => p.id === turn.tokenId)
     const discordId = actor_to_discord_ids(actor)
     const healthSetting = game.settings.get(MODULE_ID, COMBAT_HEALTH_ESTIMATE)
+
+    Logger.info(actor)
+    Logger.info(token)
 
     let output = ''
     if(discordId.length)
