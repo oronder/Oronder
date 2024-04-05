@@ -1,10 +1,7 @@
 import {
     AUTH,
-<<<<<<< HEAD
-=======
     COMBAT_ENABLED,
     COMBAT_HOOKS,
->>>>>>> 977b6e4 (feat(roll-initiative): added refreshing combat hooks)
     COMBAT_HEALTH_ESTIMATE,
     COMBAT_HEALTH_ESTIMATE_TYPE,
     ID_MAP,
@@ -27,8 +24,6 @@ export const registerSettings = async () => {
         config: false,
         default: {}
     })
-<<<<<<< HEAD
-=======
     game.settings.register(MODULE_ID, COMBAT_ENABLED, {
         scope: 'world',
         type: Number,
@@ -41,7 +36,6 @@ export const registerSettings = async () => {
         config: false,
         default: { combatStart: -1, combatTurn: -1, combatRound: -1 }
     })
->>>>>>> 977b6e4 (feat(roll-initiative): added refreshing combat hooks)
     game.settings.register(MODULE_ID, COMBAT_HEALTH_ESTIMATE, {
         scope: 'world',
         type: Number,
