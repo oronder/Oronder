@@ -26,9 +26,7 @@ export function set_combat_hooks() {
 }
 
 function getEffectsInMarkdown(actor, token) {
-    // Merge Actor effects and token.delta effects
     let effects = new Map()
-    Logger.info(token)
     if (token.document.actorLink) {
         for(const e of actor.allApplicableEffects()) {
             if (e.disabled) continue
