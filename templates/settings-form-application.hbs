@@ -186,18 +186,17 @@
 
         {{#if show_advanced}}
             <div class="form-group">
-                <h3>
+                <h4>
                     <label for="combat_tracking_enabled"
-                           title="(Under Development) Oronder will post rolls from Discord to Foundry if a GM is logged into Foundry.">
-                        Publish Discord Rolls
+                           title="Oronder will post changes in the combat tracker to the Combat Channel configured below">
+                        Publish Combat Tracker to Discord
                     </label>
-                    <input type="checkbox" id='combat_tracking_enabled' class='control' data-action='checkbox'
-                           style='float:right'
-                        {{checked guild.combat_tracking_enabled}}>
-                </h3>
+                    <input type="checkbox" id='combat_tracking_enabled' class='control' data-action='checkbox' 
+                        style='float:right' {{checked guild.combat_tracking_enabled}}>
+                </h4>
             </div>
             <div class="form-group">
-                <label for="combat_channel">Combat Channel (Under Development) </label>
+                <label for="combat_channel">Combat Channel</label>
                 <select id="combat_channel">
                     <option value="">❌ DISABLED</option>
                     {{#each guild.forum_and_text_channels}}
@@ -206,6 +205,15 @@
                     {{/each}}
                 </select>
 
+            </div>
+             <div class="form-group">
+                <label for="combat_health_estimate">Combat Health Estimate</label>
+                <select id="combat_health_estimate" title="Select whose health will be described(i.e. Healthy) rather than shown (HP 8/9).">
+                    {{#each combat_health_estimate_type}}
+                        <option value={{this}} {{#if
+                                (eq this ../combat_health_estimate)}}selected{{/if}}>{{@key}}</option>
+                    {{/each}}
+                </select>
             </div>
             <div class="form-group">
                 <button type="button" class='control' data-action='sync-all' {{#if buttons_disabled}}disabled{{/if}}>

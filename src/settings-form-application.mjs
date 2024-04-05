@@ -1,5 +1,15 @@
 import {Logger} from "./util.mjs"
-import {AUTH, DAYS_OF_WEEK, DISCORD_INIT_LINK, ID_MAP, MODULE_ID, ORONDER_BASE_URL, TIMEZONES} from "./constants.mjs"
+import {
+    AUTH, 
+    COMBAT_HEALTH_ESTIMATE,
+    COMBAT_HEALTH_ESTIMATE_TYPE,
+    DAYS_OF_WEEK,
+    DISCORD_INIT_LINK,
+    ID_MAP,
+    MODULE_ID,
+    ORONDER_BASE_URL,
+    TIMEZONES
+} from "./constants.mjs"
 import {full_sync, sync_actor} from "./sync.mjs"
 import {open_socket_with_oronder} from "./module.mjs"
 
@@ -15,6 +25,8 @@ export class OronderSettingsFormApplication extends FormApplication {
             init_active: false,
             show_advanced: false,
             id_map: id_map,
+            combat_health_estimate: game.settings.get(MODULE_ID, COMBAT_HEALTH_ESTIMATE),
+            combat_health_estimate_type: COMBAT_HEALTH_ESTIMATE_TYPE,
             players: game.users.filter(user => user.role < 3).map(user => ({
                 foundry_name: user.name,
                 foundry_id: user.id,
@@ -101,6 +113,7 @@ export class OronderSettingsFormApplication extends FormApplication {
             if (this.object.show_advanced && this.form.elements.show_advanced.checked) {
                 this.object.guild.combat_channel_id = Array.from(this.form.elements.combat_channel).find(c => c.selected)?.value || undefined
                 this.object.guild.combat_tracking_enabled = this.form.elements.combat_tracking_enabled.checked
+                this.object.combat_health_estimate = this.form.elements.combat_health_estimate.value
             }
             this.object.show_advanced = this.form.elements.show_advanced.checked
 
@@ -180,6 +193,8 @@ export class OronderSettingsFormApplication extends FormApplication {
         }
 
         this.bind()
+
+        await game.settings.set(MODULE_ID, COMBAT_HEALTH_ESTIMATE, this.object.combat_health_estimate)
 
         const updated_id_map = await game.settings.set(MODULE_ID, ID_MAP,
             Object.fromEntries(this.object.players.map(p => [p.foundry_id, p.discord_id]))

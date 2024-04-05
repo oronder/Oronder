@@ -186,7 +186,7 @@ export async function del_actor(pc_id) {
 }
 
 
-const actor_to_discord_ids = actor =>
+export const actor_to_discord_ids = actor =>
     Object.entries(actor.ownership)
         .filter(([_, perm_lvl]) => perm_lvl === CONST.DOCUMENT_OWNERSHIP_LEVELS.OWNER)
         .map(([owner_id, _]) => game.settings.get(MODULE_ID, ID_MAP)[owner_id])

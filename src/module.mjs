@@ -29,7 +29,6 @@ Hooks.once("ready", async () => {
     if (game.user.isGM) {
         await registerSettings()
         open_socket_with_oronder()
-        set_combat_hooks()
     }
 
     game.socket.on(SOCKET_NAME, data => {
@@ -98,6 +97,7 @@ export function open_socket_with_oronder(update = false) {
 
     monks_token_bar_hooks()
     handle_incoming_rolls()
+    set_combat_hooks()
 }
 
 
