@@ -1,10 +1,7 @@
 import {Logger} from "./util.mjs"
 import {
     AUTH, 
-<<<<<<< HEAD
-=======
     COMBAT_ENABLED,
->>>>>>> 977b6e4 (feat(roll-initiative): added refreshing combat hooks)
     COMBAT_HEALTH_ESTIMATE,
     COMBAT_HEALTH_ESTIMATE_TYPE,
     DAYS_OF_WEEK,
@@ -199,10 +196,7 @@ export class OronderSettingsFormApplication extends FormApplication {
 
         this.bind()
 
-<<<<<<< HEAD
-=======
         await game.settings.set(MODULE_ID, COMBAT_ENABLED, this.object.guild.combat_tracking_enabled)
->>>>>>> 977b6e4 (feat(roll-initiative): added refreshing combat hooks)
         await game.settings.set(MODULE_ID, COMBAT_HEALTH_ESTIMATE, this.object.combat_health_estimate)
 
         const updated_id_map = await game.settings.set(MODULE_ID, ID_MAP,

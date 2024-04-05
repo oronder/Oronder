@@ -1,10 +1,6 @@
 import {item_roll, Logger} from "./util.mjs";
 import {socket} from "./module.mjs";
-<<<<<<< HEAD
-import {COMBAT_HEALTH_ESTIMATE, ID_MAP, MODULE_ID} from "./constants.mjs";
-=======
 import {COMBAT_ENABLED, COMBAT_HOOKS, COMBAT_HEALTH_ESTIMATE, ID_MAP, MODULE_ID} from "./constants.mjs";
->>>>>>> 977b6e4 (feat(roll-initiative): added refreshing combat hooks)
 import { actor_to_discord_ids } from "./sync.mjs";
 
 const onCombatStart = async (combat, updateData) =>  {
@@ -27,24 +23,6 @@ const onCombatRound = async (combat, updateData, updateOptions) => {
 export function set_combat_hooks() {
     Logger.info("Setting Combat Hooks.")
 
-<<<<<<< HEAD
-    Hooks.on("combatStart", async (combat, updateData) => {
-        const roundRender = parseCombatRound({ ...combat, ...updateData })
-        const turnRender = parseTurn(combat, updateData) 
-        socket.emit('combat', roundRender+turnRender)
-    })
-    Hooks.on("combatTurn", async (combat, updateData, updateOptions) => {
-        if (updateOptions.direction < 1) return
-        const turnRender = parseTurn(combat, updateData) 
-        socket.emit('combat', turnRender)
-    })
-    Hooks.on("combatRound", async (combat, updateData, updateOptions) => {
-        if (updateOptions.direction < 1) return
-        const roundRender = parseCombatRound({ ...combat, ...updateData }, updateOptions)
-        const turnRender = parseTurn(combat, updateData) 
-        socket.emit('combat', roundRender+turnRender)
-    })
-=======
     let combatHooks = game.settings.get(MODULE_ID, COMBAT_HOOKS)
 
     const turnOffHook = (key) => {
@@ -69,7 +47,6 @@ export function set_combat_hooks() {
 
     // update settings with function ids
     game.settings.set(MODULE_ID, COMBAT_HOOKS, combatHooks)
->>>>>>> 977b6e4 (feat(roll-initiative): added refreshing combat hooks)
 }
 
 function getEffectsInMarkdown(actor, token) {
