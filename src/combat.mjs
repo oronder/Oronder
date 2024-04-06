@@ -1,13 +1,12 @@
 import {item_roll, Logger} from "./util.mjs";
-import {socket} from "./module.mjs";
+import {combat_hooks, socket} from "./module.mjs";
 import {COMBAT_ENABLED, COMBAT_HEALTH_ESTIMATE, COMBAT_HEALTH_ESTIMATE_TYPE, ID_MAP, MODULE_ID} from "./constants.mjs";
-import { actor_to_discord_ids } from "./sync.mjs";
-import { combat_hooks } from "./module.mjs";
+import {actor_to_discord_ids} from "./sync.mjs";
 
-const onCombatStart = async (combat, updateData) =>  {
-    const roundRender = parseCombatRound({ ...combat, ...updateData })
+const onCombatStart = async (combat, updateData) => {
+    const roundRender = parseCombatRound({...combat, ...updateData})
     const turnRender = parseTurn(combat, updateData)
-    socket.emit('combat', roundRender+turnRender)
+    socket.emit('combat', roundRender + turnRender)
 }
 const onCombatTurn = async (combat, updateData, updateOptions) => {
     if (updateOptions.direction < 1) return
@@ -16,9 +15,9 @@ const onCombatTurn = async (combat, updateData, updateOptions) => {
 }
 const onCombatRound = async (combat, updateData, updateOptions) => {
     if (updateOptions.direction < 1) return
-    const roundRender = parseCombatRound({ ...combat, ...updateData }, updateOptions)
+    const roundRender = parseCombatRound({...combat, ...updateData}, updateOptions)
     const turnRender = parseTurn(combat, updateData)
-    socket.emit('combat', roundRender+turnRender)
+    socket.emit('combat', roundRender + turnRender)
 }
 
 export function set_combat_hooks() {
@@ -33,11 +32,10 @@ export function set_combat_hooks() {
     }
 
     // Turn off hooks
-    ["combatStart", "combatTurn", "combatRound"].forEach(key => turnOffHook(key))
+    ["combatStart", "combatTurn", "combatRound"].forEach(turnOffHook)
 
     // Turn them back on
-    if (game.settings.get(MODULE_ID, COMBAT_ENABLED))
-    {
+    if (game.settings.get(MODULE_ID, COMBAT_ENABLED)) {
         combat_hooks.combatStart = Hooks.on("combatStart", onCombatStart)
         combat_hooks.combatTurn = Hooks.on("combatTurn", onCombatTurn)
         combat_hooks.combatRound = Hooks.on("combatRound", onCombatRound)
