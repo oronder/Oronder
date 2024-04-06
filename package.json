@@ -1,12 +1,16 @@
 {
   "dependencies": {
-    "esbuild": "^0.19.3",
+    "esbuild": "^0.20.2",
     "object-hash": "^3.0.0"
+  },
+  "devDependencies": {
+    "prettier": "^3.2.5"
   },
   "scripts": {
     "build": "esbuild src/module.mjs --bundle --minify --format=esm --outdir=dist",
     "build-dev": "esbuild src/module.mjs --bundle --sourcemap=inline --format=esm --outdir=dist",
     "copy-11": "mkdir -p ../foundry_data/Data/modules/oronder/ && cp -r ./* ../foundry_data/Data/modules/oronder/",
-    "copy-12": "mkdir -p ../foundry_data_12/Data/modules/oronder/ && cp -r ./* ../foundry_data_12/Data/modules/oronder/"
+    "copy-12": "mkdir -p ../foundry_data_12/Data/modules/oronder/ && cp -r ./* ../foundry_data_12/Data/modules/oronder/",
+    "format": "prettier --write ."
   }
 }
