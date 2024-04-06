@@ -8,6 +8,11 @@ import {handle_incoming_rolls, set_combat_hooks} from "./combat.mjs";
 export let socket
 export let session_id
 export let session_ts
+export let combat_hooks = {
+    combatStart: undefined,
+    combatRound: undefined,
+    combatTurn: undefined
+}
 let session_name
 let default_title
 

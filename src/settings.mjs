@@ -1,5 +1,6 @@
 import {
     AUTH,
+    COMBAT_ENABLED,
     COMBAT_HEALTH_ESTIMATE,
     COMBAT_HEALTH_ESTIMATE_TYPE,
     ID_MAP,
@@ -21,6 +22,12 @@ export const registerSettings = async () => {
         type: Object,
         config: false,
         default: {}
+    })
+    game.settings.register(MODULE_ID, COMBAT_ENABLED, {
+        scope: 'world',
+        type: Boolean,
+        config: false,
+        default: false
     })
     game.settings.register(MODULE_ID, COMBAT_HEALTH_ESTIMATE, {
         scope: 'world',

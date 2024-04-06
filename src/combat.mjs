@@ -1,28 +1,45 @@
 import {item_roll, Logger} from "./util.mjs";
-import {socket} from "./module.mjs";
-import {COMBAT_HEALTH_ESTIMATE, COMBAT_HEALTH_ESTIMATE_TYPE, ID_MAP, MODULE_ID} from "./constants.mjs";
+import {combat_hooks, socket} from "./module.mjs";
+import {COMBAT_ENABLED, COMBAT_HEALTH_ESTIMATE, COMBAT_HEALTH_ESTIMATE_TYPE, ID_MAP, MODULE_ID} from "./constants.mjs";
 import {actor_to_discord_ids} from "./sync.mjs";
 
+const onCombatStart = async (combat, updateData) => {
+    const roundRender = parseCombatRound({...combat, ...updateData})
+    const turnRender = parseTurn(combat, updateData)
+    socket.emit('combat', roundRender + turnRender)
+}
+const onCombatTurn = async (combat, updateData, updateOptions) => {
+    if (updateOptions.direction < 1) return
+    const turnRender = parseTurn(combat, updateData)
+    socket.emit('combat', turnRender)
+}
+const onCombatRound = async (combat, updateData, updateOptions) => {
+    if (updateOptions.direction < 1) return
+    const roundRender = parseCombatRound({...combat, ...updateData}, updateOptions)
+    const turnRender = parseTurn(combat, updateData)
+    socket.emit('combat', roundRender + turnRender)
+}
 
 export function set_combat_hooks() {
     Logger.info("Setting Combat Hooks.")
 
-    Hooks.on("combatStart", async (combat, updateData) => {
-        const roundRender = parseCombatRound({...combat, ...updateData})
-        const turnRender = parseTurn(combat, updateData)
-        socket.emit('combat', roundRender + turnRender)
-    })
-    Hooks.on("combatTurn", async (combat, updateData, updateOptions) => {
-        if (updateOptions.direction < 1) return
-        const turnRender = parseTurn(combat, updateData)
-        socket.emit('combat', turnRender)
-    })
-    Hooks.on("combatRound", async (combat, updateData, updateOptions) => {
-        if (updateOptions.direction < 1) return
-        const roundRender = parseCombatRound({...combat, ...updateData}, updateOptions)
-        const turnRender = parseTurn(combat, updateData)
-        socket.emit('combat', roundRender + turnRender)
-    })
+    Logger.info(combat_hooks)
+    const turnOffHook = (key) => {
+        if (combat_hooks[key]) {
+            Hooks.off(key, combat_hooks[key])
+            combat_hooks[key] = undefined
+        }
+    }
+
+    // Turn off hooks
+    ["combatStart", "combatTurn", "combatRound"].forEach(turnOffHook)
+
+    // Turn them back on
+    if (game.settings.get(MODULE_ID, COMBAT_ENABLED)) {
+        combat_hooks.combatStart = Hooks.on("combatStart", onCombatStart)
+        combat_hooks.combatTurn = Hooks.on("combatTurn", onCombatTurn)
+        combat_hooks.combatRound = Hooks.on("combatRound", onCombatRound)
+    }
 }
 
 function getEffectsInMarkdown(actor, token) {
