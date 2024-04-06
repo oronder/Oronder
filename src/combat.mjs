@@ -26,9 +26,9 @@ export function set_combat_hooks() {
 
     Logger.info(combat_hooks)
     const turnOffHook = (key) => {
-        if (combat_hooks[key] > -1) {
+        if (combat_hooks[key]) {
             Hooks.off(key, combat_hooks[key])
-            combat_hooks[key] = -1
+            combat_hooks[key] = undefined
         }
     }
 

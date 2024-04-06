@@ -9,9 +9,9 @@ export let socket
 export let session_id
 export let session_ts
 export let combat_hooks = {
-    combatStart: -1,
-    combatRound: -1,
-    combatTurn: -1
+    combatStart: undefined,
+    combatRound: undefined,
+    combatTurn: undefined
 }
 let session_name
 let default_title
