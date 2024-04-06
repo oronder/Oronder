@@ -10,7 +10,6 @@ export const AUTH = "auth"
 export const ORONDER_CONFIGURATION_FORM = "oronder_options"
 export const ID_MAP = "id_map"
 export const COMBAT_ENABLED = 'combat_enabled'
-export const COMBAT_HOOKS = 'combat_hooks'
 export const COMBAT_HEALTH_ESTIMATE = 'combat_health_estimate'
 export const COMBAT_HEALTH_ESTIMATE_TYPE = Object.freeze({
     Monsters: 0,

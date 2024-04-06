@@ -1,7 +1,8 @@
 import {item_roll, Logger} from "./util.mjs";
 import {socket} from "./module.mjs";
-import {COMBAT_ENABLED, COMBAT_HOOKS, COMBAT_HEALTH_ESTIMATE, COMBAT_HEALTH_ESTIMATE_TYPE, ID_MAP, MODULE_ID} from "./constants.mjs";
+import {COMBAT_ENABLED, COMBAT_HEALTH_ESTIMATE, COMBAT_HEALTH_ESTIMATE_TYPE, ID_MAP, MODULE_ID} from "./constants.mjs";
 import { actor_to_discord_ids } from "./sync.mjs";
+import { combat_hooks } from "./module.mjs";
 
 const onCombatStart = async (combat, updateData) =>  {
     const roundRender = parseCombatRound({ ...combat, ...updateData })
@@ -23,12 +24,11 @@ const onCombatRound = async (combat, updateData, updateOptions) => {
 export function set_combat_hooks() {
     Logger.info("Setting Combat Hooks.")
 
-    let combatHooks = game.settings.get(MODULE_ID, COMBAT_HOOKS)
-
+    Logger.info(combat_hooks)
     const turnOffHook = (key) => {
-        if (combatHooks[key] > -1) {
-            Hooks.off(key, combatHooks[key])
-            combatHooks[key] = -1
+        if (combat_hooks[key] > -1) {
+            Hooks.off(key, combat_hooks[key])
+            combat_hooks[key] = -1
         }
     }
 
@@ -38,15 +38,10 @@ export function set_combat_hooks() {
     // Turn them back on
     if (game.settings.get(MODULE_ID, COMBAT_ENABLED))
     {
-        combatHooks = {
-            combatStart: Hooks.on("combatStart", onCombatStart),
-            combatTurn: Hooks.on("combatTurn", onCombatTurn),
-            combatRound: Hooks.on("combatRound", onCombatTurn)
-        }
+        combat_hooks.combatStart = Hooks.on("combatStart", onCombatStart)
+        combat_hooks.combatTurn = Hooks.on("combatTurn", onCombatTurn)
+        combat_hooks.combatRound = Hooks.on("combatRound", onCombatRound)
     }
-
-    // update settings with function ids
-    game.settings.set(MODULE_ID, COMBAT_HOOKS, combatHooks)
 }
 
 function getEffectsInMarkdown(actor, token) {
