@@ -25,7 +25,7 @@ export const registerSettings = async () => {
     })
     game.settings.register(MODULE_ID, COMBAT_ENABLED, {
         scope: 'world',
-        type: Number,
+        type: Boolean,
         config: false,
         default: false
     })
