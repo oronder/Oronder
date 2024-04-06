@@ -62,7 +62,9 @@
         <hr>
         <h3 class="border">Channels</h3>
         <div class="form-group">
-            <label for="session_channel">Session Channel</label>
+            <label for="session_channel"
+                   title="Channel Sessions will be posted to. If a Forum Channel is selected, Oronder will create a new thread for each session.">
+                Session Channel</label>
             <select id="session_channel">
                 {{#each guild.forum_and_text_channels}}
                     <option value="{{id}}"  {{#if (eq id ../guild.session_channel_id)}}selected{{/if}}>
@@ -71,7 +73,8 @@
             </select>
         </div>
         <div class="form-group">
-            <label for="downtime_channel">Downtime Channel</label>
+            <label for="downtime_channel" title="Channel where /downtime... rolls should take place.">
+                Downtime Channel</label>
             <select id="downtime_channel">
                 {{#each guild.text_channels}}
                     <option value="{{id}}"  {{#if (eq id ../guild.downtime_channel_id)}}selected{{/if}}>
@@ -80,7 +83,8 @@
             </select>
         </div>
         <div class="form-group">
-            <label for="downtime_gm_channel">Downtime GM Channel</label>
+            <label for="downtime_gm_channel" title="Optional Channel where downtime activities may be claimed by a GM.">
+                Downtime GM Channel</label>
             <select id="downtime_gm_channel">
                 <option value="">❌ DISABLED</option>
                 {{#each guild.text_channels}}
@@ -90,7 +94,8 @@
             </select>
         </div>
         <div class="form-group">
-            <label for="voice_channel">Voice Channel</label>
+            <label for="voice_channel" title="Voice Channel where Oronder will create session events.">
+                Voice Channel</label>
             <select id="voice_channel">
                 {{#each guild.voice_and_stage_channels}}
                     <option value="{{id}}"  {{#if (eq id ../guild.voice_channel_id)}}selected{{/if}}>
@@ -99,7 +104,8 @@
             </select>
         </div>
         <div class="form-group">
-            <label for="scheduling_channel">Scheduling Channel</label>
+            <label for="scheduling_channel" title="Channel where Oronder will advertise new Sessions.">
+                Scheduling Channel</label>
             <select id="scheduling_channel">
                 {{#each guild.text_channels}}
                     <option value="{{id}}"  {{#if (eq id ../guild.scheduling_channel_id)}}selected{{/if}}>
@@ -129,10 +135,8 @@
         <div class="form-group">
             <h3>
                 <label for="rollcall_enabled"
-                       title="If enabled, Oronder will mention the provided at the specified time.">
-                    Rollcall
-                </label>
-                <!--            <p class="hint">If enabled, Oronder will @ mention the provided at the specified time.</p>-->
+                       title="If enabled, Oronder will prompt members for their weekly availability.">
+                    Rollcall</label>
                 <input type="checkbox" id='rollcall_enabled' class='control' data-action='checkbox'
                        style='float:right'
                     {{checked guild.rollcall_enabled}}>
@@ -140,7 +144,7 @@
         </div>
         {{#if guild.rollcall_enabled}}
             <div class="form-group">
-                <label for="rollcall_role">Role</label>
+                <label for="rollcall_role" title="Role Oronder will @ mention when posting roll call.">Role</label>
                 <select id="rollcall_role" required>
                     <option value=""></option>
                     {{#each guild.roles}}
@@ -150,7 +154,8 @@
                 </select>
             </div>
             <div class="form-group">
-                <label for="rollcall_channel">Channel</label>
+                <label for="rollcall_channel" title="Channel where roll call messages will be posted to.">
+                    Channel</label>
                 <select id="rollcall_channel" required>
                     <option value=""></option>
                     {{#each guild.text_channels}}
@@ -160,7 +165,7 @@
                 </select>
             </div>
             <div class="form-group">
-                <label for="rollcall_day">Day</label>
+                <label for="rollcall_day" title="Day of the week when roll call messages will be posted.">Day</label>
                 <select id="rollcall_day" required>
                     <option value=""></option>
                     {{#each days_of_week}}
@@ -170,7 +175,7 @@
                 </select>
             </div>
             <div class="form-group">
-                <label for="rollcall_time">Time</label>
+                <label for="rollcall_time" title="Time of day when roll call messages will be posted.">Time</label>
                 <input type="time" id="rollcall_time" required value="{{guild.rollcall_time}}">
             </div>
         {{/if}}
@@ -178,7 +183,7 @@
 
         <div class="form-group">
             <h3>
-                <label for='show_advanced'>Advanced Options</label>
+                <label for='show_advanced' title="Display Advanced and Experimental Options.">Advanced Options</label>
                 <input type="checkbox" id='show_advanced' class='control' data-action='checkbox'
                     {{checked show_advanced}} style='float:right'>
             </h3>
@@ -186,33 +191,38 @@
 
         {{#if show_advanced}}
             <div class="form-group">
-                <h4>
-                    <label for="combat_tracking_enabled"
-                           title="Oronder will post changes in the combat tracker to the Combat Channel configured below">
-                        Publish Combat Tracker to Discord
-                    </label>
-                    <input type="checkbox" id='combat_tracking_enabled' class='control' data-action='checkbox'
-                           style='float:right' {{checked guild.combat_tracking_enabled}}>
-                </h4>
+                <label for="roll_discord_to_foundry"
+                       title="Oronder will post rolls from Discord to Foundry if a GM is logged into Foundry.">
+                    (Under Development) Publish Discord Rolls to Foundry</label>
+                <input type="checkbox" id='roll_discord_to_foundry' class='control' data-action='checkbox'
+                       style='float:right' {{checked guild.roll_discord_to_foundry}}>
             </div>
             <div class="form-group">
-                <label for="combat_channel">Combat Channel</label>
-                <select id="combat_channel">
+                <label for="combat_tracking_enabled"
+                       title="Oronder will post changes in the combat tracker to the Combat Channel configured below.">
+                    Publish Combat Tracker to Discord</label>
+                <input type="checkbox" id='combat_tracking_enabled' class='control' data-action='checkbox'
+                       style='float:right' {{checked guild.combat_tracking_enabled}}>
+            </div>
+            <div class="form-group">
+                <label for="combat_channel" title="Channel where Combat Tracking Messages will be posted.">
+                    Combat Channel</label>
+                <select id="combat_channel" {{#unless guild.combat_tracking_enabled}}disabled{{/unless}}>
                     <option value="">❌ DISABLED</option>
-                    {{#each guild.forum_and_text_channels}}
+                    {{#each guild.text_channels}}
                         <option value="{{id}}"  {{#if (eq id ../guild.combat_channel_id)}}selected{{/if}}>
                             {{name}}</option>
                     {{/each}}
                 </select>
-
             </div>
             <div class="form-group">
-                <label for="combat_health_estimate">Combat Health Estimate</label>
-                <select id="combat_health_estimate"
-                        title="Select whose health will be described(i.e. Healthy) rather than shown (HP 8/9).">
+                <label for="combat_health_estimate"
+                       title="Select whose health will be described(i.e. Healthy) rather than shown (HP 8/9).">
+                    Combat Health Estimate</label>
+                <select id="combat_health_estimate" {{#unless guild.combat_tracking_enabled}}disabled{{/unless}}>
                     {{#each combat_health_estimate_type}}
-                        <option value={{this}} {{#if
-                                (eq this ../combat_health_estimate)}}selected{{/if}}>{{@key}}</option>
+                        <option value={{this}} {{#if (eq this ../combat_health_estimate)}}selected{{/if}}>
+                            {{@key}}</option>
                     {{/each}}
                 </select>
             </div>

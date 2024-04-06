@@ -98,22 +98,22 @@ export class OronderSettingsFormApplication extends FormApplication {
 
             this.object.guild.timezone = Array.from(this.form.elements.timezone).find(c => c.selected).value
             this.object.guild.starting_level = this.form.elements.starting_level.value
-            this.object.guild.rollcall_enabled = this.form.elements.rollcall_enabled.checked
-            if (this.object.guild.rollcall_enabled && this.form.elements.rollcall_enabled.checked) {
-                if (this.form.elements.rollcall_channel)
-                    this.object.guild.rollcall_channel_id = Array.from(this.form.elements.rollcall_channel).find(c => c.selected).value || undefined
-                if (this.form.elements.rollcall_role)
-                    this.object.guild.rollcall_role_id = Array.from(this.form.elements.rollcall_role).find(c => c.selected).value || undefined
-                if (this.form.elements.rollcall_day)
-                    this.object.guild.rollcall_day = this.form.elements.rollcall_day?.value
-                if (this.form.elements.rollcall_time)
-                    this.object.guild.rollcall_time = this.form.elements.rollcall_time?.value
-            }
 
+            //we don't want to set these if rollcall_enabled is actively being checked, or is not currently checked
+            if (this.object.guild.rollcall_enabled && this.form.elements.rollcall_enabled.checked) {
+                this.object.guild.rollcall_channel_id = Array.from(this.form.elements.rollcall_channel).find(c => c.selected).value || undefined
+                this.object.guild.rollcall_role_id = Array.from(this.form.elements.rollcall_role).find(c => c.selected).value || undefined
+                this.object.guild.rollcall_day = this.form.elements.rollcall_day?.value
+                this.object.guild.rollcall_time = this.form.elements.rollcall_time?.value
+            }
+            this.object.guild.rollcall_enabled = this.form.elements.rollcall_enabled.checked
+
+            //we don't want to set these if show_advanced is actively being checked, or is not currently checked
             if (this.object.show_advanced && this.form.elements.show_advanced.checked) {
-                this.object.guild.combat_channel_id = Array.from(this.form.elements.combat_channel).find(c => c.selected)?.value || undefined
+                this.object.guild.combat_channel_id = Array.from(this.form.elements.combat_channel).find(c => c.selected)?.value
+                this.object.guild.roll_discord_to_foundry = this.form.elements.roll_discord_to_foundry.checked
+                this.object.combat_health_estimate = parseInt(this.form.elements.combat_health_estimate.value)
                 this.object.guild.combat_tracking_enabled = this.form.elements.combat_tracking_enabled.checked
-                this.object.combat_health_estimate = this.form.elements.combat_health_estimate.value
             }
             this.object.show_advanced = this.form.elements.show_advanced.checked
 

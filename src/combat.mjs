@@ -1,6 +1,6 @@
 import {item_roll, Logger} from "./util.mjs";
 import {socket} from "./module.mjs";
-import {COMBAT_HEALTH_ESTIMATE, ID_MAP, MODULE_ID} from "./constants.mjs";
+import {COMBAT_HEALTH_ESTIMATE, COMBAT_HEALTH_ESTIMATE_TYPE, ID_MAP, MODULE_ID} from "./constants.mjs";
 import {actor_to_discord_ids} from "./sync.mjs";
 
 
@@ -151,13 +151,13 @@ function getHealth(hp, combatHealthSetting, actorType) {
     }
 
     switch (combatHealthSetting) {
-        case 0: // Monsters Only
+        case COMBAT_HEALTH_ESTIMATE_TYPE.Monsters:
             return (actorType === "character")
                 ? formatHealth(hp)
                 : getHealthEstimate(hp)
-        case 1: // All
+        case COMBAT_HEALTH_ESTIMATE_TYPE.All:
             return getHealthEstimate(hp)
-        case 2: // None
+        case COMBAT_HEALTH_ESTIMATE_TYPE.None:
             return formatHealth(hp)
         default:
             console.error(`Combat Health Setting(${combatHealthSetting}) is not supported.`)

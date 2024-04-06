@@ -11,9 +11,9 @@ export const ORONDER_CONFIGURATION_FORM = "oronder_options"
 export const ID_MAP = "id_map"
 export const COMBAT_HEALTH_ESTIMATE = 'combat_health_estimate'
 export const COMBAT_HEALTH_ESTIMATE_TYPE = Object.freeze({
-    'Monsters Only': 0,
-    'All': 1,
-    'None': 2
+    Monsters: 0,
+    All: 1,
+    None: 2
 })
 export const ACTORS = `${MODULE_ID}.actors`
 const dev_mode = window.location.host === 'localhost:65434'
