@@ -3,20 +3,20 @@ import {combat_hooks, socket} from "./module.mjs";
 import {COMBAT_ENABLED, COMBAT_HEALTH_ESTIMATE, COMBAT_HEALTH_ESTIMATE_TYPE, ID_MAP, MODULE_ID} from "./constants.mjs";
 import {actor_to_discord_ids} from "./sync.mjs";
 
-const onCombatStart = async (combat, updateData) => {
-    const roundRender = parseCombatRound({...combat, ...updateData})
-    const turnRender = parseTurn(combat, updateData)
+const on_combat_start = async (combat, updateData) => {
+    const roundRender = parse_combat_round({...combat, ...updateData})
+    const turnRender = parse_turn(combat, updateData)
     socket.emit('combat', roundRender + turnRender)
 }
-const onCombatTurn = async (combat, updateData, updateOptions) => {
+const on_combat_turn = async (combat, updateData, updateOptions) => {
     if (updateOptions.direction < 1) return
-    const turnRender = parseTurn(combat, updateData)
+    const turnRender = parse_turn(combat, updateData)
     socket.emit('combat', turnRender)
 }
-const onCombatRound = async (combat, updateData, updateOptions) => {
+const on_combat_round = async (combat, updateData, updateOptions) => {
     if (updateOptions.direction < 1) return
-    const roundRender = parseCombatRound({...combat, ...updateData}, updateOptions)
-    const turnRender = parseTurn(combat, updateData)
+    const roundRender = parse_combat_round({...combat, ...updateData}, updateOptions)
+    const turnRender = parse_turn(combat, updateData)
     socket.emit('combat', roundRender + turnRender)
 }
 
@@ -24,7 +24,7 @@ export function set_combat_hooks() {
     Logger.info("Setting Combat Hooks.")
 
     Logger.info(combat_hooks)
-    const turnOffHook = (key) => {
+    const turn_off_hook = (key) => {
         if (combat_hooks[key]) {
             Hooks.off(key, combat_hooks[key])
             combat_hooks[key] = undefined
@@ -32,17 +32,17 @@ export function set_combat_hooks() {
     }
 
     // Turn off hooks
-    ["combatStart", "combatTurn", "combatRound"].forEach(turnOffHook)
+    ["combatStart", "combatTurn", "combatRound"].forEach(turn_off_hook)
 
     // Turn them back on
     if (game.settings.get(MODULE_ID, COMBAT_ENABLED)) {
-        combat_hooks.combatStart = Hooks.on("combatStart", onCombatStart)
-        combat_hooks.combatTurn = Hooks.on("combatTurn", onCombatTurn)
-        combat_hooks.combatRound = Hooks.on("combatRound", onCombatRound)
+        combat_hooks.combatStart = Hooks.on("combatStart", on_combat_start)
+        combat_hooks.combatTurn = Hooks.on("combatTurn", on_combat_turn)
+        combat_hooks.combatRound = Hooks.on("combatRound", on_combat_round)
     }
 }
 
-function getEffectsInMarkdown(actor, token) {
+function get_effects_in_markdown(actor, token) {
     let a = (token.document.actorLink) ? actor : token.actor
 
     let addedEffects = new Map()
@@ -60,7 +60,7 @@ function getEffectsInMarkdown(actor, token) {
     return markdown
 }
 
-function parseTurn(combat, updateData) {
+function parse_turn(combat, updateData) {
     const c = Object.assign(combat, updateData)
     const turn = c.turns[c.turn]
     const actor = Object.assign(
@@ -84,19 +84,19 @@ function parseTurn(combat, updateData) {
     } else if (token.document.hidden) {
         output += `${actor.name} <Hidden>\n`
     } else {
-        const hp = getHealth(
+        const hp = get_health(
             {...actor.system.attributes.hp, ...token.document.delta?.system?.attributes?.hp},
             healthSetting,
             actor.type
         )
         output += `${actor.name} <${hp}>\n`
-        output += getEffectsInMarkdown(actor, token)
+        output += get_effects_in_markdown(actor, token)
     }
     output += '```\n'
     return output
 }
 
-function parseCombatRound(combat) {
+function parse_combat_round(combat) {
     // Get actors and token for each combatant by turn order
     const parsed = combat.turns.map((c) => {
         return {
@@ -129,11 +129,11 @@ function parseCombatRound(combat) {
             let line = `${init}: ${c.name} <Hidden>\n`
             return acc + line
         } else {
-            const hp = getHealth(rawHp, healthSetting, c.actor.type)
+            const hp = get_health(rawHp, healthSetting, c.actor.type)
             const ac = `AC ${c.actor.system.attributes.ac.value}`
 
             let line = `${init}: ${c.name} <${hp}> (${ac})\n`
-            line += getEffectsInMarkdown(c.actor, c.token)
+            line += get_effects_in_markdown(c.actor, c.token)
 
             return acc + line
         }
@@ -142,12 +142,12 @@ function parseCombatRound(combat) {
     return output
 }
 
-function getHealth(hp, combatHealthSetting, actorType) {
-    const formatHealth = (hpObj) => {
+function get_health(hp, combatHealthSetting, actorType) {
+    const format_health = (hpObj) => {
         return `${hpObj.value}/${hpObj.max}${hpObj.temp ? `(${hpObj.temp})` : ''}`
     }
 
-    const getHealthEstimate = (hp) => {
+    const get_health_estimate = (hp) => {
         const pct = Math.round(hp.effectiveMax ? (hp.value / hp.effectiveMax) * 100 : 0, 0, 100);
         switch (true) {
             case pct > 99:
@@ -170,12 +170,12 @@ function getHealth(hp, combatHealthSetting, actorType) {
     switch (combatHealthSetting) {
         case COMBAT_HEALTH_ESTIMATE_TYPE.Monsters:
             return (actorType === "character")
-                ? formatHealth(hp)
-                : getHealthEstimate(hp)
+                ? format_health(hp)
+                : get_health_estimate(hp)
         case COMBAT_HEALTH_ESTIMATE_TYPE.All:
-            return getHealthEstimate(hp)
+            return get_health_estimate(hp)
         case COMBAT_HEALTH_ESTIMATE_TYPE.None:
-            return formatHealth(hp)
+            return format_health(hp)
         default:
             console.error(`Combat Health Setting(${combatHealthSetting}) is not supported.`)
     }
