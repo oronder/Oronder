@@ -94,8 +94,9 @@ def update_repo_description(module_json):
                      ('author', FOUNDRY_AUTHOR),
                      ('secret-key', FOUNDRY_PACKAGE_RELEASE_TOKEN),
                      ('requires', 1),
-                     ('tags', 15),
-                     ('tags', 17)
+                     ('tags', 7), # Chat Log and Messaging
+                     ('tags', 15), # External Integrations
+#                      ('tags', 17) # Contains Paid Features
                  ]))
     response = conn.getresponse()
     if response.status != 302:
