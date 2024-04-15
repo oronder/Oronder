@@ -179,12 +179,8 @@ function get_health(hp, combatHealthSetting, actorType) {
 
 export function register_combat_settings_toggle() {
     libWrapper.register('oronder', 'CombatTrackerConfig.prototype._updateObject', async function (wrapped, ...args) {
-        Logger.info(this)
-        Logger.info(this.form.elements.oronder_combat_tracker_toggle.checked)
-        Logger.info(game.settings.get(MODULE_ID, COMBAT_ENABLED))
         await game.settings.set(MODULE_ID, COMBAT_ENABLED, this.form.elements.oronder_combat_tracker_toggle.checked)
         set_combat_hooks()
-        Logger.info(game.settings.get(MODULE_ID, COMBAT_ENABLED))
         return wrapped(...args)
     }, 'WRAPPER')
 
