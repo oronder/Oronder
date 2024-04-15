@@ -130,12 +130,8 @@ function parse_combat_round(combat) {
             return acc + line
         } else {
             const hp = get_health(rawHp, healthSetting, c.actor.type)
-            const ac = `AC ${c.actor.system.attributes.ac.value}`
-
-            let line = `${init}: ${c.name} <${hp}> (${ac})\n`
-            line += get_effects_in_markdown(c.actor, c.token)
-
-            return acc + line
+            const ac = c.actor.type === 'character' ? ` (AC ${c.actor.system.attributes.ac.value})` : ''
+            return `${acc}${init}: ${c.name} <${hp}>${ac}\n${get_effects_in_markdown(c.actor, c.token)}`
         }
     }, '')
     output += "```\n"
