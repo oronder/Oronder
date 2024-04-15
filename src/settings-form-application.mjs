@@ -13,7 +13,7 @@ import {
 } from "./constants.mjs"
 import {full_sync, sync_actor} from "./sync.mjs"
 import {open_socket_with_oronder} from "./module.mjs"
-import { set_combat_hooks } from "./combat.mjs"
+import {set_combat_hooks} from "./combat.mjs"
 
 export class OronderSettingsFormApplication extends FormApplication {
     constructor(object = {}, options = {}) {
@@ -29,6 +29,7 @@ export class OronderSettingsFormApplication extends FormApplication {
             id_map: id_map,
             combat_health_estimate: game.settings.get(MODULE_ID, COMBAT_HEALTH_ESTIMATE),
             combat_health_estimate_type: COMBAT_HEALTH_ESTIMATE_TYPE,
+            combat_tracking_enabled: game.settings.get(MODULE_ID, COMBAT_ENABLED),
             players: game.users.filter(user => user.role < 3).map(user => ({
                 foundry_name: user.name,
                 foundry_id: user.id,
@@ -115,7 +116,7 @@ export class OronderSettingsFormApplication extends FormApplication {
                 this.object.guild.combat_channel_id = Array.from(this.form.elements.combat_channel).find(c => c.selected)?.value
                 this.object.guild.roll_discord_to_foundry = this.form.elements.roll_discord_to_foundry.checked
                 this.object.combat_health_estimate = parseInt(this.form.elements.combat_health_estimate.value)
-                this.object.guild.combat_tracking_enabled = this.form.elements.combat_tracking_enabled.checked
+                this.object.combat_tracking_enabled = this.form.elements.combat_tracking_enabled.checked
             }
             this.object.show_advanced = this.form.elements.show_advanced.checked
 
@@ -196,7 +197,7 @@ export class OronderSettingsFormApplication extends FormApplication {
 
         this.bind()
 
-        await game.settings.set(MODULE_ID, COMBAT_ENABLED, this.object.guild.combat_tracking_enabled)
+        await game.settings.set(MODULE_ID, COMBAT_ENABLED, this.object.combat_tracking_enabled)
         await game.settings.set(MODULE_ID, COMBAT_HEALTH_ESTIMATE, this.object.combat_health_estimate)
 
         const updated_id_map = await game.settings.set(MODULE_ID, ID_MAP,

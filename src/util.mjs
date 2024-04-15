@@ -59,3 +59,18 @@ export function item_roll(item) {
 
     return new Roll(formula, item.getRollData())
 }
+
+export function autoResizeApplicationExisting(app) {
+    const centerPrev = app.position.top + app.position.height / 2;
+
+    const pos = app.setPosition({
+        width: app.position.width, height: "auto",
+    });
+
+    const center = pos.top + pos.height / 2;
+    app.setPosition({
+        width: app.position.width,
+        height: app.position.height,
+        top: app.position.top + (centerPrev - center),
+    });
+}

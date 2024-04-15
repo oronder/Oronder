@@ -202,12 +202,12 @@
                        title="Oronder will post changes in the combat tracker to the Combat Channel configured below.">
                     Publish Combat Tracker to Discord</label>
                 <input type="checkbox" id='combat_tracking_enabled' class='control' data-action='checkbox'
-                       style='float:right' {{checked guild.combat_tracking_enabled}}>
+                       style='float:right' {{checked combat_tracking_enabled}}>
             </div>
             <div class="form-group">
                 <label for="combat_channel" title="Channel where Combat Tracking Messages will be posted.">
                     Combat Channel</label>
-                <select id="combat_channel" {{#unless guild.combat_tracking_enabled}}disabled{{/unless}}>
+                <select id="combat_channel" {{#unless combat_tracking_enabled}}disabled{{/unless}}>
                     <option value="">❌ DISABLED</option>
                     {{#each guild.text_channels}}
                         <option value="{{id}}"  {{#if (eq id ../guild.combat_channel_id)}}selected{{/if}}>
@@ -219,7 +219,7 @@
                 <label for="combat_health_estimate"
                        title="Select whose health will be described(i.e. Healthy) rather than shown (HP 8/9).">
                     Combat Health Estimate</label>
-                <select id="combat_health_estimate" {{#unless guild.combat_tracking_enabled}}disabled{{/unless}}>
+                <select id="combat_health_estimate" {{#unless combat_tracking_enabled}}disabled{{/unless}}>
                     {{#each combat_health_estimate_type}}
                         <option value={{this}} {{#if (eq this ../combat_health_estimate)}}selected{{/if}}>
                             {{@key}}</option>

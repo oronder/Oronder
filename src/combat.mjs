@@ -1,4 +1,4 @@
-import {item_roll, Logger} from "./util.mjs";
+import {autoResizeApplicationExisting, item_roll, Logger} from "./util.mjs";
 import {combat_hooks, socket} from "./module.mjs";
 import {COMBAT_ENABLED, COMBAT_HEALTH_ESTIMATE, COMBAT_HEALTH_ESTIMATE_TYPE, ID_MAP, MODULE_ID} from "./constants.mjs";
 import {actor_to_discord_ids} from "./sync.mjs";
@@ -179,6 +179,36 @@ function get_health(hp, combatHealthSetting, actorType) {
         default:
             console.error(`Combat Health Setting(${combatHealthSetting}) is not supported.`)
     }
+}
+
+export function register_combat_settings_toggle() {
+    libWrapper.register('oronder', 'CombatTrackerConfig.prototype._updateObject', async function (wrapped, ...args) {
+        Logger.info(this)
+        Logger.info(this.form.elements.oronder_combat_tracker_toggle.checked)
+        Logger.info(game.settings.get(MODULE_ID, COMBAT_ENABLED))
+        await game.settings.set(MODULE_ID, COMBAT_ENABLED, this.form.elements.oronder_combat_tracker_toggle.checked)
+        set_combat_hooks()
+        Logger.info(game.settings.get(MODULE_ID, COMBAT_ENABLED))
+        return wrapped(...args)
+    }, 'WRAPPER')
+
+    Hooks.on('renderCombatTrackerConfig', async (application, $html, data) => {
+        const $label = $("<label/>", {
+            text: 'Publish Combat Tracker to Discord',
+            for: 'oronder_combat_tracker_toggle'
+        })
+        const $checkbox = $("<input/>", {
+            type: 'checkbox',
+            id: 'oronder_combat_tracker_toggle',
+            checked: game.settings.get(MODULE_ID, COMBAT_ENABLED)
+        })
+
+        $('<div/>', {class: "form-group"})
+            .append($label, $checkbox)
+            .insertBefore($html.find('form button').last())
+
+        autoResizeApplicationExisting(application)
+    })
 }
 
 

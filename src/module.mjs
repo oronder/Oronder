@@ -3,7 +3,7 @@ import {registerSettings} from "./settings.mjs"
 import {AUTH, MODULE_ID, ORONDER_WS_URL} from "./constants.mjs"
 import {del_actor, sync_actor} from "./sync.mjs"
 import {monks_token_bar_hooks} from "./monks_token_bar_hooks.mjs";
-import {handle_incoming_rolls, set_combat_hooks} from "./combat.mjs";
+import {handle_incoming_rolls, register_combat_settings_toggle, set_combat_hooks} from "./combat.mjs";
 
 export let socket
 export let session_id
@@ -32,8 +32,12 @@ function set_session(session) {
 
 Hooks.once("ready", async () => {
     if (game.user.isGM) {
+        if (!game.modules.get('lib-wrapper')?.active) {
+            ui.notifications.error("Oronder requires the 'libWrapper' module. Please install and activate it.")
+        }
         await registerSettings()
         open_socket_with_oronder()
+        register_combat_settings_toggle()
     }
 
     game.socket.on(SOCKET_NAME, data => {
