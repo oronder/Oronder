@@ -15,7 +15,7 @@ _The following must be done by the owner of the Discord server you'd like to int
     2. Associate Foundry Names to Discord Names.
         - Oronder will automatically assign names that match, but the rest are up to you.
     3. Configure Channels. Leaving them all set to #general is ok.
-        - **_NOTE:_** Oronder will not work if you use private channels the bot has not been invited to!
+        - **_NOTE:_** If you configure Oronder to use private channels, you must invite Oronder to those channels!
     4. Click `Save Changes`.
 
 Players should now be able to access characters they own in Foundry from Discord.
