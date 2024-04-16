@@ -143,6 +143,12 @@ export function enrich_actor(actor) {
 
     clone_pc.attributes.spellcaster = Object.values(actor.system?.spells || {}).some(s => s?.max > 0)
 
+    clone_pc.currency.cp = clone_pc.currency?.cp || 0
+    clone_pc.currency.sp = clone_pc.currency?.sp || 0
+    clone_pc.currency.ep = clone_pc.currency?.ep || 0
+    clone_pc.currency.gp = clone_pc.currency?.gp || 0
+    clone_pc.currency.pp = clone_pc.currency?.pp || 0
+
     return {
         ...prune_roll_data(clone_pc),
         name: actor.name,
