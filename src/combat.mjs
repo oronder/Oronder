@@ -184,19 +184,19 @@ export function register_combat_settings_toggle() {
         return wrapped(...args)
     }, 'WRAPPER')
 
-    Hooks.on('renderCombatTrackerConfig', async (application, $html, data) => {
-        const $label = $("<label/>", {
-            text: 'Publish Combat Tracker to Discord',
-            for: 'oronder_combat_tracker_toggle'
-        })
-        const $checkbox = $("<input/>", {
-            type: 'checkbox',
-            id: 'oronder_combat_tracker_toggle',
-            checked: game.settings.get(MODULE_ID, COMBAT_ENABLED)
-        })
-
+    Hooks.on('renderCombatTrackerConfig', async (application, $html, _) => {
         $('<div/>', {class: "form-group"})
-            .append($label, $checkbox)
+            .append(
+                $("<label/>", {
+                    text: 'Publish Combat Tracker to Discord',
+                    for: 'oronder_combat_tracker_toggle'
+                }),
+                $("<input/>", {
+                    type: 'checkbox',
+                    id: 'oronder_combat_tracker_toggle',
+                    checked: game.settings.get(MODULE_ID, COMBAT_ENABLED)
+                })
+            )
             .insertBefore($html.find('form button').last())
 
         autoResizeApplicationExisting(application)
