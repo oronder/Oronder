@@ -287,7 +287,6 @@ export class OronderSettingsFormApplication extends FormApplication {
         const event_listener = async event => {
             if (event.data.status_code) {
                 clearInterval(message_interval)
-                this.init_active = false
                 popup.close()
                 event.data.errs.forEach(e => Logger.error(e, {permanent: true}))
                 if (event.data.auth && event.data.guild) {
@@ -302,6 +301,7 @@ export class OronderSettingsFormApplication extends FormApplication {
                             )?.id ?? ''
                         )
                 }
+                this.object.init_active = false
                 this.object.buttons_disabled = false
                 this.render()
             }
@@ -314,8 +314,8 @@ export class OronderSettingsFormApplication extends FormApplication {
             if (popup.closed) {
                 clearInterval(close_interval)
                 window.removeEventListener('message', event_listener)
-                if (this.init_active) { //if init_waiting is false we have don't need to do anything
-                    this.init_active = false
+                if (this.object.init_active) { //if init_waiting is false we have don't need to do anything
+                    this.object.init_active = false
                     this.object.buttons_disabled = false
                     this.render()
                 }
