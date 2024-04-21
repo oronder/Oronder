@@ -29,7 +29,7 @@ jobs:
 
 
       - name: Downloading Dependencies
-        run: npm install --omit=dev
+        run: npm ci --omit=dev
 
       - name: Build
         run: npm run build

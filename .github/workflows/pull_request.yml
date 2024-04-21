@@ -13,12 +13,8 @@ jobs:
       contents: write
 
     steps:
-      - uses: actions/checkout@v4
-
-      - name: Use Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '14'
+      - name: Checkout Repository
+        uses: actions/checkout@v4
 
       - name: Install dependencies
         run: npm ci
