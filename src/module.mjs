@@ -33,7 +33,7 @@ function set_session(session) {
 Hooks.once("ready", async () => {
     if (game.user.isGM) {
         if (!game.modules.get('lib-wrapper')?.active) {
-            ui.notifications.error("Oronder requires the 'libWrapper' module. Please install and activate it.")
+            Logger.error(game.i18n.localize("oronder.LibWrapper-Error"))
         }
         await registerSettings()
         open_socket_with_oronder()
@@ -82,7 +82,7 @@ export function open_socket_with_oronder(update = false) {
     })
 
     socket.on('connect_error', (error) => {
-        Logger.warn(`Oronder connection failed: ${error.message}`)
+        Logger.warn(`${game.i18n.localize("oronder.Connection-Failed")}: ${error.message}`)
     })
 
     socket.on('connect', () => {
@@ -92,7 +92,7 @@ export function open_socket_with_oronder(update = false) {
         for (const [actor_id, xp] of Object.entries(data)) {
             const actor = game.actors.get(actor_id)
             if (actor === undefined) {
-                Logger.warn(`Failed to update XP. No Actor with ID ${actor_id} found!`)
+                Logger.warn(`${game.i18n.localize("oronder.Failed-To-Update-Actor")} ${actor_id} ${game.i18n.localize("oronder.Found")}`)
             } else {
                 Logger.info(`${actor.name} xp: ${actor.system.details.xp.value} -> ${xp}`)
                 await actor.update({"system.details.xp.value": xp})

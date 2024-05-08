@@ -278,7 +278,7 @@ export class OronderSettingsFormApplication extends FormApplication {
         if (popup && !popup.closed && popup.focus) {
             popup.focus()
         } else {
-            Logger.error("Could not launch Discord Authentication window! Check your browser's popup settings.")
+            Logger.error(game.i18n.localize("oronder.Discord-Popup-Blocked"))
         }
 
         const message_interval = setInterval(() => {

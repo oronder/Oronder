@@ -75,9 +75,9 @@ function parse_turn(combat, updateData) {
 
     let output = ''
     if (discordId.length)
-        output += `It's your turn <@${discordId[0]}>\n`
+        output += `${game.i18n.localize("oronder.Its-Your-Turn")} <@${discordId[0]}>\n`
     output += '```md\n'
-    output += `# Initiative ${actor.initiative} Round ${c.round}\n`
+    output += `# ${game.i18n.localize("oronder.Initiative")} ${actor.initiative} ${game.i18n.localize("oronder.Round")} ${c.round}\n`
 
     if (turn.defeated) {
         output += `${actor.name} <Defeated>\n`
@@ -109,7 +109,7 @@ function parse_combat_round(combat) {
     const healthSetting = game.settings.get(MODULE_ID, COMBAT_HEALTH_ESTIMATE)
 
     let output = "```md\n"
-    output += `Current Round: ${combat.round}\n`
+    output += `${game.i18n.localize("oronder.Current-Round")}: ${combat.round}\n`
     output += "==================\n"
 
     // Parse each combatant
@@ -147,19 +147,19 @@ function get_health(hp, combatHealthSetting, actorType) {
         const pct = Math.round(hp.effectiveMax ? (hp.value / hp.effectiveMax) * 100 : 0, 0, 100);
         switch (true) {
             case pct > 99:
-                return "Unharmed";
+                return game.i18n.localize("oronder.Unharmed");
             case pct > 75:
-                return "Healthy";
+                return game.i18n.localize("oronder.Healthy");
             case pct > 50:
-                return "Injured";
+                return game.i18n.localize("oronder.Injured");
             case pct > 25:
-                return "Bloodied";
+                return game.i18n.localize("oronder.Bloodied");
             case pct > 10:
-                return "Severe";
+                return game.i18n.localize("oronder.Severe");
             case pct > 0:
-                return "Critical";
+                return game.i18n.localize("oronder.Critical");
             default:
-                return "Dead";
+                return game.i18n.localize("oronder.Dead");
         }
     }
 
@@ -188,7 +188,7 @@ export function register_combat_settings_toggle() {
         $('<div/>', {class: "form-group"})
             .append(
                 $("<label/>", {
-                    text: 'Publish Combat Tracker to Discord',
+                    text: game.i18n.localize("oronder.Publish-Combat-Tracker-To-Discord"),
                     for: 'oronder_combat_tracker_toggle'
                 }),
                 $("<input/>", {
@@ -208,7 +208,7 @@ export function handle_incoming_rolls() {
     socket.on('roll', async data => {
         const actor = game.actors.find(a => a.id === data.actor_id)
         if (actor === undefined) {
-            Logger.error('actor not found')
+            Logger.error(game.i18n.localize("oronder.Actor-Not-Found"))
             return
         }
 
@@ -226,11 +226,11 @@ export function handle_incoming_rolls() {
 
         switch (data['type']) {
             case 'stat':
-                Logger.info(`stat roll`)
+                Logger.info(`Stat Roll`)
                 Logger.info(data)
                 break
             case 'attack':
-                Logger.info(`attack roll`)
+                Logger.info(`Attack Roll`)
                 //Actors who haven't been synced after 3/27/24 may only have reference to item name and not id
                 const item_match_fun = data?.item_id ?
                     i => i.id === data.item_id :
@@ -239,7 +239,7 @@ export function handle_incoming_rolls() {
                 const item = actor.items.find(item_match_fun)
 
                 if (item === undefined) {
-                    Logger.error('item not found')
+                    Logger.error(game.i18n.localize("oronder.Item-Not-Found"))
                     return
                 }
 

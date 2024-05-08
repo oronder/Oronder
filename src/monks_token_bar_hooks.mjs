@@ -15,13 +15,13 @@ export function monks_token_bar_hooks() {
                 message['timestamp'] > last_xp_ts
             ) {
                 if (!mtb.actors.length) {
-                    Logger.warn('No actors to reward xp to')
+                    Logger.warn(game.i18n.localize("oronder.No-Actors-To-Reward-Xp-To"))
                 } else if (!mtb.actors.map(a => a.xp).every(xp => xp === mtb.actors[0].xp)) {
                     Logger.warn('Oronder does not currently support unequal XP distribution :(')
                 } else if (session_id === undefined) {
-                    Logger.warn('No Session Found')
+                    Logger.warn(game.i18n.localize("oronder.No-Session-Found"))
                 } else if (message['timestamp'] < session_ts) {
-                    Logger.warn('XP reward predates session start')
+                    Logger.warn(game.i18n.localize("oronder.XP-Reward-Predates-Session-Start"))
                 } else {
                     last_xp_ts = message['timestamp']
                     socket.emit('xp', {session_id: session_id, id_to_xp: mtb.actors.map(a => ([a['id'], a['xp']]))})
