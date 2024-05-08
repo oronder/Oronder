@@ -45,7 +45,7 @@
             </label>
             <select id="timezone">
                 {{#each timezones}}
-                    <option value="{{this}}"  {{#if (eq this ../guild.timezone)}}selected{{/if}}>
+                    <option value="{{this}}"{{#if (eq this ../guild.timezone)}} selected{{/if}}>
                         {{this}}</option>
                 {{/each}}
             </select>
@@ -56,7 +56,7 @@
             </label>
             <select id="gm_role">
                 {{#each guild.roles}}
-                    <option value="{{id}}"  {{#if (eq id ../guild.gm_role_id)}}selected{{/if}}>{{name}}</option>
+                    <option value="{{id}}"{{#if (eq id ../guild.gm_role_id)}} selected{{/if}}>{{name}}</option>
                 {{/each}}
             </select>
         </div>
@@ -74,7 +74,7 @@
             </label>
             <select id="session_channel">
                 {{#each guild.forum_and_text_channels}}
-                    <option value="{{id}}"  {{#if (eq id ../guild.session_channel_id)}}selected{{/if}}>
+                    <option value="{{id}}"{{#if (eq id ../guild.session_channel_id)}} selected{{/if}}>
                         {{name}}</option>
                 {{/each}}
             </select>
@@ -85,7 +85,7 @@
             </label>
             <select id="downtime_channel">
                 {{#each guild.text_channels}}
-                    <option value="{{id}}"  {{#if (eq id ../guild.downtime_channel_id)}}selected{{/if}}>
+                    <option value="{{id}}"{{#if (eq id ../guild.downtime_channel_id)}} selected{{/if}}>
                         {{name}}</option>
                 {{/each}}
             </select>
@@ -97,7 +97,7 @@
             <select id="downtime_gm_channel">
                 <option value="">❌ {{localize "oronder.DISABLED"}}</option>
                 {{#each guild.text_channels}}
-                    <option value="{{id}}"  {{#if (eq id ../guild.downtime_gm_channel_id)}}selected{{/if}}>
+                    <option value="{{id}}"{{#if (eq id ../guild.downtime_gm_channel_id)}} selected{{/if}}>
                         {{name}}</option>
                 {{/each}}
             </select>
@@ -108,7 +108,7 @@
             </label>
             <select id="voice_channel">
                 {{#each guild.voice_and_stage_channels}}
-                    <option value="{{id}}"  {{#if (eq id ../guild.voice_channel_id)}}selected{{/if}}>
+                    <option value="{{id}}"{{#if (eq id ../guild.voice_channel_id)}} selected{{/if}}>
                         {{name}}</option>
                 {{/each}}
             </select>
@@ -119,7 +119,7 @@
             </label>
             <select id="scheduling_channel">
                 {{#each guild.text_channels}}
-                    <option value="{{id}}"  {{#if (eq id ../guild.scheduling_channel_id)}}selected{{/if}}>
+                    <option value="{{id}}"{{#if (eq id ../guild.scheduling_channel_id)}} selected{{/if}}>
                         {{name}}</option>
                 {{/each}}
             </select>
@@ -136,7 +136,7 @@
                 <select id="{{foundry_id}}">
                     <option value=""></option>
                     {{#each ../guild.members}}
-                        <option value="{{id}}"  {{#if (eq id ../discord_id)}}selected{{/if}}>
+                        <option value="{{id}}"{{#if (eq id ../discord_id)}} selected{{/if}}>
                             {{name}}</option>
                     {{/each}}
                 </select>
@@ -161,8 +161,8 @@
                 <select id="rollcall_role" required>
                     <option value=""></option>
                     {{#each guild.roles}}
-                        <option value="{{id}}"
-                                {{#if (eq id ../guild.rollcall_role_id)}}selected{{/if}}>{{name}}</option>
+                        <option value="{{id}}"{{#if (eq id ../guild.rollcall_role_id)}} selected{{/if}}>
+                            {{name}}</option>
                     {{/each}}
                 </select>
             </div>
@@ -173,7 +173,7 @@
                 <select id="rollcall_channel" required>
                     <option value=""></option>
                     {{#each guild.text_channels}}
-                        <option value="{{id}}"  {{#if (eq id ../guild.rollcall_channel_id)}}selected{{/if}}>
+                        <option value="{{id}}"{{#if (eq id ../guild.rollcall_channel_id)}} selected{{/if}}>
                             {{name}}</option>
                     {{/each}}
                 </select>
@@ -185,8 +185,8 @@
                 <select id="rollcall_day" required>
                     <option value=""></option>
                     {{#each days_of_week}}
-                        <option value="{{this}}"
-                                {{#if (eq this ../guild.rollcall_day)}}selected{{/if}}>{{this}}</option>
+                        <option value="{{this}}"{{#if (eq this ../guild.rollcall_day)}} selected{{/if}}>
+                            {{this}}</option>
                     {{/each}}
                 </select>
             </div>
@@ -233,7 +233,7 @@
                 <select id="combat_channel" {{#unless combat_tracking_enabled}}disabled{{/unless}}>
                     <option value="">❌ {{localize "oronder.DISABLED"}}</option>
                     {{#each guild.text_channels}}
-                        <option value="{{id}}"  {{#if (eq id ../guild.combat_channel_id)}}selected{{/if}}>
+                        <option value="{{id}}"{{#if (eq id ../guild.combat_channel_id)}} selected{{/if}}>
                             {{name}}</option>
                     {{/each}}
                 </select>
@@ -243,25 +243,24 @@
                        title="{{localize "oronder.Combat-Health-Estimate-Label"}}">
                     {{localize "oronder.Combat-Health-Estimate"}}
                 </label>
-                <select id="combat_health_estimate" {{#unless combat_tracking_enabled}}disabled{{/unless}}>
+                <select id="combat_health_estimate"{{#unless combat_tracking_enabled}} disabled{{/unless}}>
                     {{#each combat_health_estimate_type}}
-                        <option value="{{this}}" {{#if (eq this ../combat_health_estimate)}}selected{{/if}}>
+                        <option value="{{this}}"{{#if (eq this ../combat_health_estimate)}} selected{{/if}}>
                             {{@key}}</option>
                     {{/each}}
                 </select>
             </div>
             <div class="form-group">
-                <button type="button" class='control' data-action='sync-all' {{#if buttons_disabled}}disabled{{/if}}>
+                <button type="button" class='control' data-action='sync-all'{{#if buttons_disabled}} disabled{{/if}}>
                     <i class="{{#if full_sync_active}}fa-solid fa-spinner fa-spin{{else}}fa-solid fa-rotate{{/if}}"></i>
                     {{#if full_sync_active}}{{localize "oronder.Full-Sync-Pending"}}{{else}}
                         {{localize "oronder.Full-Sync"}}{{/if}}
                 </button>
             </div>
             <div class="form-group">
-                <button type="button" class='control' data-action='init' {{#if buttons_disabled}}disabled{{/if}}>
+                <button type="button" class='control' data-action='init'{{#if buttons_disabled}} disabled{{/if}}>
                     <i class="{{#if init_active}}fa-solid fa-spinner fa-spin{{else}}fa-brands fa-discord{{/if}}"></i>
-                    {{#if init_active}}{{localize "oronder.Init-Pending"}}{{else}}
-                        {{localize "oronder.Re-Init"}}{{/if}}
+                    {{#if init_active}}{{localize "oronder.Init-Pending"}}{{else}}{{localize "oronder.Re-Init"}}{{/if}}
                 </button>
             </div>
         {{/if}}
