@@ -55,7 +55,7 @@ Hooks.once("ready", async () => {
         }
     })
 
-    Hooks.on("deleteActor", async (actor, data, options, userId) => {
+    Hooks.on("deleteActor", async (actor, options, userId) => {
         if (game.user.id === userId) {
             await del_actor(actor.id)
         }
