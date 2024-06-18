@@ -93,7 +93,11 @@ def update_repo_description(module_json):
                      ('csrfmiddlewaretoken', csrf_middleware_token),
                      ('author', FOUNDRY_AUTHOR),
                      ('secret-key', FOUNDRY_PACKAGE_RELEASE_TOKEN),
-                     ('systems', 1),
+                     ('systems', 1), # D&D 5e
+#                      ('systems', 6), # Pathfinder 2e
+#                      ('systems', 367), # Call of Cthulhu 7e
+#                      ('systems', 642), # GURPS 4e Game Aid
+#                      ('systems', 1358), # Fallout2d20
                      ('tags', 7), # Chat Log and Messaging
                      ('tags', 15), # External Integrations
 #                      ('tags', 17) # Contains Paid Features
