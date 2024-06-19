@@ -200,12 +200,20 @@ export const actor_to_discord_ids = actor =>
 
 
 export async function full_sync(clear_cache) {
-    if (clear_cache) {
-        game.actors
-            .filter(_ => localStorage.getItem(`${ACTORS}.${_.id}`))
-            .forEach(_ => localStorage.removeItem(`${ACTORS}.${_.id}`))
-    }
-    return Promise.all(game.actors.map(sync_actor))
+  if (clear_cache) {
+    game.actors
+      .filter(_ => localStorage.getItem(`${ACTORS}.${_.id}`))
+      .forEach(_ => localStorage.removeItem(`${ACTORS}.${_.id}`))
+  }
+
+  return Promise.all(game.actors.map(sync_actor)).then(res => {
+    const counts = Object.fromEntries(Object.entries(
+      Object.groupBy(res.map(i => Boolean(i)), b => b)
+    ).map(([b, v]) => [b, v.length]))
+    const sync_count = counts[true] || 0
+    const skipped = counts[false] ? `, skipped ${counts[false] || 0}` : ''
+    Logger.warn(`Synced ${sync_count} actor${sync_count > 1 ? 's' : ''}${skipped}. Press F12 for details.`)
+  })
 }
 
 export async function sync_actor(actor) {
@@ -251,6 +259,7 @@ export async function sync_actor(actor) {
         if (response.ok) {
             localStorage.setItem(`${ACTORS}.${actor.id}`, new_hash)
             Logger.info(`${game.i18n.localize("oronder.Synced")} ${actor_obj.name}`)
+            return true
         } else if (response.status === 422) {
             response
                 .json()
