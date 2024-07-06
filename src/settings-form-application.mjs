@@ -132,6 +132,10 @@ export class OronderSettingsFormApplication extends FormApplication {
     }
 
     format_channels(guild) {
+        guild.text_channels.sort((a, b) =>
+            a.name === 'general' ? -1 : b.name === 'general' ? 1 : a.name.localeCompare(b.name)
+        )
+
         guild.text_channels.forEach(c => c.name = `# ${c.name}`)
         guild.voice_channels.forEach(c => c.name = `🔈 ${c.name}`)
         guild.stage_channels.forEach(c => c.name = `🎭 ${c.name}`)
@@ -233,6 +237,10 @@ export class OronderSettingsFormApplication extends FormApplication {
             delete guild.rollcall_time
             delete guild.rollcall_channel_id
             delete guild.rollcall_role_id
+        }
+
+        if (!this.object.combat_tracking_enabled) {
+            delete guild.combat_channel_id
         }
 
         await fetch(

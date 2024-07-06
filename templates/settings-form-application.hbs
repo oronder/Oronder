@@ -231,7 +231,6 @@
                     {{localize "oronder.Combat-Channel"}}
                 </label>
                 <select id="combat_channel" {{#unless combat_tracking_enabled}}disabled{{/unless}}>
-                    <option value="">❌ {{localize "oronder.DISABLED"}}</option>
                     {{#each guild.text_channels}}
                         <option value="{{id}}"  {{#if (eq id ../guild.combat_channel_id)}}selected{{/if}}>
                             {{name}}</option>
