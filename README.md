@@ -1,5 +1,6 @@
 Oronder provides deep Discord integration for Foundry Virtual Tabletop. Access your character sheets, roll for
-downtime activities, schedule sessions and reward exp directly from Discord. No struggling with Foundry from your phone. No need for Foundry to be actively running.
+downtime activities, schedule sessions and reward exp directly from Discord. No struggling with Foundry from your phone.
+No need for Foundry to be actively running.
 
 Oronder is designed to meet the needs of running a complex Westmarches game with multiple DMs and players,
 but also shines for single party campaigns.
@@ -8,12 +9,15 @@ but also shines for single party campaigns.
 
 _The following must be done by the owner of the Discord server you'd like to integrate with._
 
-- Subscribe to the [Oronder Discord](https://discord.gg/27npDAXaCA) to gain access to advanced features.
-- From your Foundry instance, select **Game Settings > Configure Settings > Oronder > Configure Oronder**.
-    1. Click the button to invite Oronder's Bot to your Discord Server.
+1. Subscribe to the [Oronder Discord](https://discord.gg/27npDAXaCA) to gain access to advanced features and support.
+2. Install and enable the Oronder Foundry Module.
+3. From your Foundry instance, select **Game Settings > Configure Settings > Oronder > Configure Oronder**.
+    1. Click the button to invite Oronder's App to your Discord Server.
         - A popup will ask you to select the server and verify permissions.
-    2. Associate Foundry Names to Discord Names.
-        - Oronder will automatically assign names that match, but the rest are up to you.
+          Opera GX users or others with non-standard popup blockers may need to follow the instructions
+          [here](https://discord.com/channels/860520082697617468/1144855605308301362/1221743284100272168).
+    2. Associate Foundry Users to their associated Discord User.
+        - Oronder will automatically assign matching names, but the rest are up to you.
     3. Configure Channels. Leaving them all set to #general is ok.
         - **_NOTE:_** If you configure Oronder to use private channels, you must invite Oronder to those channels!
     4. Click `Save Changes`.
