@@ -85,13 +85,22 @@ function gen_item_deets(item, actor_lvl) {
         return [damage, part[1]]
     })
 
-    return {
+    const out = {
         name: item.name,
         id: item.id,
         damage: damage_type_pair,
         attack: attack.formula,
-        type: item.type
+        type: item.type,
+        img: fix_relative_url(item.img),
+        ability: item.system.abilityMod,
     }
+
+    if (item.type === 'spell') {
+        out.level = item.system.level
+        out.level_scaling = item.system.scaling.mode === 'level'
+    }
+
+    return out
 }
 
 function fix_relative_url(url) {
@@ -107,12 +116,6 @@ export function enrich_actor(actor) {
     const equipment = actor.items
         .filter(item => item.type === "equipment" && item.system?.rarity)
         .map(item => item.name)
-
-    const clone_spells = JSON.parse(JSON.stringify(
-        actor.items.filter(item => item.type === 'spell')
-    )).map(spell =>
-        (({name, img, system}) => ({name, img: fix_relative_url(img), ability: system.ability}))(spell)
-    )
 
 
     let currency = actor.system['currency']
@@ -156,8 +159,7 @@ export function enrich_actor(actor) {
         discord_ids: actor_to_discord_ids(actor),
         weapons: weapons,
         equipment: equipment,
-        portrait_url: portrait_url,
-        spells: clone_spells
+        portrait_url: portrait_url
     }
 }
 
@@ -200,20 +202,20 @@ export const actor_to_discord_ids = actor =>
 
 
 export async function full_sync(clear_cache) {
-  if (clear_cache) {
-    game.actors
-      .filter(_ => localStorage.getItem(`${ACTORS}.${_.id}`))
-      .forEach(_ => localStorage.removeItem(`${ACTORS}.${_.id}`))
-  }
+    if (clear_cache) {
+        game.actors
+            .filter(_ => localStorage.getItem(`${ACTORS}.${_.id}`))
+            .forEach(_ => localStorage.removeItem(`${ACTORS}.${_.id}`))
+    }
 
-  return Promise.all(game.actors.map(sync_actor)).then(res => {
-    const counts = Object.fromEntries(Object.entries(
-      Object.groupBy(res.map(i => Boolean(i)), b => b)
-    ).map(([b, v]) => [b, v.length]))
-    const sync_count = counts[true] || 0
-    const skipped = counts[false] ? `, skipped ${counts[false] || 0}` : ''
-    Logger.warn(`Synced ${sync_count} actor${sync_count > 1 ? 's' : ''}${skipped}. Press F12 for details.`)
-  })
+    return Promise.all(game.actors.map(sync_actor)).then(res => {
+        const counts = Object.fromEntries(Object.entries(
+            Object.groupBy(res.map(i => Boolean(i)), b => b)
+        ).map(([b, v]) => [b, v.length]))
+        const sync_count = counts[true] || 0
+        const skipped = counts[false] ? `, skipped ${counts[false] || 0}` : ''
+        Logger.warn(`Synced ${sync_count} actor${sync_count > 1 ? 's' : ''}${skipped}. Press F12 for details.`)
+    })
 }
 
 export async function sync_actor(actor) {

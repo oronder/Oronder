@@ -1,6 +1,6 @@
-import {autoResizeApplicationExisting, item_roll, Logger} from "./util.mjs";
+import {autoResizeApplicationExisting, Logger} from "./util.mjs";
 import {combat_hooks, socket} from "./module.mjs";
-import {COMBAT_ENABLED, COMBAT_HEALTH_ESTIMATE, COMBAT_HEALTH_ESTIMATE_TYPE, ID_MAP, MODULE_ID} from "./constants.mjs";
+import {COMBAT_ENABLED, COMBAT_HEALTH_ESTIMATE, COMBAT_HEALTH_ESTIMATE_TYPE, MODULE_ID} from "./constants.mjs";
 import {actor_to_discord_ids} from "./sync.mjs";
 
 const on_combat_start = async (combat, updateData) => {
@@ -205,24 +205,27 @@ export function register_combat_settings_toggle() {
 
 
 export function handle_incoming_rolls() {
-    socket.on('roll', async data => {
+    socket.on('roll', async (data, callback) => {
         const actor = game.actors.find(a => a.id === data.actor_id)
         if (actor === undefined) {
             Logger.error(game.i18n.localize("oronder.Actor-Not-Found"))
             return
         }
 
-        const foundry_user_ids = Object.entries(game.settings.get(MODULE_ID, ID_MAP))
-            .filter(([_, v]) => v === data.discord_id)
-            .map(([k, _]) => k)
-
-        const actor_owners = Object.entries(actor.ownership)
-            .filter(([_, ownership_level]) => ownership_level === CONST.DOCUMENT_OWNERSHIP_LEVELS.OWNER)
-            .map(([user_id, _]) => user_id)
-
-        const user_id = foundry_user_ids.filter(
-            user_id => actor_owners.includes(user_id)
-        )[0] || game.userId
+        // const foundry_user_ids = Object.entries(game.settings.get(MODULE_ID, ID_MAP))
+        //     .filter(([_, v]) => v === data.discord_id)
+        //     .map(([k, _]) => k)
+        //
+        // const actor_owners = Object.entries(actor.ownership)
+        //     .filter(([_, ownership_level]) => ownership_level === CONST.DOCUMENT_OWNERSHIP_LEVELS.OWNER)
+        //     .map(([user_id, _]) => user_id)
+        //
+        // const user_id = foundry_user_ids.find(
+        //     user_id => actor_owners.includes(user_id)
+        // ) || game.userId
+        //
+        // const user_name = game.users.players.find(p => p.id === user_id).name
+        // const flavor = `Sent via Oronder from ${user_name}.`
 
         switch (data['type']) {
             case 'stat':
@@ -231,68 +234,36 @@ export function handle_incoming_rolls() {
                 break
             case 'attack':
                 Logger.info(`Attack Roll`)
-                //Actors who haven't been synced after 3/27/24 may only have reference to item name and not id
-                const item_match_fun = data?.item_id ?
-                    i => i.id === data.item_id :
-                    i => i.name === data.item_name
-
-                const item = actor.items.find(item_match_fun)
+                const item = actor.items.find(i => i.id === data.item_id)
 
                 if (item === undefined) {
                     Logger.error(game.i18n.localize("oronder.Item-Not-Found"))
                     return
                 }
 
-                //TODO: we want to use the roll from discord, but for now just focusing on formatting
-                const roll = item_roll(item)
-
-                await roll.toMessage({
-                    user: game.user.id,
-                    rollMode: 'roll',
-                    speaker: ChatMessage.getSpeaker({actor}),
-                    content: await renderTemplate('systems/dnd5e/templates/chat/item-card.hbs', {
-                        user: game.user,
-                        actor,
-                        item,
-                        data: item.getRollData(),
-                        hasAttack: item.hasAttack,
-                        hasDamage: item.hasDamage,
-                        isHealing: item.isHealing,
-                        rollType: item.system.actionType || 'Attack',
-                        fullContext: true
-                    })
-                })
-                let template = await renderTemplate('systems/dnd5e/templates/chat/item-card.hbs', {
-                    actor,
-                    item
-                })
-                await roll.toMessage({
-                    user: game.user.id,
-                    rollMode: 'roll',
-                    speaker: ChatMessage.getSpeaker({actor}),
+                const atk = await item.rollAttack({
+                    fastForward: true,
+                    advantage: data.advantage || false,
+                    disadvantage: data.disadvantage || false
                 })
 
 
-                const item_html = await renderTemplate(
-                    'systems/dnd5e/templates/chat/item-card.hbs',
-                    {actor, item}
-                )
-                const roll_html = await roll.render()
+                const spell_level = item.type === 'spell' ? Math.max(data.spell_level, item.system.level) : null
+                const versatile = item.type === 'weapon' ? data.versatile : null
 
-                await roll.toMessage({
-                    speaker: ChatMessage.getSpeaker({actor}),
-                    user: user_id,
-                    content: [item_html, roll_html].join('\n')
+                const dmg = await item.rollDamage({
+                    options: {
+                        fastForward: true
+                    },
+                    critical: atk.isCritical,
+                    spellLevel: spell_level,
+                    versatile: versatile
                 })
 
-                await ChatMessage.create({
-                    user: game.user.id,
-
-                    // flavor: `${actor.name} attacks with ${itemName}!`,
-                    rolls: [(await roll.roll()).toJSON()],
-                    type: CONST.CHAT_MESSAGE_TYPES.ROLL
+                callback({
+                    atk: `${atk.formula} = \`${atk.total}\``,
+                    dmg: `${dmg.formula} = \`${dmg.total}\``
                 })
-
                 break
         }
     })
