@@ -69,7 +69,7 @@ function get_effects_in_markdown(actor, token) {
 }
 
 function parse_turn(combat, updateData) {
-    const c = Object.assign({},combat, updateData)
+    const c = Object.assign({}, combat, updateData)
     const combatant = c.turns[c.turn]
     const actor = game.actors.find(a => a.id === combatant.actorId)
 
