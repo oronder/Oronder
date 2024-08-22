@@ -69,16 +69,13 @@ function get_effects_in_markdown(actor, token) {
 }
 
 function parse_turn(combat, updateData) {
-    const c = Object.assign(combat, updateData)
-    const turn = c.turns[c.turn]
-    const actor = Object.assign(
-        game.actors.find(a => a.id === turn.actorId),
-        combat.combatants.find(cb => cb.tokenId === turn.tokenId)
-    )
+    const c = Object.assign({}, combat, updateData)
+    const combatant = c.turns[c.turn]
+    const actor = game.actors.find(a => a.id === combatant.actorId)
 
     if (actor.hidden) return ''
 
-    const token = canvas.tokens.placeables.find(p => p.id === turn.tokenId)
+    const token = canvas.tokens.placeables.find(p => p.id === combatant.tokenId)
     const discordId = actor_to_discord_ids(actor)
     const healthSetting = game.settings.get(MODULE_ID, COMBAT_HEALTH_ESTIMATE)
 
@@ -86,9 +83,9 @@ function parse_turn(combat, updateData) {
     if (discordId.length)
         output += `${game.i18n.localize('oronder.Its-Your-Turn')} <@${discordId[0]}>\n`
     output += '```md\n'
-    output += `# ${game.i18n.localize('oronder.Initiative')} ${actor.initiative} ${game.i18n.localize('oronder.Round')} ${c.round}\n`
+    output += `# ${game.i18n.localize('oronder.Initiative')} ${combatant.initiative} ${game.i18n.localize('oronder.Round')} ${c.round}\n`
 
-    if (turn.defeated) {
+    if (combatant.defeated) {
         output += `${actor.name} <Defeated>\n`
     } else if (token.document.hidden) {
         output += `${actor.name} <Hidden>\n`
