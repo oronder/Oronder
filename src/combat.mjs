@@ -73,7 +73,7 @@ function parse_turn(combat, updateData) {
     const combatant = c.turns[c.turn]
     const actor = game.actors.find(a => a.id === combatant.actorId)
 
-    if (actor.hidden) return ''
+    if (combatant.hidden) return ''
 
     const token = canvas.tokens.placeables.find(p => p.id === combatant.tokenId)
     const discordId = actor_to_discord_ids(actor)
@@ -86,9 +86,9 @@ function parse_turn(combat, updateData) {
     output += `# ${game.i18n.localize('oronder.Initiative')} ${combatant.initiative} ${game.i18n.localize('oronder.Round')} ${c.round}\n`
 
     if (combatant.defeated) {
-        output += `${actor.name} <Defeated>\n`
+        output += `${combatant.name} <Defeated>\n`
     } else if (token.document.hidden) {
-        output += `${actor.name} <Hidden>\n`
+        output += `${combatant.name} <Hidden>\n`
     } else {
         const hp = get_health(
             {
@@ -98,7 +98,7 @@ function parse_turn(combat, updateData) {
             healthSetting,
             actor.type
         )
-        output += `${actor.name} <${hp}>\n`
+        output += `${combatant.name} <${hp}>\n`
         output += get_effects_in_markdown(actor, token)
     }
     output += '```\n'
