@@ -37,12 +37,8 @@
       }
     ]
   },
-  "esmodules": [
-    "dist/module.js"
-  ],
-  "styles": [
-    "styles/module.css"
-  ],
+  "esmodules": ["dist/module.js"],
+  "styles": ["styles/module.css"],
   "languages": [
     {
       "lang": "en",
