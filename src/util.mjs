@@ -1,11 +1,10 @@
-import {MODULE_DEBUG_TAG} from "./constants.mjs"
+import {MODULE_DEBUG_TAG} from './constants.mjs'
 import objectHash from 'object-hash'
 
 /**
  * Utility class to handle logging to console with an attached debug tag to identify module logs.
  */
 export class Logger {
-
     static debug(logString) {
         console.debug(..._processLog(logString))
     }
@@ -19,12 +18,14 @@ export class Logger {
     }
 
     static warn(logString, options = {}) {
-        if (options.ui ?? true) ui.notifications.warn(logString, {...options, console: false})
+        if (options.ui ?? true)
+            ui.notifications.warn(logString, {...options, console: false})
         if (options.console ?? true) console.warn(..._processLog(logString))
     }
 
     static error(logString, options = {}) {
-        if (options.ui ?? true) ui.notifications.error(logString, {...options, console: false})
+        if (options.ui ?? true)
+            ui.notifications.error(logString, {...options, console: false})
         if (options.console ?? true) console.error(..._processLog(logString))
     }
 }
@@ -54,23 +55,26 @@ export function hash(obj) {
  @returns {Roll}
  */
 export function item_roll(item) {
-    const formula = `1d20 + ${item.getAttackToHit().parts.join('+')}`
-        .replace(/(?:\s*\+?\s*(?:(?:-\s*)?(?<!\d)0)?)*([+\-])\s*/g, ' $1 ')
+    const formula = `1d20 + ${item.getAttackToHit().parts.join('+')}`.replace(
+        /(?:\s*\+?\s*(?:(?:-\s*)?(?<!\d)0)?)*([+\-])\s*/g,
+        ' $1 '
+    )
 
     return new Roll(formula, item.getRollData())
 }
 
 export function autoResizeApplicationExisting(app) {
-    const centerPrev = app.position.top + app.position.height / 2;
+    const centerPrev = app.position.top + app.position.height / 2
 
     const pos = app.setPosition({
-        width: app.position.width, height: "auto",
-    });
+        width: app.position.width,
+        height: 'auto'
+    })
 
-    const center = pos.top + pos.height / 2;
+    const center = pos.top + pos.height / 2
     app.setPosition({
         width: app.position.width,
         height: app.position.height,
-        top: app.position.top + (centerPrev - center),
-    });
+        top: app.position.top + (centerPrev - center)
+    })
 }
