@@ -162,6 +162,13 @@ export function enrich_actor(actor) {
     clone_pc.currency.gp = clone_pc.currency?.gp || 0
     clone_pc.currency.pp = clone_pc.currency?.pp || 0
 
+    clone_pc.details.items = actor.items.map(i => ({
+        name: i.name,
+        img: fix_relative_url(i.img),
+        id: i.id,
+        type: i.type
+    }))
+
     return {
         ...prune_roll_data(clone_pc),
         name: actor.name,
