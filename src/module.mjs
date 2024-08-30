@@ -126,8 +126,7 @@ export function open_socket_with_oronder(update = false) {
             Logger.error(game.i18n.localize('oronder.Item-Not-Found'))
             return
         }
-        const desc = $(item.system.description.value.trim()).text()
-        callback(desc)
+        callback(item.system.description.value)
     })
 
     monks_token_bar_hooks()
