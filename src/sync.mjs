@@ -121,14 +121,14 @@ export function enrich_actor(actor) {
         .filter(item => item.type === 'equipment' && item.system?.rarity)
         .map(item => item.name)
 
-    let currency = actor.system['currency']
+    const currency = actor.system['currency']
     for (const key in currency) {
         if (currency.hasOwnProperty(key) && !currency[key]) {
             currency[key] = 0
         }
     }
 
-    let portrait_url = fix_relative_url(actor.img)
+    const portrait_url = fix_relative_url(actor.img)
 
     const clone_pc = JSON.parse(
         JSON.stringify(actor.getRollData(), (k, v) =>
@@ -161,6 +161,13 @@ export function enrich_actor(actor) {
     clone_pc.currency.ep = clone_pc.currency?.ep || 0
     clone_pc.currency.gp = clone_pc.currency?.gp || 0
     clone_pc.currency.pp = clone_pc.currency?.pp || 0
+
+    clone_pc.details.items = actor.items.map(i => ({
+        name: i.name,
+        img: fix_relative_url(i.img),
+        id: i.id,
+        type: i.type
+    }))
 
     return {
         ...prune_roll_data(clone_pc),

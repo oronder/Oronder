@@ -115,6 +115,20 @@ export function open_socket_with_oronder(update = false) {
         game.socket.emit(SOCKET_NAME, {action: 'session', session: session})
     })
 
+    socket.on('item_desc', async (data, callback) => {
+        const actor = game.actors.find(a => a.id === data.actor_id)
+        if (actor === undefined) {
+            Logger.error(game.i18n.localize('oronder.Actor-Not-Found'))
+            return
+        }
+        const item = actor.items.find(i => i.id === data.item_id)
+        if (item === undefined) {
+            Logger.error(game.i18n.localize('oronder.Item-Not-Found'))
+            return
+        }
+        callback(item.system.description.value)
+    })
+
     monks_token_bar_hooks()
     handle_incoming_rolls()
     set_combat_hooks()
