@@ -78,20 +78,10 @@ function prune_roll_data({
 
 function gen_item_deets(item, actor_lvl) {
     const attack = item_roll(item)
-    let damage_type_pair = item.system.damage.parts.map(part => {
-        let damage = new Roll(part[0], item.getRollData()).formula
-        if (item?.system?.scaling?.mode === 'cantrip') {
-            if (actor_lvl >= 17) damage = '4' + damage.slice(1)
-            else if (actor_lvl >= 11) damage = '3' + damage.slice(1)
-            else if (actor_lvl >= 5) damage = '2' + damage.slice(1)
-        }
-        return [damage, part[1]]
-    })
 
     const out = {
         name: item.name,
         id: item.id,
-        damage: damage_type_pair,
         attack: attack.formula,
         type: item.type,
         img: fix_relative_url(item.img),
