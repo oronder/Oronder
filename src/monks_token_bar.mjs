@@ -1,7 +1,7 @@
 import {Logger} from './util.mjs'
 import {session_id, session_ts, socket} from './module.mjs'
 
-export function monks_token_bar_hooks() {
+export function set_monks_token_bar_hooks() {
     const monks_tokenbar = game.modules.get('monks-tokenbar')
     if (monks_tokenbar?.active) {
         Logger.info("Monk's Tokenbar found.")
