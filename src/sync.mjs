@@ -96,9 +96,10 @@ function export_item(item) {
     }
 
     if (item.type === 'weapon') {
-        out.attack_modes = item.system.attackModes
-            .filter(a => 'value' in a)
-            .map(a => a.value)
+        out.attack_modes =
+            item.system.attackModes
+                ?.filter(a => 'value' in a)
+                .map(a => a.value) ?? []
     }
 
     return out
