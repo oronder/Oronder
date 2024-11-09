@@ -94,8 +94,25 @@ export function set_incoming_hooks() {
         }
 
         switch (data['type']) {
-            case 'stat':
-                Logger.info(`Stat Roll\n${data}`)
+            case 'initiative':
+                if (!game.combat) {
+                    callback({})
+                    return
+                }
+                const combat = await actor.rollInitiative({
+                    createCombatants: true,
+                    rerollInitiative: true
+                })
+
+                const initiative = combat.combatants.find(
+                    a => a.actorId === actor.id
+                ).initiative
+
+                callback({res: initiative})
+                break
+            case 'ability':
+            case 'tool':
+            case 'skill':
                 await incoming_roll(actor, data, callback)
                 break
             case 'attack':
