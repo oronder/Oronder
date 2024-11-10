@@ -30,7 +30,6 @@ function roll_to_str(roll) {
  @param {function(Object)} callback
  */
 async function incoming_roll(actor, data, callback) {
-
     // if ( ability === "concentration" ) this.actor.rollConcentration({ event, legacy: false });
     // else if ( isSavingThrow ) this.actor.rollSavingThrow({ ability, event });
     // else this.actor.rollAbilityCheck({ ability, event });
@@ -99,7 +98,12 @@ async function incoming_attack(actor, data, callback) {
 
         dmg = (
             await activity.rollDamage(
-                {attackMode: data.attack_mode},
+                {
+                    attackMode: data.attack_mode,
+                    event: {
+                        altKey: atk.isCritical
+                    }
+                },
                 {configure: false},
                 {data: {user: foundry_user?.id}}
             )
@@ -115,7 +119,8 @@ async function incoming_attack(actor, data, callback) {
             options: {
                 fastForward: true
             },
-            spellLevel: data.spell_level
+            spellLevel: data.spell_level,
+            critical: atk.isCritical
         })
     }
 
