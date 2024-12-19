@@ -226,21 +226,24 @@ export class OronderSettingsFormApplication extends FormApplication {
             return response_json
         }
 
-        if (response.status === 401) {
-            await game.settings.set(MODULE_ID, AUTH, '')
-            throw new Error(game.i18n.localize('oronder.Invalid-Auth'))
-        } else if (response.status === 422) {
-            throw new Error(
-                response_json.detail
-                    .flat()
-                    .map(
-                        ({loc, input, msg}) =>
-                            `${loc.filter(_ => _ !== 'body').join('.')}.${input || '<EMPTY>'}: ${msg}`
-                    )
-                    .join(' ')
-            )
-        } else {
-            throw new Error(response.statusText)
+        switch (response.status) {
+            case 400:
+                throw new Error(game.i18n.localize('oronder.Auth-Unset-Error'))
+            case 401:
+                await game.settings.set(MODULE_ID, AUTH, '')
+                throw new Error(game.i18n.localize('oronder.Invalid-Auth'))
+            case 422:
+                throw new Error(
+                    response_json.detail
+                        .flat()
+                        .map(
+                            ({loc, input, msg}) =>
+                                `${loc.filter(_ => _ !== 'body').join('.')}.${input || '<EMPTY>'}: ${msg}`
+                        )
+                        .join(' ')
+                )
+            default:
+                throw new Error(response.statusText)
         }
     }
 

@@ -190,6 +190,9 @@ export function export_actor(actor) {
 
 function headers() {
     const authorization = game.settings.get(MODULE_ID, AUTH)
+    if (!authorization) {
+        Logger.error(game.i18n.localize('oronder.Auth-Unset-Error'))
+    }
     return new Headers({
         Accept: 'application/json',
         'Content-Type': 'application/json',

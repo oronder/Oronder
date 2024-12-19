@@ -90,5 +90,6 @@
   "oronder.Combat-Channel": "Combat Channel",
   "oronder.Combat-Channel-Label": "Channel where Combat Tracking Messages will be posted.",
   "oronder.Combat-Health-Estimate": "Combat Health Estimate",
-  "oronder.Combat-Health-Estimate-Label": "Select whose health will be described(i.e. Healthy) rather than shown (HP 8/9)."
+  "oronder.Combat-Health-Estimate-Label": "Select whose health will be described(i.e. Healthy) rather than shown (HP 8/9).",
+  "oronder.Auth-Unset-Error": "Oronder Discord App has not yet been linked with Foundry!"
 }
