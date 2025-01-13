@@ -234,4 +234,3 @@ export function register_combat_settings_toggle() {
         auto_resize(application)
     })
 }
-
