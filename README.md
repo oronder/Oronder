@@ -25,3 +25,8 @@ _The following must be done by the owner of the Discord server you'd like to int
 Players should now be able to access characters they own in Foundry from Discord.
 If a PC is not showing up, ensure that player ownership has been assigned and that the character has a class, race and
 background.
+
+[![](https://img.shields.io/github/v/release/oronder/Oronder?style=for-the-badge)](https://github.com/oronder/Oronder/releases/latest)
+[![](https://img.shields.io/badge/dynamic/json.svg?url=https%3A%2F%2Fraw.githubusercontent.com%2Foronder%2FOronder%2Fmain%2Fmodule.json&label=foundry&query=$.compatibility.verified&colorB=orange&style=for-the-badge&logo=foundryvirtualtabletop)](https://foundryvtt.com/releases/)
+[![](https://img.shields.io/badge/dynamic/json.svg?url=https%3A%2F%2Fraw.githubusercontent.com%2Foronder%2FOronder%2Fmain%2Fmodule.json&label=dnd5e&query=$.relationships.systems[0].compatibility.verified&colorB=red&style=for-the-badge&logo=dungeonsanddragons)](https://github.com/foundryvtt/dnd5e/releases)
+[![](https://img.shields.io/github/downloads/oronder/Oronder/module.zip?style=for-the-badge)](https://github.com/oronder/Oronder/releases/latest/download/module.zip)

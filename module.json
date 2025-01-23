@@ -21,8 +21,9 @@
         "id": "dnd5e",
         "manifest": "https://raw.githubusercontent.com/foundryvtt/dnd5e/master/system.json",
         "compatibility": {
-          "minimum": "2.4.0",
-          "verified": "3.3.1"
+          "minimum": "3.1.0",
+          "verified": "4.1.2",
+          "maximum": "4.9.999"
         }
       }
     ],

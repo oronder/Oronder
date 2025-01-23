@@ -1,4 +1,4 @@
-import {MODULE_DEBUG_TAG} from './constants.mjs'
+import {ID_MAP, MODULE_DEBUG_TAG, MODULE_ID} from './constants.mjs'
 import objectHash from 'object-hash'
 
 /**
@@ -55,7 +55,11 @@ export function hash(obj) {
  @returns {Roll}
  */
 export function item_roll(item) {
-    const formula = `1d20 + ${item.getAttackToHit().parts.join('+')}`.replace(
+    const parts = (
+        item.system.activities?.getByType('attack')[0].getAttackData() ??
+        item.getAttackToHit()
+    ).parts
+    const formula = `1d20 + ${parts.join('+')}`.replace(
         /(?:\s*\+?\s*(?:(?:-\s*)?(?<!\d)0)?)*([+\-])\s*/g,
         ' $1 '
     )
@@ -63,7 +67,10 @@ export function item_roll(item) {
     return new Roll(formula, item.getRollData())
 }
 
-export function autoResizeApplicationExisting(app) {
+/**
+ @param {Application} app
+ */
+export function auto_resize(app) {
     const centerPrev = app.position.top + app.position.height / 2
 
     const pos = app.setPosition({
@@ -77,4 +84,30 @@ export function autoResizeApplicationExisting(app) {
         height: app.position.height,
         top: app.position.top + (centerPrev - center)
     })
+}
+
+/**
+ @param {string} discord_id
+ @param {Actor} actor
+ @returns {User}
+ */
+export function get_user(discord_id, actor) {
+    const foundry_user_ids = Object.entries(
+        game.settings.get(MODULE_ID, ID_MAP)
+    )
+        .filter(([_, v]) => v === discord_id)
+        .map(([k, _]) => k)
+
+    const actor_owners = Object.entries(actor.ownership)
+        .filter(
+            ([_, ownership_level]) =>
+                ownership_level === CONST.DOCUMENT_OWNERSHIP_LEVELS.OWNER
+        )
+        .map(([user_id, _]) => user_id)
+
+    const user_id = foundry_user_ids.find(user_id =>
+        actor_owners.includes(user_id)
+    )
+
+    return game.users.players.find(p => p.id === user_id)
 }

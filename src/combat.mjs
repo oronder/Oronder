@@ -1,4 +1,4 @@
-import {autoResizeApplicationExisting, Logger} from './util.mjs'
+import {auto_resize, Logger} from './util.mjs'
 import {combat_hooks, socket} from './module.mjs'
 import {
     COMBAT_ENABLED,
@@ -76,12 +76,12 @@ function parse_turn(combat, updateData) {
     if (combatant.hidden) return ''
 
     const token = canvas.tokens.placeables.find(p => p.id === combatant.tokenId)
-    const discordId = actor_to_discord_ids(actor)
-    const healthSetting = game.settings.get(MODULE_ID, COMBAT_HEALTH_ESTIMATE)
+    const discord_id = actor_to_discord_ids(actor)
+    const health_settings = game.settings.get(MODULE_ID, COMBAT_HEALTH_ESTIMATE)
 
     let output = ''
-    if (discordId.length)
-        output += `${game.i18n.localize('oronder.Its-Your-Turn')} <@${discordId[0]}>\n`
+    if (discord_id.length)
+        output += `${game.i18n.localize('oronder.Its-Your-Turn')} <@${discord_id[0]}>\n`
     output += '```md\n'
     output += `# ${game.i18n.localize('oronder.Initiative')} ${combatant.initiative} ${game.i18n.localize('oronder.Round')} ${c.round}\n`
 
@@ -95,7 +95,7 @@ function parse_turn(combat, updateData) {
                 ...actor.system.attributes.hp,
                 ...token.document.delta?.system?.attributes?.hp
             },
-            healthSetting,
+            health_settings,
             actor.type
         )
         output += `${combatant.name} <${hp}>\n`
@@ -231,73 +231,7 @@ export function register_combat_settings_toggle() {
             )
             .insertBefore($html.find('form button').last())
 
-        autoResizeApplicationExisting(application)
+        auto_resize(application)
     })
 }
 
-export function handle_incoming_rolls() {
-    socket.on('roll', async (data, callback) => {
-        const actor = game.actors.find(a => a.id === data.actor_id)
-        if (actor === undefined) {
-            Logger.error(game.i18n.localize('oronder.Actor-Not-Found'))
-            return
-        }
-
-        // const foundry_user_ids = Object.entries(game.settings.get(MODULE_ID, ID_MAP))
-        //     .filter(([_, v]) => v === data.discord_id)
-        //     .map(([k, _]) => k)
-        //
-        // const actor_owners = Object.entries(actor.ownership)
-        //     .filter(([_, ownership_level]) => ownership_level === CONST.DOCUMENT_OWNERSHIP_LEVELS.OWNER)
-        //     .map(([user_id, _]) => user_id)
-        //
-        // const user_id = foundry_user_ids.find(
-        //     user_id => actor_owners.includes(user_id)
-        // ) || game.userId
-        //
-        // const user_name = game.users.players.find(p => p.id === user_id).name
-        // const flavor = `Sent via Oronder from ${user_name}.`
-
-        switch (data['type']) {
-            case 'stat':
-                Logger.info(`Stat Roll`)
-                Logger.info(data)
-                break
-            case 'attack':
-                Logger.info(`Attack Roll`)
-                const item = actor.items.find(i => i.id === data.item_id)
-
-                if (item === undefined) {
-                    Logger.error(game.i18n.localize('oronder.Item-Not-Found'))
-                    return
-                }
-
-                const atk = await item.rollAttack({
-                    fastForward: true,
-                    advantage: data.advantage || false,
-                    disadvantage: data.disadvantage || false
-                })
-
-                const spell_level =
-                    item.type === 'spell'
-                        ? Math.max(data.spell_level, item.system.level)
-                        : null
-                const versatile = item.type === 'weapon' ? data.versatile : null
-
-                const dmg = await item.rollDamage({
-                    options: {
-                        fastForward: true
-                    },
-                    critical: atk.isCritical,
-                    spellLevel: spell_level,
-                    versatile: versatile
-                })
-
-                callback({
-                    atk: `${atk.formula} = \`${atk.total}\``,
-                    dmg: `${dmg.formula} = \`${dmg.total}\``
-                })
-                break
-        }
-    })
-}

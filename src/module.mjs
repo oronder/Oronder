@@ -2,12 +2,9 @@ import {Logger} from './util.mjs'
 import {registerSettings} from './settings.mjs'
 import {AUTH, MODULE_ID, ORONDER_WS_URL} from './constants.mjs'
 import {del_actor, sync_actor} from './sync.mjs'
-import {monks_token_bar_hooks} from './monks_token_bar_hooks.mjs'
-import {
-    handle_incoming_rolls,
-    register_combat_settings_toggle,
-    set_combat_hooks
-} from './combat.mjs'
+import {set_monks_token_bar_hooks} from './monks_token_bar.mjs'
+import {register_combat_settings_toggle, set_combat_hooks} from './combat.mjs'
+import {set_incoming_hooks} from './incoming.mjs'
 
 export let socket
 export let session_id
@@ -129,8 +126,8 @@ export function open_socket_with_oronder(update = false) {
         callback(item.system.description.value)
     })
 
-    monks_token_bar_hooks()
-    handle_incoming_rolls()
+    set_monks_token_bar_hooks()
+    set_incoming_hooks()
     set_combat_hooks()
 }
 

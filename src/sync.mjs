@@ -76,22 +76,15 @@ function prune_roll_data({
     return Object.keys(pc).length ? pc : null
 }
 
-function gen_item_deets(item, actor_lvl) {
+/**
+ * @param {Item5e} item
+ */
+function export_item(item) {
     const attack = item_roll(item)
-    let damage_type_pair = item.system.damage.parts.map(part => {
-        let damage = new Roll(part[0], item.getRollData()).formula
-        if (item?.system?.scaling?.mode === 'cantrip') {
-            if (actor_lvl >= 17) damage = '4' + damage.slice(1)
-            else if (actor_lvl >= 11) damage = '3' + damage.slice(1)
-            else if (actor_lvl >= 5) damage = '2' + damage.slice(1)
-        }
-        return [damage, part[1]]
-    })
 
     const out = {
         name: item.name,
         id: item.id,
-        damage: damage_type_pair,
         attack: attack.formula,
         type: item.type,
         img: fix_relative_url(item.img),
@@ -100,22 +93,34 @@ function gen_item_deets(item, actor_lvl) {
 
     if (item.type === 'spell') {
         out.level = item.system.level
-        out.level_scaling = item.system.scaling.mode === 'level'
+    }
+
+    if (item.type === 'weapon') {
+        out.attack_modes =
+            item.system.attackModes
+                ?.filter(a => 'value' in a)
+                .map(a => a.value) ?? []
     }
 
     return out
 }
 
+/**
+ * @param {string} url
+ */
 function fix_relative_url(url) {
     return url.indexOf('http://') === 0 || url.indexOf('https://') === 0
         ? url
         : new URL(url, window.location.origin).href
 }
 
-export function enrich_actor(actor) {
+/**
+ @param {Actor} actor
+ */
+export function export_actor(actor) {
     const weapons = actor.items
         .filter(item => item.hasAttack && item.type !== 'consumable')
-        .map(item => gen_item_deets(item, actor.system.details.level))
+        .map(item => export_item(item))
 
     const equipment = actor.items
         .filter(item => item.type === 'equipment' && item.system?.rarity)
@@ -130,39 +135,42 @@ export function enrich_actor(actor) {
 
     const portrait_url = fix_relative_url(actor.img)
 
-    const clone_pc = JSON.parse(
+    const clone_actor = JSON.parse(
         JSON.stringify(actor.getRollData(), (k, v) =>
             v instanceof Set ? [...v] : v
         )
     )
-    clone_pc.details.dead = Boolean(
+    clone_actor.details.dead = Boolean(
         actor.effects.find(e => !e.disabled && e.name === 'Dead')
     )
-    clone_pc.details.background =
+    clone_actor.details.background =
         typeof actor.system.details.background === 'string'
             ? actor.system.details.background
             : actor.system.details.background
               ? actor.system.details.background.name
               : ''
 
-    clone_pc.details.race =
+    clone_actor.details.race =
         typeof actor.system.details.race === 'string'
             ? actor.system.details.race
             : actor.system.details.race
               ? actor.system.details.race.name
               : ''
 
-    clone_pc.attributes.spellcaster = Object.values(
-        actor.system?.spells || {}
-    ).some(s => s?.max > 0)
+    clone_actor.attributes.spellcaster = Math.max(
+        -1,
+        ...Object.values(actor.system.spells)
+            .filter(s => s.max)
+            .map(s => s.level)
+    )
 
-    clone_pc.currency.cp = clone_pc.currency?.cp || 0
-    clone_pc.currency.sp = clone_pc.currency?.sp || 0
-    clone_pc.currency.ep = clone_pc.currency?.ep || 0
-    clone_pc.currency.gp = clone_pc.currency?.gp || 0
-    clone_pc.currency.pp = clone_pc.currency?.pp || 0
+    clone_actor.currency.cp = clone_actor.currency?.cp ?? 0
+    clone_actor.currency.sp = clone_actor.currency?.sp ?? 0
+    clone_actor.currency.ep = clone_actor.currency?.ep ?? 0
+    clone_actor.currency.gp = clone_actor.currency?.gp ?? 0
+    clone_actor.currency.pp = clone_actor.currency?.pp ?? 0
 
-    clone_pc.details.items = actor.items.map(i => ({
+    clone_actor.details.items = actor.items.map(i => ({
         name: i.name,
         img: fix_relative_url(i.img),
         id: i.id,
@@ -170,7 +178,7 @@ export function enrich_actor(actor) {
     }))
 
     return {
-        ...prune_roll_data(clone_pc),
+        ...prune_roll_data(clone_actor),
         name: actor.name,
         id: actor.id,
         discord_ids: actor_to_discord_ids(actor),
@@ -182,6 +190,9 @@ export function enrich_actor(actor) {
 
 function headers() {
     const authorization = game.settings.get(MODULE_ID, AUTH)
+    if (!authorization) {
+        Logger.error(game.i18n.localize('oronder.Auth-Unset-Error'))
+    }
     return new Headers({
         Accept: 'application/json',
         'Content-Type': 'application/json',
@@ -189,6 +200,9 @@ function headers() {
     })
 }
 
+/**
+ @param {Object} pc
+ */
 async function upload(pc) {
     const requestOptions = {
         method: 'PUT',
@@ -200,6 +214,9 @@ async function upload(pc) {
     return await fetch(`${ORONDER_BASE_URL}/actor`, requestOptions)
 }
 
+/**
+ @param {string} pc_id
+ */
 export async function del_actor(pc_id) {
     const requestOptions = {
         method: 'DELETE',
@@ -210,6 +227,10 @@ export async function del_actor(pc_id) {
     return await fetch(`${ORONDER_BASE_URL}/actor/${pc_id}`, requestOptions)
 }
 
+/**
+ @param {Actor} actor
+ @return {string[]}
+ */
 export const actor_to_discord_ids = actor =>
     Object.entries(actor.ownership)
         .filter(
@@ -219,6 +240,9 @@ export const actor_to_discord_ids = actor =>
         .map(([owner_id, _]) => game.settings.get(MODULE_ID, ID_MAP)[owner_id])
         .filter(discord_id => discord_id)
 
+/**
+ @param {boolean} clear_cache
+ */
 export async function full_sync(clear_cache) {
     if (clear_cache) {
         game.actors
@@ -235,14 +259,17 @@ export async function full_sync(clear_cache) {
                 )
             ).map(([b, v]) => [b, v.length])
         )
-        const sync_count = counts[true] || 0
-        const skipped = counts[false] ? `, skipped ${counts[false] || 0}` : ''
+        const sync_count = counts[true] ?? 0
+        const skipped = counts[false] ? `, skipped ${counts[false] ?? 0}` : ''
         Logger.warn(
             `Synced ${sync_count} actor${sync_count > 1 ? 's' : ''}${skipped}. Press F12 for details.`
         )
     })
 }
 
+/**
+ @param {Actor} actor
+ */
 export async function sync_actor(actor) {
     if (actor.type !== 'character') {
         Logger.info(
@@ -258,7 +285,7 @@ export async function sync_actor(actor) {
     }
 
     const old_hash = localStorage.getItem(`${ACTORS}.${actor.id}`)
-    const actor_obj = enrich_actor(actor)
+    const actor_obj = export_actor(actor)
     const new_hash = hash(actor_obj)
 
     if (old_hash && old_hash === new_hash) {
