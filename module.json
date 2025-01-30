@@ -51,6 +51,11 @@
       "name": "日本語",
       "path": "languages/ja.json"
     }
+    {
+      "lang": "es",
+      "name": "Español",
+      "path": "languages/es.json"
+    }
   ],
   "socket": true,
   "url": "https://discord.gg/ZggUCHsQqg",
