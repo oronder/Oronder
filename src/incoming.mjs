@@ -215,15 +215,16 @@ export function set_incoming_hooks() {
                         res: 'You may not make a Concentration Saving Throw with this Actor.',
                         ephemeral: true
                     }
-                }
-                out = {
-                    res: rolls_to_str(
-                        await actor.rollConcentration(
-                            {event: event},
-                            {configure: false},
-                            {data: {user: foundry_user_id}}
+                } else {
+                    out = {
+                        res: rolls_to_str(
+                            await actor.rollConcentration(
+                                {event: event},
+                                {configure: false},
+                                {data: {user: foundry_user_id}}
+                            )
                         )
-                    )
+                    }
                 }
                 break
             case 'death':
