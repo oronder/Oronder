@@ -33,6 +33,11 @@ function prune_roll_data({
         pc.abilities[key] = (({checkProf, saveProf, bonuses, ...o}) => o)(
             pc.abilities[key]
         )
+
+        //dnd5e 3.3.0 changes save from an int to an object. This is a hack to avoid changing the backend.
+        if( typeof pc.abilities[key].save === 'object'){
+            pc.abilities[key].save = pc.abilities[key].save.value
+        }
     }
 
     pc.details = (({originalClass, ...o}) => o)(pc.details)
