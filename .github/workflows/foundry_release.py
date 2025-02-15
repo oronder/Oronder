@@ -93,13 +93,14 @@ def update_repo_description(module_json):
                      ('csrfmiddlewaretoken', csrf_middleware_token),
                      ('author', FOUNDRY_AUTHOR),
                      ('secret-key', FOUNDRY_PACKAGE_RELEASE_TOKEN),
-                     ('systems', 1), # D&D 5e
-#                      ('systems', 6), # Pathfinder 2e
-#                      ('systems', 367), # Call of Cthulhu 7e
-#                      ('systems', 642), # GURPS 4e Game Aid
-#                      ('systems', 1358), # Fallout2d20
+                     ('systems', 1), # dnd5e
                      ('tags', 7), # Chat Log and Messaging
-                     ('tags', 15), # External Integrations
+                     ('tags', 15) # External Integrations
+#                      ('systems', 6), # pf2e
+#                      ('systems', 141), # blades-in-the-dark
+#                      ('systems', 367), # CoC7
+#                      ('systems', 642), # gurps
+#                      ('systems', 1358), # fallout
 #                      ('tags', 17) # Contains Paid Features
                  ]))
     response = conn.getresponse()
@@ -129,6 +130,8 @@ def push_release(module_json: dict) -> None:
         })
     )
     response_json = json.loads(conn.getresponse().read().decode())
+    if 'status' not in response_json:
+        BAD(pformat(response_json))
     if response_json['status'] != 'success':
         BAD(pformat(response_json['errors']))
     GOOD('MODULE POSTED TO REPO')
