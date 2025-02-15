@@ -25,18 +25,18 @@ FILES_CHANGED = os.environ['FILES_CHANGED']
 
 
 def main():
+    with open('./module.json', 'r') as file:
+        module_json = json.load(file)
     if all(f.startswith('.github') for f in FILES_CHANGED.split()):
         SKIP('SKIPPING DEPLOYMENT. ONLY RELEASE CONFIG MODIFIED')
         for f in FILES_CHANGED.split():
             INFO(f)
-        return
 
-    with open('./module.json', 'r') as file:
-        module_json = json.load(file)
-
-    update_repo_description(module_json)
-    push_release(module_json)
-    post_update_to_discord()
+        push_release(module_json, True)
+    else:
+        update_repo_description(module_json)
+        push_release(module_json, False)
+        post_update_to_discord()
 
 
 def update_repo_description(module_json):
@@ -93,15 +93,15 @@ def update_repo_description(module_json):
                      ('csrfmiddlewaretoken', csrf_middleware_token),
                      ('author', FOUNDRY_AUTHOR),
                      ('secret-key', FOUNDRY_PACKAGE_RELEASE_TOKEN),
-                     ('systems', 1), # dnd5e
-                     ('tags', 7), # Chat Log and Messaging
-                     ('tags', 15) # External Integrations
-#                      ('systems', 6), # pf2e
-#                      ('systems', 141), # blades-in-the-dark
-#                      ('systems', 367), # CoC7
-#                      ('systems', 642), # gurps
-#                      ('systems', 1358), # fallout
-#                      ('tags', 17) # Contains Paid Features
+                     ('systems', 1),  # dnd5e
+                     ('tags', 7),  # Chat Log and Messaging
+                     ('tags', 15)  # External Integrations
+                     #                      ('systems', 6), # pf2e
+                     #                      ('systems', 141), # blades-in-the-dark
+                     #                      ('systems', 367), # CoC7
+                     #                      ('systems', 642), # gurps
+                     #                      ('systems', 1358), # fallout
+                     #                      ('tags', 17) # Contains Paid Features
                  ]))
     response = conn.getresponse()
     if response.status != 302:
@@ -110,7 +110,7 @@ def update_repo_description(module_json):
     GOOD('REPO DESCRIPTION UPDATED')
 
 
-def push_release(module_json: dict) -> None:
+def push_release(module_json: dict, dry_run: bool) -> None:
     INFO('Pushing new release to Foundry VTT Module Repository')
     conn = HTTPSConnection("api.foundryvtt.com")
     conn.request(
@@ -121,6 +121,7 @@ def push_release(module_json: dict) -> None:
         },
         body=json.dumps({
             'id': module_json['id'],
+            'dry-run': dry_run,
             'release': {
                 'version': TAG,
                 'manifest': f"{GITHUB_URL}/releases/download/{TAG}/module.json",
@@ -130,10 +131,16 @@ def push_release(module_json: dict) -> None:
         })
     )
     response_json = json.loads(conn.getresponse().read().decode())
+    if dry_run:
+        INFO(pformat(response_json))
+        return
     if 'status' not in response_json:
         BAD(pformat(response_json))
     if response_json['status'] != 'success':
         BAD(pformat(response_json['errors']))
+
+
+
     GOOD('MODULE POSTED TO REPO')
 
 
