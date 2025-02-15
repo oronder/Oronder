@@ -111,7 +111,7 @@ def update_repo_description(module_json):
 
 
 def push_release(module_json: dict, dry_run: bool) -> None:
-    INFO('Pushing new release to Foundry VTT Module Repository')
+    INFO(f'{"Testing" if dry_run else "Pushing"} new release to Foundry VTT Module Repository')
     conn = HTTPSConnection("api.foundryvtt.com")
     conn.request(
         "POST", "/_api/packages/release_version/",
@@ -138,8 +138,6 @@ def push_release(module_json: dict, dry_run: bool) -> None:
         BAD(pformat(response_json))
     if response_json['status'] != 'success':
         BAD(pformat(response_json['errors']))
-
-
 
     GOOD('MODULE POSTED TO REPO')
 
