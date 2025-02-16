@@ -90,7 +90,8 @@ async function incoming_attack(actor, data, event, foundry_user_id) {
                 {configure: false},
                 {data: {user: foundry_user_id}}
             )
-        )[0]
+        ).map(d => [rolls_to_str(d), d.options.type])
+
     } else {
         atk = await item.rollAttack({
             fastForward: true,
@@ -98,18 +99,18 @@ async function incoming_attack(actor, data, event, foundry_user_id) {
             disadvantage: data.advantage === 'Disadvantage'
         })
 
-        dmg = await item.rollDamage({
+        dmg = rolls_to_str(await item.rollDamage({
             options: {
                 fastForward: true
             },
             spellLevel: data.spell_level,
             critical: atk.isCritical
-        })
+        }))
     }
 
     return {
         atk: rolls_to_str(atk),
-        dmg: rolls_to_str(dmg)
+        dmg: dmg
     }
 }
 
