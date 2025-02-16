@@ -112,7 +112,7 @@ def update_repo_description(module_json):
 
 def push_release(module_json: dict, dry_run: bool) -> None:
     INFO(f'{"Testing" if dry_run else "Pushing"} new release to Foundry VTT Module Repository')
-    conn = HTTPSConnection("api.foundryvtt.com")
+    conn = HTTPSConnection("api.foundryvtt.com", timeout=120)
     conn.request(
         "POST", "/_api/packages/release_version/",
         headers={
@@ -130,12 +130,13 @@ def push_release(module_json: dict, dry_run: bool) -> None:
             }
         })
     )
-    response_json = json.loads(conn.getresponse().read().decode())
+    response = conn.getresponse()
+    response_json = json.loads(response.read().decode())
     if dry_run:
         INFO(pformat(response_json))
         return
     if 'status' not in response_json:
-        BAD(pformat(response_json))
+        WARN(f'{response=}\n\n{response.status=}\n\n{pformat(response_json)}')
     if response_json['status'] != 'success':
         BAD(pformat(response_json['errors']))
 
@@ -202,6 +203,10 @@ def SKIP(s: str):
 
 def GOOD(s: str):
     safe_print(f'✅ {s}')
+
+
+def WARN(s: str):
+    safe_print(f'❓ {s}')
 
 
 def BAD(s: str):
