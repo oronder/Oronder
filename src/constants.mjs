@@ -637,3 +637,10 @@ export const TIMEZONES = [
     'WET',
     'Zulu'
 ]
+
+export const DND5e='dnd5e'
+export const PF2e = 'pf2e'
+export const BitD = 'blades-in-the-dark'
+export const CoC7 = 'CoC7'
+export const GURPS = 'gurps'
+export const FALLOUT = 'fallout'

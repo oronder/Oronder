@@ -25,6 +25,46 @@
           "verified": "4.3.1",
           "maximum": "4.3.999"
         }
+      },
+      {
+        "id": "pf2e",
+        "manifest": "https://github.com/foundryvtt/pf2e/releases/latest/download/system.json",
+        "compatibility": {
+          "minimum": "6.0.0",
+          "verified": "6.0.4"
+        }
+      },
+      {
+        "id": "blades-in-the-dark",
+        "manifest": "https://raw.githubusercontent.com/Dez384/foundryvtt-blades-in-the-dark/master/system.json",
+        "compatibility": {
+          "minimum": "5.0.0",
+          "verified": "5.1.2"
+        }
+      },
+      {
+        "id": "CoC7",
+        "manifest": "https://github.com/Miskatonic-Investigative-Society/CoC7-FoundryVTT/releases/latest/download/system.json",
+        "compatibility": {
+          "minimum": "0.10.0",
+          "verified": "0.10.18"
+        }
+      },
+      {
+        "id": "gurps",
+        "manifest": "https://raw.githubusercontent.com/crnormand/gurps/release/system.json",
+        "compatibility": {
+          "minimum": "0.17.0",
+          "verified": "0.17.3"
+        }
+      },
+      {
+        "id": "fallout",
+        "manifest": "https://raw.githubusercontent.com/Muttley/foundryvtt-fallout/main/system/system.json",
+        "compatibility": {
+          "minimum": "11.0.0",
+          "verified": "11.11.4"
+        }
       }
     ],
     "requires": [
