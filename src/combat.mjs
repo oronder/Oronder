@@ -31,7 +31,6 @@ const on_combat_round = async (combat, updateData, updateOptions) => {
 export function set_combat_hooks() {
     Logger.info('Setting Combat Hooks.')
 
-    Logger.info(combat_hooks)
     const turn_off_hook = key => {
         if (combat_hooks[key]) {
             Hooks.off(key, combat_hooks[key])
