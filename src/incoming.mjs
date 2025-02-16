@@ -18,9 +18,9 @@ function rolls_to_str(rolls) {
                     if ('results' in t) {
                         const f = t.results.some(_ => _.discarded)
                             ? r =>
-                                  r.discarded
-                                      ? `~~${r.result}~~`
-                                      : `**${r.result}**`
+                                r.discarded
+                                    ? `~~${r.result}~~`
+                                    : `**${r.result}**`
                             : r => r.result
 
                         const rolls = t.results.map(f).join(', ')
@@ -80,7 +80,13 @@ async function incoming_attack(actor, data, event, foundry_user_id) {
 
         dmg = (
             await activity.rollDamage(
-                {attackMode: data.attack_mode, event: {altKey: atk.isCritical}},
+                {
+                    attackMode: data.attack_mode,
+                    event: {
+                        altKey: atk.isCritical,
+                        target: {closest: _ => null}
+                    }
+                },
                 {configure: false},
                 {data: {user: foundry_user_id}}
             )
