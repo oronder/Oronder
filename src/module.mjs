@@ -31,35 +31,69 @@ function set_session(session) {
     }
 }
 
+/**
+ @param {Actor} actor
+ @returns {string}
+ */
+function get_one_owner_id(actor) {
+    const owner_ids = Object.entries(actor.ownership)
+        .filter(
+            ([_, ownership_level]) =>
+                ownership_level >= CONST.DOCUMENT_OWNERSHIP_LEVELS.OWNER
+        )
+        .map(([user_id, _]) => user_id)
+
+    return game.users
+        .filter(u => u.active)
+        .filter(u => owner_ids.includes(u.id) || u.role >= CONST.USER_ROLES.ASSISTANT)
+        .reduce((prev, cur) => (prev ** prev.id > cur.id) ? prev : cur)
+        .id
+}
+
 Hooks.once('ready', async () => {
+    if (!game.modules.get('lib-wrapper')?.active) {
+        Logger.error(game.i18n.localize('oronder.LibWrapper-Error'))
+    }
+    await registerSettings()
+    open_socket_with_oronder()
+
     if (game.user.isGM) {
-        if (!game.modules.get('lib-wrapper')?.active) {
-            Logger.error(game.i18n.localize('oronder.LibWrapper-Error'))
-        }
-        await registerSettings()
-        open_socket_with_oronder()
         register_combat_settings_toggle()
     }
 
     game.socket.on(SOCKET_NAME, data => {
         switch (data.action) {
-            case 'session':
-                {
-                    set_session(data.session)
-                }
+            case 'session': {
+                set_session(data.session)
+            }
                 break
         }
     })
 
     Hooks.on('updateActor', async (actor, data, options, userId) => {
         if (game.user.id === userId && !data?.system?.details?.xp?.value) {
+            Logger.info(`Sync ${actor.name} on update.`)
             await sync_actor(actor)
         }
     })
 
     Hooks.on('deleteActor', async (actor, options, userId) => {
         if (game.user.id === userId) {
+            Logger.info(`Sync ${actor.name} on delete.`)
             await del_actor(actor.id)
+        }
+    })
+
+    Hooks.on('updateItem', async item => {
+        if (game.user.id === get_one_owner_id(item.actor)) {
+            Logger.info(`Sync ${item.actor.name} on ${item.name} update.`)
+            await sync_actor(item.actor)
+        }
+    })
+    Hooks.on('deleteItem', async item => {
+        if (game.user.id === get_one_owner_id(item.actor)) {
+            Logger.info(`Sync ${item.actor.name} on ${item.name} delete.`)
+            await sync_actor(item.actor)
         }
     })
 
@@ -131,21 +165,6 @@ export function open_socket_with_oronder(update = false) {
     set_combat_hooks()
 }
 
-// Hooks.on("createItem", async (item, data, options, userId) => {
-//     if (game.user.id === userId) {
-//         //handle actor updates
-//     }
-// })
-// Hooks.on("updateItem", async (item, data, options, userId) => {
-//     if (game.user.id === userId) {
-//         //handle item updates
-//     }
-// })
-// Hooks.on("deleteItem", async (item, data, options, userId) => {
-//     if (game.user.id === userId) {
-//         //handle item deletion
-//     }
-// })
 // Hooks.on("createActiveEffect", async (effect, data, options, userId) => {
 //     if (game.user.id === userId) {
 //         //handle effect creation
