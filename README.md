@@ -9,7 +9,7 @@ but also shines for single party campaigns.
 
 _The following must be done by the owner of the Discord server you'd like to integrate with._
 
-1. Subscribe to the [Oronder Discord](https://discord.gg/27npDAXaCA) to gain access to advanced features and support.
+1. Subscribe to the [Oronder Discord](https://discord.gg/Adg48Xrs6K) to gain access to advanced features and support.
 2. Install and enable the Oronder Foundry Module.
 3. From your Foundry instance, select **Game Settings > Configure Settings > Oronder > Configure Oronder**.
     1. Click the button to invite Oronder's App to your Discord Server.

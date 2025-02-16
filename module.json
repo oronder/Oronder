@@ -58,7 +58,7 @@
     }
   ],
   "socket": true,
-  "url": "https://discord.gg/ZggUCHsQqg",
+  "url": "https://discord.gg/Adg48Xrs6K",
   "bugs": "#{GITHUB_URL}#/issues",
   "manifest": "#{GITHUB_URL}#/releases/latest/download/module.json",
   "download": "#{GITHUB_URL}#/releases/download/#{TAG}#/module.zip",
