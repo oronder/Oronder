@@ -43,7 +43,7 @@ function rolls_to_str(rolls) {
  @param {string} foundry_user_id
  @return Object
  */
-async function incoming_attack(actor, data, event, foundry_user_id) {
+async function incoming_attack(actor, data, foundry_user_id) {
     const item = actor.items.find(i => i.id === data.item_id)
 
     if (item === undefined) {
@@ -66,29 +66,29 @@ async function incoming_attack(actor, data, event, foundry_user_id) {
 
     const atk = (
         await activity.rollAttack(
-            {attackMode: data.attack_mode, event: event},
+            {
+                attackMode: data.attack_mode,
+                advantage: data.advantage === 'Advantage',
+                disadvantage: data.advantage === 'Disadvantage'
+            },
             {configure: false},
             {data: {user: foundry_user_id}}
         )
     )[0]
 
-    const dmg = (
-        await activity.rollDamage(
-            {
-                attackMode: data.attack_mode,
-                event: {
-                    altKey: atk.isCritical,
-                    target: {closest: _ => null}
-                }
-            },
-            {configure: false},
-            {data: {user: foundry_user_id}}
-        )
-    ).map(d => [rolls_to_str(d), d.options.type])
+    const dmg = await activity.rollDamage(
+        {
+            attackMode: data.attack_mode,
+            isCritical: atk.isCritical
+        },
+        {configure: false},
+        {data: {user: foundry_user_id}}
+    )
+
 
     return {
         atk: rolls_to_str(atk),
-        dmg: dmg
+        dmg: dmg.map(d => [rolls_to_str(d), d.options.type])
     }
 }
 
@@ -113,7 +113,7 @@ async function incoming_initiative(actor, event) {
     // Temporarily cache the configured roll and use it to roll initiative for the Actor
     actor._cachedInitiativeRoll = rolls[0]
     const combat = await actor.rollInitiative({
-        createCombatants: true,
+        createCombatants: !game.combat.combatants.some(a => a.actorId === actor.id),
         rerollInitiative: true
     })
 
@@ -148,7 +148,7 @@ export function set_incoming_hooks() {
                 out = await incoming_initiative(actor, event)
                 break
             case 'attack':
-                out = await incoming_attack(actor, data, event, foundry_user_id)
+                out = await incoming_attack(actor, data, foundry_user_id)
                 break
             case 'save':
                 out = {
