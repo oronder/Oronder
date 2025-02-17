@@ -11,7 +11,7 @@ _The following must be done by the owner of the Discord server you'd like to int
 
 1. Subscribe to the [Oronder Discord](https://discord.gg/Adg48Xrs6K) to gain access to advanced features and support.
 2. Install and enable the Oronder Foundry Module.
-3. From your Foundry instance, select **Game Settings > Configure Settings > Oronder > Configure Oronder**.
+3. From your Foundry instance, select `Game Settings` → `Configure Settings` → `Oronder` → `Configure Oronder`.
     1. Click the button to invite Oronder's App to your Discord Server.
         - A popup will ask you to select the server and verify permissions.
           Opera GX users or others with non-standard popup blockers may need to follow the instructions
