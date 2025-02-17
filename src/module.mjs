@@ -46,8 +46,8 @@ function get_one_owner_id(actor) {
     return game.users
         .filter(u => u.active)
         .filter(u => owner_ids.includes(u.id) || u.role >= CONST.USER_ROLES.ASSISTANT)
-        .reduce((prev, cur) => prev.id > cur.id ? prev : cur)
-        .id
+        .map(u => u.id)
+        .reduce((prev, cur) => prev > cur ? prev : cur)
 }
 
 Hooks.once('ready', async () => {
