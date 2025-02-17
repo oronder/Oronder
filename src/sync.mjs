@@ -35,8 +35,8 @@ function prune_roll_data({
         )
 
         //TODO This is a hack to avoid changing the backend.
-        // dnd5e 3.3.0 changes save from an int to an object.
-        if( typeof pc.abilities[key].save === 'object'){
+        // dnd5e 4.3.0 changes save from an int to an object.
+        if (typeof pc.abilities[key].save === 'object') {
             pc.abilities[key].save = pc.abilities[key].save.value
         }
     }
@@ -52,10 +52,10 @@ function prune_roll_data({
     )
 
     //TODO This is a hack to avoid changing the backend.
-    // dnd5e 3.3.0 changes moves spell info under spell.
-    if ('spell' in pc.attributes){
-        pc.attributes.spelldc =pc.attributes.spell.dc
-        pc.attributes.spellmod =pc.attributes.spell.mod
+    // dnd5e 4.3.0 changes moves spell info under spell.
+    if ('spell' in pc.attributes) {
+        pc.attributes.spelldc = pc.attributes.spell.dc
+        pc.attributes.spellmod = pc.attributes.spell.mod
     }
 
     for (let class_name in pc.classes) {

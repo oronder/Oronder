@@ -51,62 +51,40 @@ async function incoming_attack(actor, data, event, foundry_user_id) {
         return {}
     }
 
-    let atk
-    let dmg
+    let activity = item.system.activities.getByType('attack')[0]
 
-    if ('activities' in item.system) {
-        //dnd5e 4.0+
-        let activity = item.system.activities.getByType('attack')[0]
-
-        if ('spell_level' in data) {
-            activity = item
-                .clone(
-                    {
-                        'flags.dnd5e.scaling':
-                            data.spell_level - item.system.level
-                    },
-                    {keepId: true}
-                )
-                .system.activities.get(activity.id)
-        }
-
-        atk = (
-            await activity.rollAttack(
-                {attackMode: data.attack_mode, event: event},
-                {configure: false},
-                {data: {user: foundry_user_id}}
-            )
-        )[0]
-
-        dmg = (
-            await activity.rollDamage(
+    if ('spell_level' in data) {
+        activity = item
+            .clone(
                 {
-                    attackMode: data.attack_mode,
-                    event: {
-                        altKey: atk.isCritical,
-                        target: {closest: _ => null}
-                    }
+                    'flags.dnd5e.scaling': data.spell_level - item.system.level
                 },
-                {configure: false},
-                {data: {user: foundry_user_id}}
+                {keepId: true}
             )
-        ).map(d => [rolls_to_str(d), d.options.type])
-
-    } else {
-        atk = await item.rollAttack({
-            fastForward: true,
-            advantage: data.advantage === 'Advantage',
-            disadvantage: data.advantage === 'Disadvantage'
-        })
-
-        dmg = rolls_to_str(await item.rollDamage({
-            options: {
-                fastForward: true
-            },
-            spellLevel: data.spell_level,
-            critical: atk.isCritical
-        }))
+            .system.activities.get(activity.id)
     }
+
+    const atk = (
+        await activity.rollAttack(
+            {attackMode: data.attack_mode, event: event},
+            {configure: false},
+            {data: {user: foundry_user_id}}
+        )
+    )[0]
+
+    const dmg = (
+        await activity.rollDamage(
+            {
+                attackMode: data.attack_mode,
+                event: {
+                    altKey: atk.isCritical,
+                    target: {closest: _ => null}
+                }
+            },
+            {configure: false},
+            {data: {user: foundry_user_id}}
+        )
+    ).map(d => [rolls_to_str(d), d.options.type])
 
     return {
         atk: rolls_to_str(atk),
