@@ -128,6 +128,11 @@ async function incoming_initiative(actor, event) {
 
 export function set_incoming_hooks() {
     socket.on('roll', async (data, callback) => {
+        if (game.version < 12) {
+            Logger.info(`rolling ${data['type']} requires Foundry v12 or later.`)
+            callback({})
+            return
+        }
         const actor = game.actors.find(a => a.id === data.actor_id)
         if (actor === undefined) {
             Logger.error(game.i18n.localize('oronder.Actor-Not-Found'))
