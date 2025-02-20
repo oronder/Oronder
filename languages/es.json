@@ -39,7 +39,7 @@
   "oronder.Severe": "Casi muerto",
   "oronder.Critical": "Inconsciente",
   "oronder.Dead": "Muerto",
-  "oronder.Publish-Combat-Tracker-To-Discord": "Publicar tracker de combate en Discord",
+  "oronder.Publish-Combat-Tracker-To-Discord": "Publicar en Discord",
   "oronder.Actor-Not-Found": "Actor no encontrado",
   "oronder.Item-Not-Found": "Objeto no encontrado",
   "oronder.LibWrapper-Error": "Oronder requiere el módulo 'libWrapper'. Instálalo y actívalo.",

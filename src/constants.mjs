@@ -18,6 +18,9 @@ export const COMBAT_HEALTH_ESTIMATE_TYPE = Object.freeze({
 })
 export const ACTORS = `${MODULE_ID}.actors`
 const dev_mode = window.location.host === 'localhost:65434'
+if (dev_mode) {
+    CONFIG.debug.hooks = true
+}
 const url_common = dev_mode ? '://localhost:65435' : 's://api.oronder.com'
 export const ORONDER_BASE_URL = `http${url_common}`
 export const ORONDER_WS_URL = `ws${url_common}`

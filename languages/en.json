@@ -39,7 +39,7 @@
   "oronder.Severe": "Severe",
   "oronder.Critical": "Critical",
   "oronder.Dead": "Dead",
-  "oronder.Publish-Combat-Tracker-To-Discord": "Publish Combat Tracker to Discord",
+  "oronder.Publish-Combat-Tracker-To-Discord": "Publish to Discord",
   "oronder.Actor-Not-Found": "Actor Not Found",
   "oronder.Item-Not-Found": "Item Not Found",
   "oronder.LibWrapper-Error": "Oronder requires the 'libWrapper' module. Please install and activate it.",
