@@ -34,7 +34,7 @@
         "type": "module",
         "compatibility": {
           "minimum": "1.0.0.0",
-          "verified": "1.12.15.0"
+          "verified": "1.13.2.0"
         }
       }
     ]
