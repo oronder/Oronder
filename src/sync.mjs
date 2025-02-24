@@ -38,7 +38,9 @@ function prune_roll_data({
         // dnd5e 4.3.3 adds a toJSON method that converts it to a string.
         // dnd5e 4.3.0 changes save from an int to an object.
         if (typeof pc.abilities[key].save === 'string') {
-            pc.abilities[key].save = parseInt(pc.abilities[key].save.replaceAll('!', ''))
+            pc.abilities[key].save = parseInt(
+                pc.abilities[key].save.replaceAll('!', '')
+            )
         } else if (typeof pc.abilities[key].save === 'object') {
             pc.abilities[key].save = pc.abilities[key].save.value
         }

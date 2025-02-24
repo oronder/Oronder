@@ -45,9 +45,12 @@ function get_one_owner_id(actor) {
 
     return game.users
         .filter(u => u.active)
-        .filter(u => owner_ids.includes(u.id) || u.role >= CONST.USER_ROLES.ASSISTANT)
+        .filter(
+            u =>
+                owner_ids.includes(u.id) || u.role >= CONST.USER_ROLES.ASSISTANT
+        )
         .map(u => u.id)
-        .reduce((prev, cur) => prev > cur ? prev : cur)
+        .reduce((prev, cur) => (prev > cur ? prev : cur))
 }
 
 Hooks.once('ready', async () => {
@@ -63,9 +66,10 @@ Hooks.once('ready', async () => {
 
     game.socket.on(SOCKET_NAME, data => {
         switch (data.action) {
-            case 'session': {
-                set_session(data.session)
-            }
+            case 'session':
+                {
+                    set_session(data.session)
+                }
                 break
         }
     })

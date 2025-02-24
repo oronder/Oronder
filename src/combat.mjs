@@ -1,6 +1,11 @@
 import {auto_resize, Logger} from './util.mjs'
 import {combat_hooks, socket} from './module.mjs'
-import {COMBAT_ENABLED, COMBAT_HEALTH_ESTIMATE, COMBAT_HEALTH_ESTIMATE_TYPE, MODULE_ID} from './constants.mjs'
+import {
+    COMBAT_ENABLED,
+    COMBAT_HEALTH_ESTIMATE,
+    COMBAT_HEALTH_ESTIMATE_TYPE,
+    MODULE_ID
+} from './constants.mjs'
 import {actor_to_discord_ids} from './sync.mjs'
 
 const on_combat_start = async (combat, updateData) => {
@@ -34,7 +39,7 @@ export function set_combat_hooks() {
     }
 
     // Turn off hooks
-    ['combatStart', 'combatTurn', 'combatRound'].forEach(turn_off_hook)
+    ;['combatStart', 'combatTurn', 'combatRound'].forEach(turn_off_hook)
 
     // Turn them back on
     if (game.settings.get(MODULE_ID, COMBAT_ENABLED)) {
@@ -193,12 +198,15 @@ function get_health(hp, combatHealthSetting, actorType) {
 }
 
 export function register_combat_settings_toggle() {
-    const hook_fun = game.version < 13 ? 'prototype._updateObject' : 'DEFAULT_OPTIONS.form.handler'
+    const hook_fun =
+        game.version < 13
+            ? 'prototype._updateObject'
+            : 'DEFAULT_OPTIONS.form.handler'
 
     libWrapper.register(
         'oronder',
         `CombatTrackerConfig.${hook_fun}`,
-        async function(wrapped, ...args) {
+        async function (wrapped, ...args) {
             await game.settings.set(
                 MODULE_ID,
                 COMBAT_ENABLED,
@@ -232,7 +240,9 @@ export function register_combat_settings_toggle() {
             formGroup.className = 'form-group'
 
             const label = document.createElement('label')
-            label.textContent = game.i18n.localize('oronder.Publish-Combat-Tracker-To-Discord')
+            label.textContent = game.i18n.localize(
+                'oronder.Publish-Combat-Tracker-To-Discord'
+            )
             label.htmlFor = 'oronder_combat_tracker_toggle'
 
             const formFields = document.createElement('div')
@@ -256,7 +266,9 @@ export function register_combat_settings_toggle() {
             formFields.appendChild(input)
             formGroup.appendChild(hint)
 
-            const last_div = html.querySelector('div.form-group[data-setting-id="core.combatTheme"]')
+            const last_div = html.querySelector(
+                'div.form-group[data-setting-id="core.combatTheme"]'
+            )
             last_div.parentNode.insertBefore(formGroup, last_div)
         }
         auto_resize(combatTrackerConfig)
