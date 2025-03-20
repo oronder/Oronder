@@ -18,9 +18,9 @@ function rolls_to_str(rolls) {
                     if ('results' in t) {
                         const f = t.results.some(_ => _.discarded)
                             ? r =>
-                                r.discarded
-                                    ? `~~${r.result}~~`
-                                    : `**${r.result}**`
+                                  r.discarded
+                                      ? `~~${r.result}~~`
+                                      : `**${r.result}**`
                             : r => r.result
 
                         const rolls = t.results.map(f).join(', ')
@@ -85,7 +85,6 @@ async function incoming_attack(actor, data, foundry_user_id) {
         {data: {user: foundry_user_id}}
     )
 
-
     return {
         atk: rolls_to_str(atk),
         dmg: dmg.map(d => [rolls_to_str(d), d.options.type])
@@ -113,7 +112,9 @@ async function incoming_initiative(actor, event) {
     // Temporarily cache the configured roll and use it to roll initiative for the Actor
     actor._cachedInitiativeRoll = rolls[0]
     const combat = await actor.rollInitiative({
-        createCombatants: !game.combat.combatants.some(a => a.actorId === actor.id),
+        createCombatants: !game.combat.combatants.some(
+            a => a.actorId === actor.id
+        ),
         rerollInitiative: true
     })
 
@@ -129,7 +130,9 @@ async function incoming_initiative(actor, event) {
 export function set_incoming_hooks() {
     socket.on('roll', async (data, callback) => {
         if (game.version < 12) {
-            Logger.info(`rolling ${data['type']} requires Foundry v12 or later.`)
+            Logger.info(
+                `rolling ${data['type']} requires Foundry v12 or later.`
+            )
             callback({})
             return
         }
