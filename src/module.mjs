@@ -82,13 +82,13 @@ function skippable(data) {
 
     let changes = value_count(data.system)
 
-    if (system?.attributes?.hp?.value !== undefined)
+    if (data.system?.attributes?.hp?.value !== undefined)
         changes -= 1
 
-    if (system?.details?.xp?.value !== undefined)
+    if (data.system?.details?.xp?.value !== undefined)
         changes -= 1
 
-    if (typeof system?.spells === 'object' && Object.values(system.spells).filter(s => s.value).length)
+    if (typeof data.system?.spells === 'object' && Object.values(data.system.spells).filter(s => s.value).length)
         changes -= 1
 
     return changes === 0

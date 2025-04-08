@@ -127,7 +127,7 @@ function export_item(item) {
  * @param {string} url
  */
 function fix_relative_url(url) {
-    return url.indexOf('http://') === 0 || url.indexOf('https://') === 0
+    return !url || url.indexOf('http://') === 0 || url.indexOf('https://') === 0
         ? url
         : new URL(url, window.location.origin).href
 }
