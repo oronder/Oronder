@@ -6,7 +6,7 @@
   "library": "false",
   "compatibility": {
     "minimum": 11.0,
-    "verified": 13.336,
+    "verified": 13.342,
     "maximum": "13.999"
   },
   "authors": [
@@ -23,8 +23,8 @@
         "manifest": "https://raw.githubusercontent.com/foundryvtt/dnd5e/master/system.json",
         "compatibility": {
           "minimum": "4.2.0",
-          "verified": "4.3.3",
-          "maximum": "4.3.999"
+          "verified": "5.0.1",
+          "maximum": "5.0.999"
         }
       }
     ],
