@@ -27,7 +27,7 @@ export const ORONDER_WS_URL = `ws${url_common}`
 const discord_oauth_url = new URL('https://discord.com/api/oauth2/authorize')
 discord_oauth_url.search = new URLSearchParams({
     client_id: dev_mode ? '1148024288973160529' : '1064553830810923048',
-    permissions: '17995947789312',
+    permissions: '580945901472832',
     response_type: 'code',
     redirect_uri: `${ORONDER_BASE_URL}/init`,
     scope: 'bot guilds.members.read',
