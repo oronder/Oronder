@@ -1,26 +1,21 @@
-import {
-    ACTORS,
-    AUTH,
-    ID_MAP,
-    MODULE_ID,
-    ORONDER_BASE_URL
-} from './constants.mjs'
+import {ACTORS, AUTH, ID_MAP, MODULE_ID, ORONDER_BASE_URL} from './constants.mjs'
 import {hash, item_roll, Logger} from './util.mjs'
+import {world_data} from './module.mjs'
 
 function prune_roll_data({
-    spells,
-    resources,
-    flags,
-    effects,
-    srd5e,
-    prof,
-    scale,
-    actorId,
-    actorUuid,
-    tokenId,
-    tokenUuid,
-    ...pc
-} = {}) {
+                             spells,
+                             resources,
+                             flags,
+                             effects,
+                             srd5e,
+                             prof,
+                             scale,
+                             actorId,
+                             actorUuid,
+                             tokenId,
+                             tokenUuid,
+                             ...pc
+                         } = {}) {
     for (let key in pc.skills) {
         pc.skills[key] = (({prof, bonuses, ...o}) => o)(pc.skills[key])
     }
@@ -65,30 +60,30 @@ function prune_roll_data({
 
     for (let class_name in pc.classes) {
         pc.classes[class_name] = (({
-            advancement,
-            description,
-            hitDiceUsed,
-            identifier,
-            isOriginalClass,
-            prof,
-            saves,
-            skills,
-            spellcasting,
-            source,
-            ...o
-        }) => o)(pc.classes[class_name])
+                                       advancement,
+                                       description,
+                                       hitDiceUsed,
+                                       identifier,
+                                       isOriginalClass,
+                                       prof,
+                                       saves,
+                                       skills,
+                                       spellcasting,
+                                       source,
+                                       ...o
+                                   }) => o)(pc.classes[class_name])
 
         if ('subclass' in pc.classes[class_name]) {
             pc.classes[class_name].subclass = (({
-                advancement,
-                classIdentifier,
-                description,
-                modelProvider,
-                parent,
-                prof,
-                spellcasting,
-                ...o
-            }) => o)(pc.classes[class_name].subclass)
+                                                    advancement,
+                                                    classIdentifier,
+                                                    description,
+                                                    modelProvider,
+                                                    parent,
+                                                    prof,
+                                                    spellcasting,
+                                                    ...o
+                                                }) => o)(pc.classes[class_name].subclass)
         }
     }
     return Object.keys(pc).length ? pc : null
@@ -165,15 +160,15 @@ export function export_actor(actor) {
         typeof actor.system.details.background === 'string'
             ? actor.system.details.background
             : actor.system.details.background
-              ? actor.system.details.background.name
-              : ''
+                ? actor.system.details.background.name
+                : ''
 
     clone_actor.details.race =
         typeof actor.system.details.race === 'string'
             ? actor.system.details.race
             : actor.system.details.race
-              ? actor.system.details.race.name
-              : ''
+                ? actor.system.details.race.name
+                : ''
 
     clone_actor.attributes.spellcaster = Math.max(
         -1,
@@ -202,7 +197,8 @@ export function export_actor(actor) {
         discord_ids: actor_to_discord_ids(actor),
         weapons: weapons,
         equipment: equipment,
-        portrait_url: portrait_url
+        portrait_url: portrait_url,
+        world: world_data
     }
 }
 
@@ -360,13 +356,13 @@ export async function sync_actor(actor) {
                 response.json().then(({detail}) =>
                     Logger.error(
                         `${actor_obj.name} ${game.i18n.localize('oronder.Failed-To-Sync')} ` +
-                            detail
-                                .flat()
-                                .map(
-                                    ({loc, input, msg}) =>
-                                        `❌ ${loc.filter(_ => _ !== 'body').join('.')}.${input} ${msg}`
-                                )
-                                .join(' '),
+                        detail
+                            .flat()
+                            .map(
+                                ({loc, input, msg}) =>
+                                    `❌ ${loc.filter(_ => _ !== 'body').join('.')}.${input} ${msg}`
+                            )
+                            .join(' '),
                         {permanent: true}
                     )
                 )

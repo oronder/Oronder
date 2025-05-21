@@ -9,11 +9,13 @@ import {set_incoming_hooks} from './incoming.mjs'
 export let socket
 export let session_id
 export let session_ts
+export let world_data
 export let combat_hooks = {
     combatStart: undefined,
     combatRound: undefined,
     combatTurn: undefined
 }
+
 let session_name
 let default_title
 
@@ -32,6 +34,7 @@ function set_session(session) {
 }
 
 /**
+ * Used for when we don't know the initiating user. We don't care where the sync is run, just that it's only done once.
  @param {Actor} actor
  @returns {string}
  */
@@ -101,6 +104,12 @@ Hooks.once('ready', async () => {
         Logger.error(game.i18n.localize('oronder.LibWrapper-Error'))
     }
     await registerSettings()
+
+    world_data = (
+        ({id, coreVersion, system, systemVersion}) =>
+            ({id, coreVersion, system, systemVersion})
+    )(game.world)
+
     open_socket_with_oronder()
 
     if (game.user.isGM) {
@@ -110,9 +119,7 @@ Hooks.once('ready', async () => {
     game.socket.on(SOCKET_NAME, data => {
         switch (data.action) {
             case 'session':
-                {
-                    set_session(data.session)
-                }
+                set_session(data.session)
                 break
         }
     })
@@ -190,7 +197,8 @@ export function open_socket_with_oronder(update = false) {
 
     socket = io(ORONDER_WS_URL, {
         transports: ['websocket'],
-        auth: {Authorization: authorization}
+        auth: {Authorization: authorization},
+        world: world_data
     })
 
     socket.on('connect_error', error => {
