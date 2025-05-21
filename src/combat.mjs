@@ -218,7 +218,7 @@ export function register_combat_settings_toggle() {
         'WRAPPER'
     )
 
-    Hooks.on('renderCombatTrackerConfig', async (combatTrackerConfig, html) => {
+    Hooks.on('renderCombatTrackerConfig', async (combatTrackerConfig, form) => {
         if (game.version < 13) {
             $('<div/>', {class: 'form-group'})
                 .append(
@@ -234,7 +234,7 @@ export function register_combat_settings_toggle() {
                         checked: game.settings.get(MODULE_ID, COMBAT_ENABLED)
                     })
                 )
-                .insertBefore(html.find('form button').last())
+                .insertBefore(form.find('form button').last())
         } else {
             const formGroup = document.createElement('div')
             formGroup.className = 'form-group'
@@ -266,10 +266,8 @@ export function register_combat_settings_toggle() {
             formFields.appendChild(input)
             formGroup.appendChild(hint)
 
-            const last_div = html.querySelector(
-                'div.form-group[data-setting-id="core.combatTheme"]'
-            )
-            last_div.parentNode.insertBefore(formGroup, last_div)
+            const footer = form.querySelector('footer[class="form-footer"]')
+            footer.parentNode.insertBefore(formGroup, footer)
         }
         auto_resize(combatTrackerConfig)
     })
