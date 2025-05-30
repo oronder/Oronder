@@ -9,8 +9,7 @@
   "scripts": {
     "build": "esbuild src/module.mjs --bundle --minify --format=esm --outdir=dist",
     "build-dev": "esbuild src/module.mjs --bundle --sourcemap=inline --format=esm --outdir=dist",
-    "copy-11": "mkdir -p ../foundry_data/Data/modules/oronder/ && cp -r ./* ../foundry_data/Data/modules/oronder/",
-    "copy-12": "mkdir -p ../foundry_data_12/Data/modules/oronder/ && cp -r ./* ../foundry_data_12/Data/modules/oronder/",
+    "copy": "mkdir -p $MODULE_DIR/oronder/ && cp -r ./* $MODULE_DIR/oronder/",
     "format": "prettier --write ."
   }
 }
