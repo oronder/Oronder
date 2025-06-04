@@ -4,12 +4,13 @@
     "object-hash": "^3.0.0"
   },
   "devDependencies": {
-    "prettier": "^3.5.3"
+    "prettier": "^3.5.3",
+    "cpy-cli": "^5.0.0"
   },
   "scripts": {
     "build": "esbuild src/module.mjs --bundle --minify --format=esm --outdir=dist",
     "build-dev": "esbuild src/module.mjs --bundle --sourcemap=inline --format=esm --outdir=dist",
-    "copy": "mkdir -p $MODULE_DIR/oronder/ && cp -r ./* $MODULE_DIR/oronder/",
+    "copy": "cpy './**' '$MODULE_DIR/oronder/' --parents",
     "format": "prettier --write ."
   }
 }
