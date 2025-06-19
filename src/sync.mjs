@@ -1,4 +1,10 @@
-import {ACTORS, AUTH, ID_MAP, MODULE_ID, ORONDER_BASE_URL} from './constants.mjs'
+import {
+    ACTORS,
+    AUTH,
+    ID_MAP,
+    MODULE_ID,
+    ORONDER_BASE_URL
+} from './constants.mjs'
 import {hash, item_roll, Logger} from './util.mjs'
 import {world_data} from './module.mjs'
 
@@ -89,6 +95,7 @@ function prune_roll_data({
     return Object.keys(pc).length ? pc : null
 }
 
+// noinspection JSValidateJSDoc
 /**
  * @param {Item5e} item
  */
@@ -127,6 +134,7 @@ function fix_relative_url(url) {
         : new URL(url, window.location.origin).href
 }
 
+// noinspection JSValidateJSDoc
 /**
  @param {Actor} actor
  */
@@ -241,6 +249,7 @@ export async function del_actor(pc_id) {
     return await fetch(`${ORONDER_BASE_URL}/actor/${pc_id}`, requestOptions)
 }
 
+// noinspection JSValidateJSDoc
 /**
  @param {Actor} actor
  @return {string[]}
@@ -281,6 +290,7 @@ export async function full_sync(clear_cache) {
     })
 }
 
+// noinspection JSValidateJSDoc
 /**
  @param {Actor} actor
  */
@@ -325,6 +335,7 @@ export function syncable(actor) {
     return true
 }
 
+// noinspection JSValidateJSDoc
 /**
  @param {Actor} actor
  */

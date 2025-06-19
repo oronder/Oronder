@@ -33,6 +33,7 @@ function set_session(session) {
     }
 }
 
+// noinspection JSValidateJSDoc
 /**
  * Used for when we don't know the initiating user. We don't care where the sync is run, just that it's only done once.
  @param {Actor} actor
@@ -105,10 +106,12 @@ Hooks.once('ready', async () => {
     }
     await registerSettings()
 
-    world_data = (
-        ({id, coreVersion, system, systemVersion}) =>
-            ({id, coreVersion, system, systemVersion})
-    )(game.world)
+    world_data = (({id, coreVersion, system, systemVersion}) => ({
+        id,
+        coreVersion,
+        system,
+        systemVersion
+    }))(game.world)
 
     open_socket_with_oronder()
 
