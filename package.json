@@ -1,6 +1,6 @@
 {
   "dependencies": {
-    "esbuild": "^0.25.5",
+    "esbuild": "^0.25.8",
     "object-hash": "^3.0.0"
   },
   "devDependencies": {
