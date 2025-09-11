@@ -1,11 +1,11 @@
 {
   "dependencies": {
-    "esbuild": "^0.25.8",
+    "esbuild": "^0.25.9",
     "object-hash": "^3.0.0"
   },
   "devDependencies": {
     "prettier": "^3.6.2",
-    "cpy-cli": "^5.0.0"
+    "cpy-cli": "^6.0.0"
   },
   "scripts": {
     "build": "esbuild src/module.mjs --bundle --minify --format=esm --outdir=dist",
