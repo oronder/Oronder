@@ -5,10 +5,10 @@ import {
     COMBAT_HEALTH_ESTIMATE,
     COMBAT_HEALTH_ESTIMATE_TYPE,
     DAYS_OF_WEEK,
-    DISCORD_INIT_LINK,
+    get_base_url,
+    get_discord_init_link,
     ID_MAP,
     MODULE_ID,
-    ORONDER_BASE_URL,
     TIMEZONES
 } from './constants.mjs'
 import {full_sync, sync_actor} from './sync.mjs'
@@ -204,7 +204,7 @@ export class OronderSettingsFormApplication extends FormApplication {
         const auth = game.settings.get(MODULE_ID, AUTH)
         if (auth) {
             try {
-                const guild = await fetch(`${ORONDER_BASE_URL}/guild`, {
+                const guild = await fetch(`${get_base_url()}/guild`, {
                     method: 'GET',
                     headers: new Headers({
                         Accept: 'application/json',
@@ -315,7 +315,7 @@ export class OronderSettingsFormApplication extends FormApplication {
             delete guild.combat_channel_id
         }
 
-        await fetch(`${ORONDER_BASE_URL}/guild`, {
+        await fetch(`${get_base_url()}/guild`, {
             method: 'POST',
             headers: new Headers({
                 'Content-Type': 'application/json',
@@ -367,7 +367,11 @@ export class OronderSettingsFormApplication extends FormApplication {
             .map(([k, v]) => `${k}=${v}`)
             .join(',')
 
-        const popup = window.open(DISCORD_INIT_LINK, 'Discord Auth', params)
+        const popup = window.open(
+            get_discord_init_link(),
+            'Discord Auth',
+            params
+        )
         if (popup && !popup.closed && popup.focus) {
             popup.focus()
         } else {
@@ -375,7 +379,7 @@ export class OronderSettingsFormApplication extends FormApplication {
         }
 
         const message_interval = setInterval(() => {
-            popup.postMessage('', ORONDER_BASE_URL)
+            popup.postMessage('', get_base_url())
         }, 500)
         const event_listener = async event => {
             if (event.data.status_code) {

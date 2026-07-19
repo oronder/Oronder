@@ -1,6 +1,6 @@
 import {Logger} from './util.mjs'
 import {registerSettings} from './settings.mjs'
-import {AUTH, ID_MAP, MODULE_ID, ORONDER_WS_URL} from './constants.mjs'
+import {AUTH, get_ws_url, ID_MAP, MODULE_ID} from './constants.mjs'
 import {del_actor, sync_actor} from './sync.mjs'
 import {set_monks_token_bar_hooks} from './monks_token_bar.mjs'
 import {register_combat_settings_toggle, set_combat_hooks} from './combat.mjs'
@@ -159,7 +159,7 @@ export function open_socket_with_oronder(update = false) {
     const authorization = game.settings.get(MODULE_ID, AUTH)
     if (!authorization) return
 
-    socket = io(ORONDER_WS_URL, {
+    socket = io(get_ws_url(), {
         transports: ['websocket'],
         auth: {Authorization: authorization},
         world: world_data

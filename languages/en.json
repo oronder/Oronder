@@ -93,5 +93,7 @@
   "oronder.Combat-Channel-Label": "Channel where Combat Tracking Messages will be posted.",
   "oronder.Combat-Health-Estimate": "Combat Health Estimate",
   "oronder.Combat-Health-Estimate-Label": "Select whose health will be described(i.e. Healthy) rather than shown (HP 8/9).",
-  "oronder.Auth-Unset-Error": "Oronder Discord App has not yet been linked with Foundry!"
+  "oronder.Auth-Unset-Error": "Oronder Discord App has not yet been linked with Foundry!",
+  "oronder.Backend-Url": "Backend URL",
+  "oronder.Backend-Url-Label": "Base URL of a self-hosted Oronder server (e.g. https://oronder.example.com). Leave empty to use the official api.oronder.com service."
 }

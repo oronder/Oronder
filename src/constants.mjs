@@ -16,26 +16,72 @@ export const COMBAT_HEALTH_ESTIMATE_TYPE = Object.freeze({
     All: 1,
     None: 2
 })
+export const BACKEND_URL = 'backend_url'
 export const ACTORS = `${MODULE_ID}.actors`
 const dev_mode = window.location.host === 'localhost:65434'
 if (dev_mode) {
     CONFIG.debug.hooks = true
 }
-const url_common = dev_mode ? '://localhost:65435' : 's://api.oronder.com'
-export const ORONDER_BASE_URL = `http${url_common}`
-export const ORONDER_WS_URL = `ws${url_common}`
-const discord_oauth_url = new URL('https://discord.com/api/oauth2/authorize')
-discord_oauth_url.search = new URLSearchParams({
-    client_id: dev_mode ? '1148024288973160529' : '1064553830810923048',
-    permissions: '580945901472832',
-    response_type: 'code',
-    redirect_uri: `${ORONDER_BASE_URL}/init`,
-    scope: 'bot guilds.members.read',
-    state: btoa(
-        `${Intl.DateTimeFormat().resolvedOptions().timeZone}|${window.location.origin}`
+
+/**
+ * Pure resolution of the backend base + websocket urls.
+ * Order: explicit backend_url setting > dev-mode localhost heuristic > production.
+ * The setting's http(s) scheme decides ws vs wss (http -> ws, https -> wss).
+ @param {string} host window.location.host
+ @param {string} backend_url_setting value of the backend_url world setting
+ @returns {{base_url: string, ws_url: string}}
+ */
+export function resolve_backend_urls(host, backend_url_setting) {
+    const override = (backend_url_setting ?? '').trim().replace(/\/+$/, '')
+    if (override) {
+        return {
+            base_url: override,
+            ws_url: override.replace(/^http/, 'ws')
+        }
+    }
+    const url_common =
+        host === 'localhost:65434'
+            ? '://localhost:65435'
+            : 's://api.oronder.com'
+    return {base_url: `http${url_common}`, ws_url: `ws${url_common}`}
+}
+
+function backend_url_setting() {
+    // Settings are not readable before registration; fall back to '' so the
+    // default resolution applies.
+    try {
+        return game.settings.get(MODULE_ID, BACKEND_URL)
+    } catch {
+        return ''
+    }
+}
+
+export function get_base_url() {
+    return resolve_backend_urls(window.location.host, backend_url_setting())
+        .base_url
+}
+
+export function get_ws_url() {
+    return resolve_backend_urls(window.location.host, backend_url_setting())
+        .ws_url
+}
+
+export function get_discord_init_link() {
+    const discord_oauth_url = new URL(
+        'https://discord.com/api/oauth2/authorize'
     )
-}).toString()
-export const DISCORD_INIT_LINK = discord_oauth_url.href
+    discord_oauth_url.search = new URLSearchParams({
+        client_id: dev_mode ? '1148024288973160529' : '1064553830810923048',
+        permissions: '580945901472832',
+        response_type: 'code',
+        redirect_uri: `${get_base_url()}/init`,
+        scope: 'bot guilds.members.read',
+        state: btoa(
+            `${Intl.DateTimeFormat().resolvedOptions().timeZone}|${window.location.origin}`
+        )
+    }).toString()
+    return discord_oauth_url.href
+}
 export const DAYS_OF_WEEK = [
     'Monday',
     'Tuesday',

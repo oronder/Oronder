@@ -1,10 +1,4 @@
-import {
-    ACTORS,
-    AUTH,
-    ID_MAP,
-    MODULE_ID,
-    ORONDER_BASE_URL
-} from './constants.mjs'
+import {ACTORS, AUTH, get_base_url, ID_MAP, MODULE_ID} from './constants.mjs'
 import {hash, Logger, ownership_to_discord_ids} from './util.mjs'
 import {world_data} from './module.mjs'
 import {get_adapter} from './systems/index.mjs'
@@ -44,7 +38,7 @@ async function upload(pc) {
         redirect: 'follow'
     }
 
-    return await fetch(`${ORONDER_BASE_URL}/actor`, requestOptions)
+    return await fetch(`${get_base_url()}/actor`, requestOptions)
 }
 
 /**
@@ -57,7 +51,7 @@ export async function del_actor(pc_id) {
         redirect: 'follow'
     }
 
-    return await fetch(`${ORONDER_BASE_URL}/actor/${pc_id}`, requestOptions)
+    return await fetch(`${get_base_url()}/actor/${pc_id}`, requestOptions)
 }
 
 // noinspection JSValidateJSDoc
