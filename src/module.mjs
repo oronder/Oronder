@@ -5,6 +5,7 @@ import {del_actor, sync_actor} from './sync.mjs'
 import {set_monks_token_bar_hooks} from './monks_token_bar.mjs'
 import {register_combat_settings_toggle, set_combat_hooks} from './combat.mjs'
 import {set_incoming_hooks} from './incoming.mjs'
+import {get_adapter} from './systems/index.mjs'
 
 export let socket
 export let session_id
@@ -57,49 +58,6 @@ function get_one_owner_id(actor) {
         .reduce((prev, cur) => (prev > cur ? prev : cur))
 }
 
-/**
- *
- * @returns number
- * @param i
- */
-function value_count(i) {
-    if (typeof i === 'object') {
-        return Object.values(i)
-            .map(value_count)
-            .reduce((acc, cur) => acc + cur)
-    } else if (Array.isArray(i)) {
-        return i.map(value_count).reduce((acc, cur) => acc + cur)
-    } else {
-        return 1
-    }
-}
-
-/**
- * @param {{}} data
- */
-function skippable(data) {
-    const relevant_change_keys = Object.keys(data).filter(
-        k => !['_id', '_stats'].includes(k)
-    )
-    if (!relevant_change_keys.length) return true
-
-    if (relevant_change_keys.length > 1 || (!'system') in data) return false
-
-    let changes = value_count(data.system)
-
-    if (data.system?.attributes?.hp?.value !== undefined) changes -= 1
-
-    if (data.system?.details?.xp?.value !== undefined) changes -= 1
-
-    if (
-        typeof data.system?.spells === 'object' &&
-        Object.values(data.system.spells).filter(s => s.value).length
-    )
-        changes -= 1
-
-    return changes === 0
-}
-
 Hooks.once('ready', async () => {
     if (!game.modules.get('lib-wrapper')?.active) {
         Logger.error(game.i18n.localize('oronder.LibWrapper-Error'))
@@ -128,7 +86,10 @@ Hooks.once('ready', async () => {
     })
 
     Hooks.on('updateActor', async (actor, data, options, userId) => {
-        if (game.user.id === userId && !skippable(data)) {
+        if (
+            game.user.id === userId &&
+            !get_adapter().skippable(actor, data, options)
+        ) {
             Logger.info(`Sync ${actor.name} on update.`)
 
             if ('==ownership' in data) {
@@ -221,10 +182,7 @@ export function open_socket_with_oronder(update = false) {
                     `${game.i18n.localize('oronder.Failed-To-Update-Actor')} ${actor_id} ${game.i18n.localize('oronder.Found')}`
                 )
             } else {
-                Logger.info(
-                    `${actor.name} xp: ${actor.system.details.xp.value} -> ${xp}`
-                )
-                await actor.update({'system.details.xp.value': xp})
+                await get_adapter().xp_write(actor, xp)
             }
         }
     })

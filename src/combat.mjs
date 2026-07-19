@@ -7,6 +7,7 @@ import {
     MODULE_ID
 } from './constants.mjs'
 import {actor_to_discord_ids} from './sync.mjs'
+import {get_adapter} from './systems/index.mjs'
 
 const on_combat_start = async (combat, updateData) => {
     const roundRender = parse_combat_round({...combat, ...updateData})
@@ -90,10 +91,7 @@ function parse_turn(combat, updateData) {
         output += `${combatant.name} <Hidden>\n`
     } else {
         const hp = get_health(
-            {
-                ...actor.system.attributes.hp,
-                ...token.document.delta?.system?.attributes?.hp
-            },
+            get_adapter().hp(actor, token.document),
             health_settings,
             actor.type
         )
@@ -125,10 +123,7 @@ function parse_combat_round(combat) {
         // Hidden from Initiative
         if (c.hidden) return acc
 
-        const rawHp = {
-            ...c.actor.system.attributes.hp,
-            ...c.token.document.delta?.system?.attributes?.hp
-        }
+        const rawHp = get_adapter().hp(c.actor, c.token.document)
         const init = `${c.initiative || 'XX'}`.padStart(3)
 
         // Combatant is marked as defeated in initative
@@ -141,10 +136,9 @@ function parse_combat_round(combat) {
             return acc + line
         } else {
             const hp = get_health(rawHp, healthSetting, c.actor.type)
-            const ac =
-                c.actor.type === 'character'
-                    ? ` (AC ${c.actor.system.attributes.ac.value})`
-                    : ''
+            const ac_value =
+                c.actor.type === 'character' ? get_adapter().ac(c.actor) : null
+            const ac = ac_value != null ? ` (AC ${ac_value})` : ''
             return `${acc}${init}: ${c.name} <${hp}>${ac}\n${get_effects_in_markdown(c.actor, c.token)}`
         }
     }, '')

@@ -11,6 +11,7 @@
     "build": "esbuild src/module.mjs --bundle --minify --format=esm --outdir=dist",
     "build-dev": "esbuild src/module.mjs --bundle --sourcemap=inline --format=esm --outdir=dist",
     "copy": "cpy './**' '$MODULE_DIR/oronder/' --parents",
-    "format": "prettier --write ."
+    "format": "prettier --write .",
+    "test": "node --test test/*.test.mjs"
   }
 }

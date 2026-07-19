@@ -28,6 +28,8 @@
   "oronder.No-Race": "Actor has no Race.",
   "oronder.No-Background": "Actor has no Background.",
   "oronder.No-Class": "Actor has no Class.",
+  "oronder.No-Ancestry": "Actor has no Ancestry.",
+  "oronder.No-Occupation": "Actor has no Occupation.",
   "oronder.Its-Your-Turn": "It's your turn",
   "oronder.Initiative": "Initiative",
   "oronder.Round": "Round",
