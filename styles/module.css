@@ -1,0 +1,6 @@
+/* ApplicationV2 window-content is overflow:hidden; let the (tall) settings
+   form scroll inside the window instead of being clipped. */
+#oronder-options .oronder-config {
+    overflow-y: auto;
+    min-height: 0;
+}

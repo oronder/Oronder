@@ -1,4 +1,4 @@
-<form autocomplete="off">
+<div class="oronder-config">
     <div>
         {{#if guild}}
             <h1>{{guild.name}}</h1>
@@ -7,43 +7,24 @@
         {{/if}}
     </div>
     {{#if guild}}
-        <!--        <div class="form-group">-->
-        <!--            <label for="appt">Choose a time for your meeting:</label>-->
-        <!--            <input type="time" id="appt" name="appt" min="09:00" max="18:00" required/>-->
-        <!--        </div>-->
-
-        <!--        <div class="form-group">-->
-        <!--            <multi-checkbox name="check-many-boxes">-->
-        <!--                <optgroup label="Basic Options">-->
-        <!--                    <option value="foo">Foo</option>-->
-        <!--                    <option value="bar">Bar</option>-->
-        <!--                    <option value="baz">Baz</option>-->
-        <!--                </optgroup>-->
-        <!--                <optgroup label="Advanced Options">-->
-        <!--                    <option value="fizz">Fizz</option>-->
-        <!--                    <option value="buzz">Buzz</option>-->
-        <!--                </optgroup>-->
-        <!--            </multi-checkbox>-->
-        <!--        </div>-->
-
         <div class="form-group">
             <label for="gm_xp" title="{{localize "oronder.GM-XP-Label"}}">
                 {{localize "oronder.GM-XP"}}
             </label>
-            <input type="text" min="0" id="gm_xp" inputmode="numeric" value="{{guild.gm_xp}}">
+            <input type="text" min="0" id="gm_xp" name="gm_xp" inputmode="numeric" value="{{guild.gm_xp}}">
         </div>
         <div class="form-group">
             <label for="starting_level" title="{{localize "oronder.Starting-Level-Label"}}">
                 {{localize "oronder.Starting-Level"}}</label>
             <input type="text" min="1"
-                   max="20" id="starting_level" inputmode="numeric"
+                   max="20" id="starting_level" name="starting_level" inputmode="numeric"
                    value="{{guild.starting_level}}">
         </div>
         <div class="form-group">
             <label for="timezone" title="{{localize "oronder.Timezone-Label"}}">
                 {{localize "oronder.Timezone"}}
             </label>
-            <select id="timezone">
+            <select id="timezone" name="timezone">
                 {{#each timezones}}
                     <option value="{{this}}"  {{#if (eq this ../guild.timezone)}}selected{{/if}}>
                         {{this}}</option>
@@ -54,7 +35,7 @@
             <label for="gm_role" title="{{localize "oronder.GM-Role-Label"}}">
                 {{localize "oronder.GM-Role"}}
             </label>
-            <select id="gm_role">
+            <select id="gm_role" name="gm_role">
                 {{#each guild.roles}}
                     <option value="{{id}}"  {{#if (eq id ../guild.gm_role_id)}}selected{{/if}}>{{name}}</option>
                 {{/each}}
@@ -72,7 +53,7 @@
             <label for="session_channel" title="{{localize "oronder.Session-Channel-Label"}}">
                 {{localize "oronder.Session-Channel"}}
             </label>
-            <select id="session_channel">
+            <select id="session_channel" name="session_channel">
                 {{#each guild.forum_and_text_channels}}
                     <option value="{{id}}"  {{#if (eq id ../guild.session_channel_id)}}selected{{/if}}>
                         {{name}}</option>
@@ -83,7 +64,7 @@
             <label for="downtime_channel" title="{{localize "oronder.Downtime-Channel-Label"}}">
                 {{localize "oronder.Downtime-Channel"}}
             </label>
-            <select id="downtime_channel">
+            <select id="downtime_channel" name="downtime_channel">
                 {{#each guild.text_channels}}
                     <option value="{{id}}"  {{#if (eq id ../guild.downtime_channel_id)}}selected{{/if}}>
                         {{name}}</option>
@@ -94,7 +75,7 @@
             <label for="downtime_gm_channel" title="{{localize "oronder.Downtime-GM-Channel-Label"}}">
                 {{localize "oronder.Downtime-GM-Channel"}}
             </label>
-            <select id="downtime_gm_channel">
+            <select id="downtime_gm_channel" name="downtime_gm_channel">
                 <option value="">❌ {{localize "oronder.DISABLED"}}</option>
                 {{#each guild.text_channels}}
                     <option value="{{id}}"  {{#if (eq id ../guild.downtime_gm_channel_id)}}selected{{/if}}>
@@ -106,7 +87,7 @@
             <label for="voice_channel" title="{{localize "oronder.Voice-Channel-Label"}}">
                 {{localize "oronder.Voice-Channel"}}
             </label>
-            <select id="voice_channel">
+            <select id="voice_channel" name="voice_channel">
                 {{#each guild.voice_and_stage_channels}}
                     <option value="{{id}}"  {{#if (eq id ../guild.voice_channel_id)}}selected{{/if}}>
                         {{name}}</option>
@@ -117,7 +98,7 @@
             <label for="scheduling_channel" title="{{localize "oronder.Scheduling-Channel-Label"}}">
                 {{localize "oronder.Scheduling-Channel"}}
             </label>
-            <select id="scheduling_channel">
+            <select id="scheduling_channel" name="scheduling_channel">
                 {{#each guild.text_channels}}
                     <option value="{{id}}"  {{#if (eq id ../guild.scheduling_channel_id)}}selected{{/if}}>
                         {{name}}</option>
@@ -133,7 +114,7 @@
         {{#each players}}
             <div class="form-group">
                 <label for="{{foundry_id}}">{{foundry_name}}</label>
-                <select id="{{foundry_id}}">
+                <select id="{{foundry_id}}" name="{{foundry_id}}">
                     <option value=""></option>
                     {{#each ../guild.members}}
                         <option value="{{id}}"  {{#if (eq id ../discord_id)}}selected{{/if}}>
@@ -148,7 +129,7 @@
                 <label for="rollcall_enabled" title="{{localize "oronder.Rollcall-Label"}}">
                     {{localize "oronder.Rollcall"}}
                 </label>
-                <input type="checkbox" id='rollcall_enabled' class='control' data-action='checkbox'
+                <input type="checkbox" id='rollcall_enabled' name='rollcall_enabled' data-action='checkbox'
                        style='float:right'
                     {{checked guild.rollcall_enabled}}>
             </h3>
@@ -158,7 +139,7 @@
                 <label for="rollcall_role" title="{{localize "oronder.Rollcall-Role-Label"}}">
                     {{localize "oronder.Role"}}
                 </label>
-                <select id="rollcall_role" required>
+                <select id="rollcall_role" name="rollcall_role" required>
                     <option value=""></option>
                     {{#each guild.roles}}
                         <option value="{{id}}"
@@ -170,7 +151,7 @@
                 <label for="rollcall_channel" title="{{localize "oronder.Rollcall-Channel-Label"}}">
                     {{localize "oronder.Channel"}}
                 </label>
-                <select id="rollcall_channel" required>
+                <select id="rollcall_channel" name="rollcall_channel" required>
                     <option value=""></option>
                     {{#each guild.text_channels}}
                         <option value="{{id}}"  {{#if (eq id ../guild.rollcall_channel_id)}}selected{{/if}}>
@@ -182,7 +163,7 @@
                 <label for="rollcall_day" title="{{localize "oronder.Rollcall-Day-Label"}}">
                     {{localize "oronder.Day"}}
                 </label>
-                <select id="rollcall_day" required>
+                <select id="rollcall_day" name="rollcall_day" required>
                     <option value=""></option>
                     {{#each days_of_week}}
                         <option value="{{this}}"
@@ -194,7 +175,7 @@
                 <label for="rollcall_time" title="{{localize "oronder.Rollcall-Time-Label"}}">
                     {{localize "oronder.Time"}}
                 </label>
-                <input type="time" id="rollcall_time" required value="{{guild.rollcall_time}}">
+                <input type="time" id="rollcall_time" name="rollcall_time" required value="{{guild.rollcall_time}}">
             </div>
         {{/if}}
 
@@ -204,7 +185,7 @@
                 <label for='show_advanced' title="{{localize "oronder.Advanced-Options-Label"}}">
                     {{localize "oronder.Advanced-Options"}}
                 </label>
-                <input type="checkbox" id='show_advanced' class='control' data-action='checkbox'
+                <input type="checkbox" id='show_advanced' name='show_advanced' data-action='checkbox'
                     {{checked show_advanced}} style='float:right'>
             </h3>
         </div>
@@ -215,22 +196,23 @@
                        title="{{localize "oronder.Publish-Discord-Rolls-To-Foundry-Label"}}">
                     {{localize "oronder.Publish-Discord-Rolls-To-Foundry"}}
                 </label>
-                <input type="checkbox" id='roll_discord_to_foundry' class='control' data-action='checkbox'
-                       style='float:right' {{checked guild.roll_discord_to_foundry}}>
+                <input type="checkbox" id='roll_discord_to_foundry' name='roll_discord_to_foundry'
+                       data-action='checkbox' style='float:right' {{checked guild.roll_discord_to_foundry}}>
             </div>
             <div class="form-group">
                 <label for="combat_tracking_enabled"
                        title="{{localize "oronder.Combat-Tracking-Enable-Label"}}">
                     {{localize "oronder.Combat-Tracking-Enable"}}
                 </label>
-                <input type="checkbox" id='combat_tracking_enabled' class='control' data-action='checkbox'
-                       style='float:right' {{checked combat_tracking_enabled}}>
+                <input type="checkbox" id='combat_tracking_enabled' name='combat_tracking_enabled'
+                       data-action='checkbox' style='float:right' {{checked combat_tracking_enabled}}>
             </div>
             <div class="form-group">
                 <label for="combat_channel" title="{{localize "oronder.Combat-Channel-Label"}}">
                     {{localize "oronder.Combat-Channel"}}
                 </label>
-                <select id="combat_channel" {{#unless combat_tracking_enabled}}disabled{{/unless}}>
+                <select id="combat_channel" name="combat_channel"
+                        {{#unless combat_tracking_enabled}}disabled{{/unless}}>
                     {{#each guild.text_channels}}
                         <option value="{{id}}"  {{#if (eq id ../guild.combat_channel_id)}}selected{{/if}}>
                             {{name}}</option>
@@ -242,7 +224,8 @@
                        title="{{localize "oronder.Combat-Health-Estimate-Label"}}">
                     {{localize "oronder.Combat-Health-Estimate"}}
                 </label>
-                <select id="combat_health_estimate" {{#unless combat_tracking_enabled}}disabled{{/unless}}>
+                <select id="combat_health_estimate" name="combat_health_estimate"
+                        {{#unless combat_tracking_enabled}}disabled{{/unless}}>
                     {{#each combat_health_estimate_type}}
                         <option value="{{this}}" {{#if (eq this ../combat_health_estimate)}}selected{{/if}}>
                             {{@key}}</option>
@@ -250,14 +233,14 @@
                 </select>
             </div>
             <div class="form-group">
-                <button type="button" class='control' data-action='sync-all' {{#if buttons_disabled}}disabled{{/if}}>
+                <button type="button" data-action='sync-all' {{#if buttons_disabled}}disabled{{/if}}>
                     <i class="{{#if full_sync_active}}fa-solid fa-spinner fa-spin{{else}}fa-solid fa-rotate{{/if}}"></i>
                     {{#if full_sync_active}}{{localize "oronder.Full-Sync-Pending"}}{{else}}
                         {{localize "oronder.Full-Sync"}}{{/if}}
                 </button>
             </div>
             <div class="form-group">
-                <button type="button" class='control' data-action='init' {{#if buttons_disabled}}disabled{{/if}}>
+                <button type="button" data-action='init' {{#if buttons_disabled}}disabled{{/if}}>
                     <i class="{{#if init_active}}fa-solid fa-spinner fa-spin{{else}}fa-brands fa-discord{{/if}}"></i>
                     {{#if init_active}}{{localize "oronder.Init-Pending"}}{{else}}
                         {{localize "oronder.Re-Init"}}{{/if}}
@@ -271,10 +254,10 @@
         </button>
     {{else}}
         <div class="form-group">
-            <button type="button" id='init' class='control' data-action='init' {{#if buttons_disabled}}disabled{{/if}}>
+            <button type="button" id='init' data-action='init' {{#if buttons_disabled}}disabled{{/if}}>
                 <i class="{{#if init_active}}fa-solid fa-spinner fa-spin{{else}}fa-brands fa-discord{{/if}}"></i>
                 {{#if init_active}}{{localize "oronder.Init-Pending"}}{{else}}{{localize "oronder.Init"}}{{/if}}
             </button>
         </div>
     {{/if}}
-</form>
+</div>
