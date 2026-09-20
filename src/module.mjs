@@ -83,7 +83,7 @@ function skippable(data) {
     )
     if (!relevant_change_keys.length) return true
 
-    if (relevant_change_keys.length > 1 || (!'system') in data) return false
+    if (relevant_change_keys.length > 1 || !('system' in data)) return false
 
     let changes = value_count(data.system)
 
