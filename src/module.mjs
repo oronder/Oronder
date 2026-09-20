@@ -200,8 +200,7 @@ export function open_socket_with_oronder(update = false) {
 
     socket = io(ORONDER_WS_URL, {
         transports: ['websocket'],
-        auth: {Authorization: authorization},
-        world: world_data
+        auth: {Authorization: authorization}
     })
 
     socket.on('connect_error', error => {
