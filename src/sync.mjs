@@ -364,19 +364,26 @@ export async function sync_actor(actor) {
                 )
                 return true
             } else if (response.status === 422) {
-                response.json().then(({detail}) =>
+                response.json().then(({detail}) => {
+                    // FastAPI's own validation errors arrive as an array of
+                    // {loc, input, msg}; Oronder's handler raises with a plain
+                    // string. Assuming the array shape threw TypeError on the
+                    // string, which swallowed the only useful diagnostic the
+                    // user gets when a sync is rejected.
+                    const reason = Array.isArray(detail)
+                        ? detail
+                              .flat()
+                              .map(
+                                  ({loc, input, msg}) =>
+                                      `❌ ${(loc ?? []).filter(_ => _ !== 'body').join('.')}.${input} ${msg}`
+                              )
+                              .join(' ')
+                        : String(detail ?? 'unknown validation error')
                     Logger.error(
-                        `${actor_obj.name} ${game.i18n.localize('oronder.Failed-To-Sync')} ` +
-                            detail
-                                .flat()
-                                .map(
-                                    ({loc, input, msg}) =>
-                                        `❌ ${loc.filter(_ => _ !== 'body').join('.')}.${input} ${msg}`
-                                )
-                                .join(' '),
+                        `${actor_obj.name} ${game.i18n.localize('oronder.Failed-To-Sync')} ${reason}`,
                         {permanent: true}
                     )
-                )
+                })
             } else if (response.status === 401) {
                 Logger.error(
                     `${game.i18n.localize('oronder.Invalid-Auth')}: ${actor_obj.name} ${game.i18n.localize('oronder.Failed-To-Sync')}`
