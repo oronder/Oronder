@@ -82,7 +82,6 @@
   "oronder.Time": "Hora",
   "oronder.Rollcall-Time-Label": "Hora del día en que se publicarán los mensajes de confirmación de asistencia.",
   "oronder.Advanced-Options": "Opciones avanzadas",
-  "oronder.Advanced-Options-Label": "Mostrar opciones avanzadas y experimentales.",
   "oronder.Publish-Discord-Rolls-To-Foundry": "Usar Foundry para calcular /attack y /roll.",
   "oronder.Publish-Discord-Rolls-To-Foundry-Label": "Oronder publicará las tiradas de Discord en Foundry si un GM ha iniciado sesión en Foundry.",
   "oronder.Combat-Tracking-Enable": "Publicar tracker de combate en Discord",

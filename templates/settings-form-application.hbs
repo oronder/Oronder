@@ -188,62 +188,52 @@
         <fieldset>
             <legend>{{localize "oronder.Advanced-Options"}}</legend>
             <div class="form-group">
-                <label for="show_advanced">{{localize "oronder.Advanced-Options"}}</label>
+                <label for="roll_discord_to_foundry">{{localize "oronder.Publish-Discord-Rolls-To-Foundry"}}</label>
                 <div class="form-fields">
-                    <input type="checkbox" id="show_advanced" name="show_advanced" data-action="toggle"
-                        {{checked show_advanced}}>
+                    <input type="checkbox" id="roll_discord_to_foundry" name="roll_discord_to_foundry"
+                           data-action="toggle" {{checked guild.roll_discord_to_foundry}}>
                 </div>
-                <p class="hint">{{localize "oronder.Advanced-Options-Label"}}</p>
+                <p class="hint">{{localize "oronder.Publish-Discord-Rolls-To-Foundry-Label"}}</p>
             </div>
-            {{#if show_advanced}}
-                <div class="form-group">
-                    <label for="roll_discord_to_foundry">{{localize "oronder.Publish-Discord-Rolls-To-Foundry"}}</label>
-                    <div class="form-fields">
-                        <input type="checkbox" id="roll_discord_to_foundry" name="roll_discord_to_foundry"
-                               data-action="toggle" {{checked guild.roll_discord_to_foundry}}>
-                    </div>
-                    <p class="hint">{{localize "oronder.Publish-Discord-Rolls-To-Foundry-Label"}}</p>
+            <div class="form-group">
+                <label for="combat_tracking_enabled">{{localize "oronder.Combat-Tracking-Enable"}}</label>
+                <div class="form-fields">
+                    <input type="checkbox" id="combat_tracking_enabled" name="combat_tracking_enabled"
+                           data-action="toggle" {{checked combat_tracking_enabled}}>
                 </div>
-                <div class="form-group">
-                    <label for="combat_tracking_enabled">{{localize "oronder.Combat-Tracking-Enable"}}</label>
-                    <div class="form-fields">
-                        <input type="checkbox" id="combat_tracking_enabled" name="combat_tracking_enabled"
-                               data-action="toggle" {{checked combat_tracking_enabled}}>
-                    </div>
-                    <p class="hint">{{localize "oronder.Combat-Tracking-Enable-Label"}}</p>
+                <p class="hint">{{localize "oronder.Combat-Tracking-Enable-Label"}}</p>
+            </div>
+            <div class="form-group">
+                <label for="combat_channel">{{localize "oronder.Combat-Channel"}}</label>
+                <div class="form-fields">
+                    <select id="combat_channel" name="combat_channel" {{#unless combat_tracking_enabled}}disabled{{/unless}}>
+                        {{#each guild.text_channels}}
+                            <option value="{{id}}" {{#if (eq id ../guild.combat_channel_id)}}selected{{/if}}>{{name}}</option>
+                        {{/each}}
+                    </select>
                 </div>
-                <div class="form-group">
-                    <label for="combat_channel">{{localize "oronder.Combat-Channel"}}</label>
-                    <div class="form-fields">
-                        <select id="combat_channel" name="combat_channel" {{#unless combat_tracking_enabled}}disabled{{/unless}}>
-                            {{#each guild.text_channels}}
-                                <option value="{{id}}" {{#if (eq id ../guild.combat_channel_id)}}selected{{/if}}>{{name}}</option>
-                            {{/each}}
-                        </select>
-                    </div>
-                    <p class="hint">{{localize "oronder.Combat-Channel-Label"}}</p>
+                <p class="hint">{{localize "oronder.Combat-Channel-Label"}}</p>
+            </div>
+            <div class="form-group">
+                <label for="combat_health_estimate">{{localize "oronder.Combat-Health-Estimate"}}</label>
+                <div class="form-fields">
+                    <select id="combat_health_estimate" name="combat_health_estimate" data-dtype="Number"
+                            {{#unless combat_tracking_enabled}}disabled{{/unless}}>
+                        {{#each combat_health_estimate_type}}
+                            <option value="{{this}}" {{#if (eq this ../combat_health_estimate)}}selected{{/if}}>{{@key}}</option>
+                        {{/each}}
+                    </select>
                 </div>
-                <div class="form-group">
-                    <label for="combat_health_estimate">{{localize "oronder.Combat-Health-Estimate"}}</label>
-                    <div class="form-fields">
-                        <select id="combat_health_estimate" name="combat_health_estimate" data-dtype="Number"
-                                {{#unless combat_tracking_enabled}}disabled{{/unless}}>
-                            {{#each combat_health_estimate_type}}
-                                <option value="{{this}}" {{#if (eq this ../combat_health_estimate)}}selected{{/if}}>{{@key}}</option>
-                            {{/each}}
-                        </select>
-                    </div>
-                    <p class="hint">{{localize "oronder.Combat-Health-Estimate-Label"}}</p>
-                </div>
-                <button type="button" data-action="syncAll" {{#if buttons_disabled}}disabled{{/if}}>
-                    <i class="{{#if full_sync_active}}fa-solid fa-spinner fa-spin{{else}}fa-solid fa-rotate{{/if}}" inert></i>
-                    <span>{{#if full_sync_active}}{{localize "oronder.Full-Sync-Pending"}}{{else}}{{localize "oronder.Full-Sync"}}{{/if}}</span>
-                </button>
-                <button type="button" data-action="init" {{#if buttons_disabled}}disabled{{/if}}>
-                    <i class="{{#if init_active}}fa-solid fa-spinner fa-spin{{else}}fa-brands fa-discord{{/if}}" inert></i>
-                    <span>{{#if init_active}}{{localize "oronder.Init-Pending"}}{{else}}{{localize "oronder.Re-Init"}}{{/if}}</span>
-                </button>
-            {{/if}}
+                <p class="hint">{{localize "oronder.Combat-Health-Estimate-Label"}}</p>
+            </div>
+            <button type="button" data-action="syncAll" {{#if buttons_disabled}}disabled{{/if}}>
+                <i class="{{#if full_sync_active}}fa-solid fa-spinner fa-spin{{else}}fa-solid fa-rotate{{/if}}" inert></i>
+                <span>{{#if full_sync_active}}{{localize "oronder.Full-Sync-Pending"}}{{else}}{{localize "oronder.Full-Sync"}}{{/if}}</span>
+            </button>
+            <button type="button" data-action="init" {{#if buttons_disabled}}disabled{{/if}}>
+                <i class="{{#if init_active}}fa-solid fa-spinner fa-spin{{else}}fa-brands fa-discord{{/if}}" inert></i>
+                <span>{{#if init_active}}{{localize "oronder.Init-Pending"}}{{else}}{{localize "oronder.Re-Init"}}{{/if}}</span>
+            </button>
         </fieldset>
     {{else}}
         <fieldset>

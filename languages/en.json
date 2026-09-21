@@ -82,7 +82,6 @@
   "oronder.Time": "Time",
   "oronder.Rollcall-Time-Label": "Time of day when roll call messages will be posted.",
   "oronder.Advanced-Options": "Advanced Options",
-  "oronder.Advanced-Options-Label": "Display Advanced and Experimental Options.",
   "oronder.Publish-Discord-Rolls-To-Foundry": "Use Foundry to calculate /attack and /roll.",
   "oronder.Publish-Discord-Rolls-To-Foundry-Label": "Oronder will post rolls from Discord to Foundry if a GM is logged into Foundry.",
   "oronder.Combat-Tracking-Enable": "Publish Combat Tracker to Discord",

@@ -64,7 +64,6 @@ export class OronderSettingsFormApplication extends HandlebarsApplicationMixin(
             buttons_disabled: false,
             full_sync_active: false,
             init_active: false,
-            show_advanced: false,
             id_map: id_map,
             combat_health_estimate: game.settings.get(
                 MODULE_ID,
@@ -133,21 +132,16 @@ export class OronderSettingsFormApplication extends HandlebarsApplicationMixin(
         }
         this.object.guild.rollcall_enabled = data.rollcall_enabled
 
-        // Advanced fields are only present once show_advanced has been rendered as checked.
-        if ('roll_discord_to_foundry' in data) {
-            this.object.guild.roll_discord_to_foundry =
-                data.roll_discord_to_foundry
-            this.object.combat_tracking_enabled = data.combat_tracking_enabled
-            // combat_channel and combat_health_estimate are disabled, and so omitted
-            // from the form data, while combat tracking is off.
-            if ('combat_channel' in data) {
-                this.object.guild.combat_channel_id = data.combat_channel
-            }
-            if ('combat_health_estimate' in data) {
-                this.object.combat_health_estimate = data.combat_health_estimate
-            }
+        this.object.guild.roll_discord_to_foundry = data.roll_discord_to_foundry
+        this.object.combat_tracking_enabled = data.combat_tracking_enabled
+        // combat_channel and combat_health_estimate are disabled, and so omitted
+        // from the form data, while combat tracking is off.
+        if ('combat_channel' in data) {
+            this.object.guild.combat_channel_id = data.combat_channel
         }
-        this.object.show_advanced = data.show_advanced
+        if ('combat_health_estimate' in data) {
+            this.object.combat_health_estimate = data.combat_health_estimate
+        }
 
         this.object.players.forEach(
             p => (p.discord_id = data[p.foundry_id] ?? '')
