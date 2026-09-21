@@ -15,10 +15,48 @@ import {full_sync, sync_actor} from './sync.mjs'
 import {open_socket_with_oronder} from './module.mjs'
 import {set_combat_hooks} from './combat.mjs'
 
-export class OronderSettingsFormApplication extends FormApplication {
-    constructor(object = {}, options = {}) {
+const {ApplicationV2, HandlebarsApplicationMixin} = foundry.applications.api
+
+export class OronderSettingsFormApplication extends HandlebarsApplicationMixin(
+    ApplicationV2
+) {
+    static DEFAULT_OPTIONS = {
+        id: 'oronder-options',
+        tag: 'form',
+        classes: ['oronder', 'standard-form'],
+        window: {
+            title: 'oronder.Oronder-Bot-Config',
+            icon: 'fa-solid fa-link',
+            resizable: true
+        },
+        position: {width: 580, height: 'auto'},
+        form: {
+            handler: OronderSettingsFormApplication.#onSubmit,
+            closeOnSubmit: true
+        },
+        actions: {
+            init: OronderSettingsFormApplication.#onInit,
+            syncAll: OronderSettingsFormApplication.#onSyncAll,
+            toggle: OronderSettingsFormApplication.#onToggle
+        }
+    }
+
+    static PARTS = {
+        form: {
+            template: `modules/${MODULE_ID}/templates/settings-form-application.hbs`,
+            // Keep the scroll position when a toggle re-renders the form.
+            scrollable: ['']
+        },
+        // A separate part so Save stays pinned below the scrolling form.
+        footer: {
+            template: `modules/${MODULE_ID}/templates/settings-form-footer.hbs`
+        }
+    }
+
+    constructor(options = {}) {
+        super(options)
         const id_map = game.settings.get(MODULE_ID, ID_MAP)
-        foundry.utils.mergeObject(object, {
+        this.object = {
             guild: undefined,
             timezones: TIMEZONES,
             days_of_week: DAYS_OF_WEEK,
@@ -43,139 +81,76 @@ export class OronderSettingsFormApplication extends FormApplication {
                     foundry_id: user.id,
                     discord_id: id_map[user.id] ?? ''
                 }))
-        })
-
-        foundry.utils.mergeObject(options, {height: 'auto'})
-
-        super(object, options)
-    }
-
-    static get defaultOptions() {
-        return foundry.utils.mergeObject(super.defaultOptions, {
-            id: 'oronder-options',
-            template: `modules/${MODULE_ID}/templates/settings-form-application.hbs`,
-            width: 580,
-            resizable: true
-        })
+        }
     }
 
     /** @override */
-    get title() {
-        return game.i18n.localize('oronder.Oronder-Bot-Config')
-    }
-
-    /** @override */
-    async getData(options = {}) {
+    async _prepareContext(options) {
+        // Carry any unsaved edits across re-renders.
+        this.bind()
         if (!this.object.guild) {
             this.object.guild = await this.get_guild()
         }
         return this.object
     }
 
-    /** @override */
-    activateListeners(html) {
-        super.activateListeners(html)
-        html.find('.control').on('click', this._onClickControl.bind(this))
-    }
-
-    _onClickControl(event) {
-        switch (event.currentTarget.dataset.action) {
-            case 'sync-all':
-                return this._full_sync(true)
-            case 'init':
-                return this._init()
-            case 'checkbox':
-                this.render()
-                return Promise.resolve()
-        }
-    }
-
     /**
-     * TODO: This rebinds everything on any change. Reconsider this pattern if moving to AppV2 post V11.
-     * https://foundryvtt.com/api/v12/classes/foundry.applications.api.ApplicationV2.html
+     * Fold the current state of the rendered form back into this.object so that a
+     * re-render does not discard edits which have not been submitted yet.
      */
     bind() {
-        if (this.object.guild && !this.form.elements.init) {
-            this.object.guild.gm_role_id = Array.from(
-                this.form.elements.gm_role
-            ).find(o => o.selected).value
-            this.object.guild.gm_xp = this.form.elements.gm_xp.value
-
-            this.object.guild.session_channel_id = Array.from(
-                this.form.elements.session_channel
-            ).find(c => c.selected).value
-            this.object.guild.downtime_channel_id = Array.from(
-                this.form.elements.downtime_channel
-            ).find(c => c.selected).value
-            this.object.guild.downtime_gm_channel_id =
-                Array.from(this.form.elements.downtime_gm_channel).find(
-                    c => c.selected
-                )?.value || undefined
-            this.object.guild.voice_channel_id = Array.from(
-                this.form.elements.voice_channel
-            ).find(c => c.selected).value
-            this.object.guild.scheduling_channel_id = Array.from(
-                this.form.elements.scheduling_channel
-            ).find(c => c.selected).value
-
-            this.object.guild.timezone = Array.from(
-                this.form.elements.timezone
-            ).find(c => c.selected).value
-            this.object.guild.starting_level =
-                this.form.elements.starting_level.value
-
-            //we don't want to set these if rollcall_enabled is actively being checked, or is not currently checked
-            if (
-                this.object.guild.rollcall_enabled &&
-                this.form.elements.rollcall_enabled.checked
-            ) {
-                this.object.guild.rollcall_channel_id =
-                    Array.from(this.form.elements.rollcall_channel).find(
-                        c => c.selected
-                    ).value || undefined
-                this.object.guild.rollcall_role_id =
-                    Array.from(this.form.elements.rollcall_role).find(
-                        c => c.selected
-                    ).value || undefined
-                this.object.guild.rollcall_day =
-                    this.form.elements.rollcall_day?.value
-                this.object.guild.rollcall_time =
-                    this.form.elements.rollcall_time?.value
-            }
-            this.object.guild.rollcall_enabled =
-                this.form.elements.rollcall_enabled.checked
-
-            //we don't want to set these if show_advanced is actively being checked, or is not currently checked
-            if (
-                this.object.show_advanced &&
-                this.form.elements.show_advanced.checked
-            ) {
-                this.object.guild.combat_channel_id = Array.from(
-                    this.form.elements.combat_channel
-                ).find(c => c.selected)?.value
-                this.object.guild.roll_discord_to_foundry =
-                    this.form.elements.roll_discord_to_foundry.checked
-                this.object.combat_health_estimate = parseInt(
-                    this.form.elements.combat_health_estimate.value
-                )
-                this.object.combat_tracking_enabled =
-                    this.form.elements.combat_tracking_enabled.checked
-            }
-            this.object.show_advanced = this.form.elements.show_advanced.checked
-
-            this.object.players.forEach(
-                p =>
-                    (p.discord_id =
-                        Array.from(
-                            this.form.elements[p.foundry_id].options
-                        ).find(o => o.selected)?.value ?? '')
-            )
+        if (!this.object.guild || !this.element) {
+            return
         }
-    }
+        const data = new foundry.applications.ux.FormDataExtended(this.element)
+            .object
+        if (!('gm_role' in data)) {
+            // The form is showing the un-initialized (Discord auth) state.
+            return
+        }
 
-    render(force = false, options = {}) {
-        this.bind()
-        return super.render(force, options)
+        this.object.guild.gm_role_id = data.gm_role
+        this.object.guild.gm_xp = data.gm_xp
+
+        this.object.guild.session_channel_id = data.session_channel
+        this.object.guild.downtime_channel_id = data.downtime_channel
+        this.object.guild.downtime_gm_channel_id =
+            data.downtime_gm_channel || undefined
+        this.object.guild.voice_channel_id = data.voice_channel
+        this.object.guild.scheduling_channel_id = data.scheduling_channel
+
+        this.object.guild.timezone = data.timezone
+        this.object.guild.starting_level = data.starting_level
+
+        // Rollcall fields are only present once rollcall_enabled has been rendered as checked.
+        if ('rollcall_channel' in data) {
+            this.object.guild.rollcall_channel_id =
+                data.rollcall_channel || undefined
+            this.object.guild.rollcall_role_id = data.rollcall_role || undefined
+            this.object.guild.rollcall_day = data.rollcall_day
+            this.object.guild.rollcall_time = data.rollcall_time
+        }
+        this.object.guild.rollcall_enabled = data.rollcall_enabled
+
+        // Advanced fields are only present once show_advanced has been rendered as checked.
+        if ('roll_discord_to_foundry' in data) {
+            this.object.guild.roll_discord_to_foundry =
+                data.roll_discord_to_foundry
+            this.object.combat_tracking_enabled = data.combat_tracking_enabled
+            // combat_channel and combat_health_estimate are disabled, and so omitted
+            // from the form data, while combat tracking is off.
+            if ('combat_channel' in data) {
+                this.object.guild.combat_channel_id = data.combat_channel
+            }
+            if ('combat_health_estimate' in data) {
+                this.object.combat_health_estimate = data.combat_health_estimate
+            }
+        }
+        this.object.show_advanced = data.show_advanced
+
+        this.object.players.forEach(
+            p => (p.discord_id = data[p.foundry_id] ?? '')
+        )
     }
 
     format_channels(guild) {
@@ -247,9 +222,32 @@ export class OronderSettingsFormApplication extends FormApplication {
         }
     }
 
-    /** @override */
-    //Save Changes
-    async _updateObject(event, formData) {
+    /**
+     * @this {OronderSettingsFormApplication}
+     */
+    static async #onToggle() {
+        await this.render()
+    }
+
+    /**
+     * @this {OronderSettingsFormApplication}
+     */
+    static async #onSyncAll() {
+        await this._full_sync(true)
+    }
+
+    /**
+     * @this {OronderSettingsFormApplication}
+     */
+    static async #onInit() {
+        await this._init()
+    }
+
+    /**
+     * Save Changes
+     * @this {OronderSettingsFormApplication}
+     */
+    static async #onSubmit(_event, _form, _formData) {
         const auth = game.settings.get(MODULE_ID, AUTH)
         if (!auth) {
             return
@@ -338,19 +336,19 @@ export class OronderSettingsFormApplication extends FormApplication {
     async _full_sync(clear_cache = false) {
         this.object.full_sync_active = true
         this.object.buttons_disabled = true
-        this.render()
+        await this.render()
 
         await full_sync(clear_cache).catch(Logger.error)
 
         this.object.full_sync_active = false
         this.object.buttons_disabled = false
-        this.render()
+        await this.render()
     }
 
     async _init() {
         this.object.init_active = true
         this.object.buttons_disabled = true
-        this.render()
+        await this.render()
 
         const params = Object.entries({
             scrollbars: 'no',
@@ -400,7 +398,7 @@ export class OronderSettingsFormApplication extends FormApplication {
                 }
                 this.object.init_active = false
                 this.object.buttons_disabled = false
-                this.render()
+                await this.render()
             }
         }
 

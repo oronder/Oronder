@@ -17,11 +17,16 @@ export const COMBAT_HEALTH_ESTIMATE_TYPE = Object.freeze({
     None: 2
 })
 export const ACTORS = `${MODULE_ID}.actors`
-const dev_mode = window.location.host === 'localhost:65434'
+// Dev mode is keyed off the port alone so the module works from any host serving
+// Foundry on 65434, not just localhost. The API is expected on 65435 of whichever
+// host the browser reached Foundry on.
+const dev_mode = window.location.port === '65434'
 if (dev_mode) {
     CONFIG.debug.hooks = true
 }
-const url_common = dev_mode ? '://localhost:65435' : 's://api.oronder.com'
+const url_common = dev_mode
+    ? `://${window.location.hostname}:65435`
+    : 's://api.oronder.com'
 export const ORONDER_BASE_URL = `http${url_common}`
 export const ORONDER_WS_URL = `ws${url_common}`
 const discord_oauth_url = new URL('https://discord.com/api/oauth2/authorize')
