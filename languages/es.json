@@ -60,6 +60,7 @@
   "oronder.GM-Role-Label": "Rol de Discord para DMs.",
   "oronder.Discord-Status": "Estado de Discord",
   "oronder.Channels": "Canales",
+  "oronder.Game": "Juego",
   "oronder.Session-Channel": "Canal de sesiones",
   "oronder.Session-Channel-Label": "Canal donde se publicarán las sesiones. Si se selecciona un canal de foro, Oronder creará un nuevo hilo para cada sesión.",
   "oronder.Downtime-Channel": "Canal de inactividad",

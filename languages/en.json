@@ -60,6 +60,7 @@
   "oronder.GM-Role-Label": "Discord Role for GMs.",
   "oronder.Discord-Status": "Discord Status",
   "oronder.Channels": "Channels",
+  "oronder.Game": "Game",
   "oronder.Session-Channel": "Session Channel",
   "oronder.Session-Channel-Label": "Channel Sessions will be posted to. If a Forum Channel is selected, Oronder will create a new thread for each session.",
   "oronder.Downtime-Channel": "Downtime Channel",

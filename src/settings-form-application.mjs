@@ -85,6 +85,19 @@ export class OronderSettingsFormApplication extends HandlebarsApplicationMixin(
     }
 
     /** @override */
+    get title() {
+        const guild_name = this.object?.guild?.name
+        return guild_name ? `${super.title}: ${guild_name}` : super.title
+    }
+
+    /** @override */
+    async _onRender(context, options) {
+        await super._onRender(context, options)
+        // The frame's title is set on first render, before the guild has loaded.
+        if (this.window.title) this.window.title.innerText = this.title
+    }
+
+    /** @override */
     async _prepareContext(options) {
         // Carry any unsaved edits across re-renders.
         this.bind()

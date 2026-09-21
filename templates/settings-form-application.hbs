@@ -1,7 +1,7 @@
 <div class="oronder-settings standard-form scrollable">
     {{#if guild}}
         <fieldset>
-            <legend>{{guild.name}}</legend>
+            <legend>{{localize "oronder.Game"}}</legend>
             <div class="form-group">
                 <label for="gm_xp">{{localize "oronder.GM-XP"}}</label>
                 <div class="form-fields">
@@ -28,6 +28,10 @@
                 </div>
                 <p class="hint">{{localize "oronder.Timezone-Label"}}</p>
             </div>
+        </fieldset>
+
+        <fieldset>
+            <legend>Discord</legend>
             <div class="form-group">
                 <label for="gm_role">{{localize "oronder.GM-Role"}}</label>
                 <div class="form-fields">
