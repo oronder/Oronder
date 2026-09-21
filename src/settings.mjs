@@ -38,7 +38,7 @@ export const registerSettings = async () => {
     game.settings.registerMenu(MODULE_ID, ORONDER_CONFIGURATION_FORM, {
         name: 'oronder.Oronder-Configuration',
         label: 'oronder.Configure-Oronder',
-        icon: 'fa-solid fa-link',
+        icon: 'oronder-icon',
         // hint: 'oronder.Configure-Hint',
         scope: 'client',
         config: true,

@@ -1,15 +1,26 @@
+/* Oronder logo as a one-colour glyph, sized and coloured like a Font Awesome icon. */
+.oronder-icon {
+    display: inline-block;
+    width: 1.25em;
+    height: 1em;
+    vertical-align: -0.125em;
+    background-color: currentColor;
+    mask: url('oronder-icon.svg') center / contain no-repeat;
+}
+
 /* Let the form shrink to the window's max height so .scrollable can scroll it. */
 #oronder-options .oronder-settings {
     flex: 1;
     min-height: 0;
 }
 
-/* The flex gap spaces everything; stacked margins would add to it. */
-#oronder-options .oronder-settings > :is(hr, h1, h2, h3) {
-    margin: 0;
-}
-
 /* Nothing to save until a guild is connected. */
 #oronder-options .form-footer[hidden] {
     display: none;
+}
+
+/* Core sets label line-height to the input height, which only suits one-line
+   labels; a few of ours wrap. The row already centres the label vertically. */
+#oronder-options .form-group > label {
+    line-height: 1.25;
 }

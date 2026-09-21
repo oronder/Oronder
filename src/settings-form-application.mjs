@@ -27,7 +27,7 @@ export class OronderSettingsFormApplication extends HandlebarsApplicationMixin(
         window: {
             contentClasses: ['standard-form'],
             title: 'oronder.Oronder-Bot-Config',
-            icon: 'fa-solid fa-link',
+            icon: 'oronder-icon',
             resizable: true
         },
         position: {width: 580, height: 'auto'},
