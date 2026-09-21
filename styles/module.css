@@ -1,8 +1,12 @@
-/* Foundry caps window height at the viewport; scroll the form instead of clipping it. */
+/* Let the form shrink to the window's max height so .scrollable can scroll it. */
 #oronder-options .oronder-settings {
     flex: 1;
     min-height: 0;
-    overflow-y: auto;
+}
+
+/* The flex gap spaces everything; stacked margins would add to it. */
+#oronder-options .oronder-settings > :is(hr, h1, h2, h3) {
+    margin: 0;
 }
 
 /* Nothing to save until a guild is connected. */

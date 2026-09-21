@@ -23,8 +23,9 @@ export class OronderSettingsFormApplication extends HandlebarsApplicationMixin(
     static DEFAULT_OPTIONS = {
         id: 'oronder-options',
         tag: 'form',
-        classes: ['oronder', 'standard-form'],
+        classes: ['oronder'],
         window: {
+            contentClasses: ['standard-form'],
             title: 'oronder.Oronder-Bot-Config',
             icon: 'fa-solid fa-link',
             resizable: true
