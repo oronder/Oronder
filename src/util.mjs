@@ -55,16 +55,16 @@ export function hash(obj) {
  @returns {Roll}
  */
 export function item_roll(item) {
-    const parts = (
-        item.system.activities?.getByType('attack')[0].getAttackData() ??
-        item.getAttackToHit()
-    ).parts
+    const activity = item.system.activities.getByType('attack')[0]
+    const parts = activity.getAttackData().parts
     const formula = `1d20 + ${parts.join('+')}`.replace(
         /(?:\s*\+?\s*(?:(?:-\s*)?(?<!\d)0)?)*([+\-])\s*/g,
         ' $1 '
     )
 
-    return new Roll(formula, item.getRollData())
+    // The attack's parts reference @mod, which only the activity's roll data
+    // defines. The item's roll data has no mod, so it resolved to 0.
+    return new Roll(formula, activity.getRollData())
 }
 
 /**
