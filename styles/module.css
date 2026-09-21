@@ -1,0 +1,11 @@
+/* Foundry caps window height at the viewport; scroll the form instead of clipping it. */
+#oronder-options .oronder-settings {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+}
+
+/* Nothing to save until a guild is connected. */
+#oronder-options .form-footer[hidden] {
+    display: none;
+}
