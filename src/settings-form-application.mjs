@@ -373,12 +373,19 @@ export class OronderSettingsFormApplication extends HandlebarsApplicationMixin(
             .map(([k, v]) => `${k}=${v}`)
             .join(',')
 
-        const popup = window.open(discord_init_link(), 'Discord Auth', params)
+        // Open on the click, then navigate: awaiting the link first would put
+        // window.open outside the user gesture and the browser would block it.
+        const popup = window.open('', 'Discord Auth', params)
         if (popup && !popup.closed && popup.focus) {
             popup.focus()
         } else {
             Logger.error(game.i18n.localize('oronder.Discord-Popup-Blocked'))
+            this.object.init_active = false
+            this.object.buttons_disabled = false
+            await this.render()
+            return
         }
+        popup.location.href = await discord_init_link()
 
         const message_interval = setInterval(() => {
             popup.postMessage('', oronder_base_url())

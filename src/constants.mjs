@@ -67,22 +67,63 @@ export function oronder_ws_url() {
 }
 
 /**
- * The Discord authorization link for whichever server we talk to. Its
- * redirect_uri has to match that server's own, and be registered on its
- * Discord application.
- * @returns {string}
+ * The server's own Discord application id and OAuth2 redirect, which it knows
+ * and the module must match exactly. Servers older than this endpoint answer
+ * 404, in which case fall back to the configured or built-in values.
+ * Cached: the server URL setting requires a reload to change.
+ * @returns {Promise<{discord_app_id: string, redirect_uri: string}>}
  */
-export function discord_init_link() {
+let discord_config_promise
+export function discord_config() {
+    discord_config_promise ??= (async () => {
+        const base = oronder_base_url()
+        const fallback = {
+            discord_app_id:
+                setting(DISCORD_APP_ID) ||
+                (dev_mode ? DEV_DISCORD_APP_ID : DEFAULT_DISCORD_APP_ID),
+            redirect_uri: `${base}/init`
+        }
+        try {
+            const response = await fetch(`${base}/config`, {
+                signal: AbortSignal.timeout(5000)
+            })
+            if (response.status === 404) {
+                return fallback // a server from before /config
+            }
+            if (!response.ok) {
+                throw new Error(response.statusText)
+            }
+            const {discord_app_id, redirect_uri} = await response.json()
+            return discord_app_id && redirect_uri
+                ? {discord_app_id, redirect_uri}
+                : fallback
+        } catch (error) {
+            console.warn(
+                ...MODULE_DEBUG_TAG,
+                `Could not read ${base}/config: ${error.message}`
+            )
+            return fallback
+        }
+    })()
+    return discord_config_promise
+}
+
+/**
+ * The Discord authorization link for whichever server we talk to. The
+ * redirect_uri is the server's own, and must be registered on its Discord
+ * application.
+ * @returns {Promise<string>}
+ */
+export async function discord_init_link() {
+    const {discord_app_id, redirect_uri} = await discord_config()
     const discord_oauth_url = new URL(
         'https://discord.com/api/oauth2/authorize'
     )
     discord_oauth_url.search = new URLSearchParams({
-        client_id:
-            setting(DISCORD_APP_ID) ||
-            (dev_mode ? DEV_DISCORD_APP_ID : DEFAULT_DISCORD_APP_ID),
+        client_id: discord_app_id,
         permissions: '580945901472832',
         response_type: 'code',
-        redirect_uri: `${oronder_base_url()}/init`,
+        redirect_uri: redirect_uri,
         scope: 'bot guilds.members.read',
         state: btoa(
             `${Intl.DateTimeFormat().resolvedOptions().timeZone}|${window.location.origin}`
