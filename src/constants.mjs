@@ -17,30 +17,80 @@ export const COMBAT_HEALTH_ESTIMATE_TYPE = Object.freeze({
     None: 2
 })
 export const ACTORS = `${MODULE_ID}.actors`
+export const SERVER_URL = 'server_url'
+export const DISCORD_APP_ID = 'discord_app_id'
+
+const DEFAULT_SERVER_URL = 'https://api.oronder.com'
+const DEFAULT_DISCORD_APP_ID = '1064553830810923048'
+const DEV_DISCORD_APP_ID = '1148024288973160529'
+
 // Dev mode is keyed off the port alone so the module works from any host serving
 // Foundry on 65434, not just localhost. The API is expected on 65435 of whichever
 // host the browser reached Foundry on.
-const dev_mode = window.location.port === '65434'
+export const dev_mode = window.location.port === '65434'
 if (dev_mode) {
     CONFIG.debug.hooks = true
 }
-const url_common = dev_mode
-    ? `://${window.location.hostname}:65435`
-    : 's://api.oronder.com'
-export const ORONDER_BASE_URL = `http${url_common}`
-export const ORONDER_WS_URL = `ws${url_common}`
-const discord_oauth_url = new URL('https://discord.com/api/oauth2/authorize')
-discord_oauth_url.search = new URLSearchParams({
-    client_id: dev_mode ? '1148024288973160529' : '1064553830810923048',
-    permissions: '580945901472832',
-    response_type: 'code',
-    redirect_uri: `${ORONDER_BASE_URL}/init`,
-    scope: 'bot guilds.members.read',
-    state: btoa(
-        `${Intl.DateTimeFormat().resolvedOptions().timeZone}|${window.location.origin}`
+
+/**
+ * Settings are registered on ready, and these are read from module scope, so
+ * treat an unregistered setting as unset rather than letting it throw.
+ * @param {string} key
+ * @returns {string}
+ */
+function setting(key) {
+    return game.settings?.settings?.has(`${MODULE_ID}.${key}`)
+        ? String(game.settings.get(MODULE_ID, key)).trim()
+        : ''
+}
+
+/**
+ * Where the Oronder server lives: the configured server, else the dev server
+ * beside this Foundry instance, else the public one.
+ * @returns {string}
+ */
+export function oronder_base_url() {
+    const configured = setting(SERVER_URL)
+    if (configured) {
+        return configured.replace(/\/+$/, '')
+    }
+    return dev_mode
+        ? `http://${window.location.hostname}:65435`
+        : DEFAULT_SERVER_URL
+}
+
+/**
+ * @returns {string}
+ */
+export function oronder_ws_url() {
+    return oronder_base_url().replace(/^http/, 'ws')
+}
+
+/**
+ * The Discord authorization link for whichever server we talk to. Its
+ * redirect_uri has to match that server's own, and be registered on its
+ * Discord application.
+ * @returns {string}
+ */
+export function discord_init_link() {
+    const discord_oauth_url = new URL(
+        'https://discord.com/api/oauth2/authorize'
     )
-}).toString()
-export const DISCORD_INIT_LINK = discord_oauth_url.href
+    discord_oauth_url.search = new URLSearchParams({
+        client_id:
+            setting(DISCORD_APP_ID) ||
+            (dev_mode ? DEV_DISCORD_APP_ID : DEFAULT_DISCORD_APP_ID),
+        permissions: '580945901472832',
+        response_type: 'code',
+        redirect_uri: `${oronder_base_url()}/init`,
+        scope: 'bot guilds.members.read',
+        state: btoa(
+            `${Intl.DateTimeFormat().resolvedOptions().timeZone}|${window.location.origin}`
+        )
+    }).toString()
+    return discord_oauth_url.href
+}
+
 export const DAYS_OF_WEEK = [
     'Monday',
     'Tuesday',
