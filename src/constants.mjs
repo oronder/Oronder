@@ -22,7 +22,6 @@ export const DISCORD_APP_ID = 'discord_app_id'
 
 const DEFAULT_SERVER_URL = 'https://api.oronder.com'
 const DEFAULT_DISCORD_APP_ID = '1064553830810923048'
-const DEV_DISCORD_APP_ID = '1148024288973160529'
 
 // Dev mode is keyed off the port alone so the module works from any host serving
 // Foundry on 65434, not just localhost. The API is expected on 65435 of whichever
@@ -78,9 +77,7 @@ export function discord_config() {
     discord_config_promise ??= (async () => {
         const base = oronder_base_url()
         const fallback = {
-            discord_app_id:
-                setting(DISCORD_APP_ID) ||
-                (dev_mode ? DEV_DISCORD_APP_ID : DEFAULT_DISCORD_APP_ID),
+            discord_app_id: setting(DISCORD_APP_ID) || DEFAULT_DISCORD_APP_ID,
             redirect_uri: `${base}/init`
         }
         try {
