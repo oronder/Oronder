@@ -17,30 +17,118 @@ export const COMBAT_HEALTH_ESTIMATE_TYPE = Object.freeze({
     None: 2
 })
 export const ACTORS = `${MODULE_ID}.actors`
+export const SERVER_URL = 'server_url'
+export const DISCORD_APP_ID = 'discord_app_id'
+
+const DEFAULT_SERVER_URL = 'https://api.oronder.com'
+const DEFAULT_DISCORD_APP_ID = '1064553830810923048'
+
 // Dev mode is keyed off the port alone so the module works from any host serving
 // Foundry on 65434, not just localhost. The API is expected on 65435 of whichever
 // host the browser reached Foundry on.
-const dev_mode = window.location.port === '65434'
+export const dev_mode = window.location.port === '65434'
 if (dev_mode) {
     CONFIG.debug.hooks = true
 }
-const url_common = dev_mode
-    ? `://${window.location.hostname}:65435`
-    : 's://api.oronder.com'
-export const ORONDER_BASE_URL = `http${url_common}`
-export const ORONDER_WS_URL = `ws${url_common}`
-const discord_oauth_url = new URL('https://discord.com/api/oauth2/authorize')
-discord_oauth_url.search = new URLSearchParams({
-    client_id: dev_mode ? '1148024288973160529' : '1064553830810923048',
-    permissions: '580945901472832',
-    response_type: 'code',
-    redirect_uri: `${ORONDER_BASE_URL}/init`,
-    scope: 'bot guilds.members.read',
-    state: btoa(
-        `${Intl.DateTimeFormat().resolvedOptions().timeZone}|${window.location.origin}`
+
+/**
+ * Settings are registered on ready, and these are read from module scope, so
+ * treat an unregistered setting as unset rather than letting it throw.
+ * @param {string} key
+ * @returns {string}
+ */
+function setting(key) {
+    return game.settings?.settings?.has(`${MODULE_ID}.${key}`)
+        ? String(game.settings.get(MODULE_ID, key)).trim()
+        : ''
+}
+
+/**
+ * Where the Oronder server lives: the configured server, else the dev server
+ * beside this Foundry instance, else the public one.
+ * @returns {string}
+ */
+export function oronder_base_url() {
+    const configured = setting(SERVER_URL)
+    if (configured) {
+        return configured.replace(/\/+$/, '')
+    }
+    return dev_mode
+        ? `http://${window.location.hostname}:65435`
+        : DEFAULT_SERVER_URL
+}
+
+/**
+ * @returns {string}
+ */
+export function oronder_ws_url() {
+    return oronder_base_url().replace(/^http/, 'ws')
+}
+
+/**
+ * The server's own Discord application id and OAuth2 redirect, which it knows
+ * and the module must match exactly. Servers older than this endpoint answer
+ * 404, in which case fall back to the configured or built-in values.
+ * Cached: the server URL setting requires a reload to change.
+ * @returns {Promise<{discord_app_id: string, redirect_uri: string}>}
+ */
+let discord_config_promise
+export function discord_config() {
+    discord_config_promise ??= (async () => {
+        const base = oronder_base_url()
+        const fallback = {
+            discord_app_id: setting(DISCORD_APP_ID) || DEFAULT_DISCORD_APP_ID,
+            redirect_uri: `${base}/init`
+        }
+        try {
+            const response = await fetch(`${base}/config`, {
+                signal: AbortSignal.timeout(5000)
+            })
+            if (response.status === 404) {
+                return fallback // a server from before /config
+            }
+            if (!response.ok) {
+                throw new Error(response.statusText)
+            }
+            const {discord_app_id, redirect_uri} = await response.json()
+            return discord_app_id && redirect_uri
+                ? {discord_app_id, redirect_uri}
+                : fallback
+        } catch (error) {
+            console.warn(
+                ...MODULE_DEBUG_TAG,
+                `Could not read ${base}/config: ${error.message}`
+            )
+            return fallback
+        }
+    })()
+    return discord_config_promise
+}
+
+/**
+ * The Discord authorization link for whichever server we talk to. The
+ * redirect_uri is the server's own, and must be registered on its Discord
+ * application.
+ * @returns {Promise<string>}
+ */
+export async function discord_init_link() {
+    const {discord_app_id, redirect_uri} = await discord_config()
+    const discord_oauth_url = new URL(
+        'https://discord.com/api/oauth2/authorize'
     )
-}).toString()
-export const DISCORD_INIT_LINK = discord_oauth_url.href
+    discord_oauth_url.search = new URLSearchParams({
+        client_id: discord_app_id,
+        permissions: '580945901472832',
+        response_type: 'code',
+        redirect_uri: redirect_uri,
+        scope: 'bot guilds.members.read',
+        state: btoa(
+            `${Intl.DateTimeFormat().resolvedOptions().timeZone}|${window.location.origin}`
+        )
+    }).toString()
+    return discord_oauth_url.href
+}
+
 export const DAYS_OF_WEEK = [
     'Monday',
     'Tuesday',

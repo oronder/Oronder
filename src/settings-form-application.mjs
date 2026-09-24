@@ -5,11 +5,11 @@ import {
     COMBAT_HEALTH_ESTIMATE,
     COMBAT_HEALTH_ESTIMATE_TYPE,
     DAYS_OF_WEEK,
-    DISCORD_INIT_LINK,
     ID_MAP,
     MODULE_ID,
-    ORONDER_BASE_URL,
-    TIMEZONES
+    TIMEZONES,
+    discord_init_link,
+    oronder_base_url
 } from './constants.mjs'
 import {full_sync, sync_actor} from './sync.mjs'
 import {open_socket_with_oronder} from './module.mjs'
@@ -187,7 +187,7 @@ export class OronderSettingsFormApplication extends HandlebarsApplicationMixin(
         const auth = game.settings.get(MODULE_ID, AUTH)
         if (auth) {
             try {
-                const guild = await fetch(`${ORONDER_BASE_URL}/guild`, {
+                const guild = await fetch(`${oronder_base_url()}/guild`, {
                     method: 'GET',
                     headers: new Headers({
                         Accept: 'application/json',
@@ -321,7 +321,7 @@ export class OronderSettingsFormApplication extends HandlebarsApplicationMixin(
             delete guild.combat_channel_id
         }
 
-        await fetch(`${ORONDER_BASE_URL}/guild`, {
+        await fetch(`${oronder_base_url()}/guild`, {
             method: 'POST',
             headers: new Headers({
                 'Content-Type': 'application/json',
@@ -373,15 +373,22 @@ export class OronderSettingsFormApplication extends HandlebarsApplicationMixin(
             .map(([k, v]) => `${k}=${v}`)
             .join(',')
 
-        const popup = window.open(DISCORD_INIT_LINK, 'Discord Auth', params)
+        // Open on the click, then navigate: awaiting the link first would put
+        // window.open outside the user gesture and the browser would block it.
+        const popup = window.open('', 'Discord Auth', params)
         if (popup && !popup.closed && popup.focus) {
             popup.focus()
         } else {
             Logger.error(game.i18n.localize('oronder.Discord-Popup-Blocked'))
+            this.object.init_active = false
+            this.object.buttons_disabled = false
+            await this.render()
+            return
         }
+        popup.location.href = await discord_init_link()
 
         const message_interval = setInterval(() => {
-            popup.postMessage('', ORONDER_BASE_URL)
+            popup.postMessage('', oronder_base_url())
         }, 500)
         const event_listener = async event => {
             if (event.data.status_code) {

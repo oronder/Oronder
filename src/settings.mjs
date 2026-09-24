@@ -5,7 +5,9 @@ import {
     COMBAT_HEALTH_ESTIMATE_TYPE,
     ID_MAP,
     MODULE_ID,
-    ORONDER_CONFIGURATION_FORM
+    ORONDER_CONFIGURATION_FORM,
+    SERVER_URL,
+    DISCORD_APP_ID
 } from './constants.mjs'
 import {Logger} from './util.mjs'
 import {OronderSettingsFormApplication} from './settings-form-application.mjs'
@@ -34,6 +36,24 @@ export const registerSettings = async () => {
         type: Number,
         config: false,
         default: COMBAT_HEALTH_ESTIMATE_TYPE.none
+    })
+    game.settings.register(MODULE_ID, SERVER_URL, {
+        name: 'oronder.Server-URL',
+        hint: 'oronder.Server-URL-Hint',
+        scope: 'world',
+        type: String,
+        config: true,
+        default: '',
+        requiresReload: true
+    })
+    game.settings.register(MODULE_ID, DISCORD_APP_ID, {
+        name: 'oronder.Discord-App-Id',
+        hint: 'oronder.Discord-App-Id-Hint',
+        scope: 'world',
+        type: String,
+        config: true,
+        default: '',
+        requiresReload: true
     })
     game.settings.registerMenu(MODULE_ID, ORONDER_CONFIGURATION_FORM, {
         name: 'oronder.Oronder-Configuration',

@@ -3,7 +3,7 @@ import {
     AUTH,
     ID_MAP,
     MODULE_ID,
-    ORONDER_BASE_URL
+    oronder_base_url
 } from './constants.mjs'
 import {hash, item_roll, Logger} from './util.mjs'
 import {world_data} from './module.mjs'
@@ -233,7 +233,7 @@ async function upload(pc) {
         redirect: 'follow'
     }
 
-    return await fetch(`${ORONDER_BASE_URL}/actor`, requestOptions)
+    return await fetch(`${oronder_base_url()}/actor`, requestOptions)
 }
 
 /**
@@ -246,7 +246,7 @@ export async function del_actor(pc_id) {
         redirect: 'follow'
     }
 
-    return await fetch(`${ORONDER_BASE_URL}/actor/${pc_id}`, requestOptions)
+    return await fetch(`${oronder_base_url()}/actor/${pc_id}`, requestOptions)
 }
 
 // noinspection JSValidateJSDoc
