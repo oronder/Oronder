@@ -26,6 +26,14 @@
           "verified": "6.0.3",
           "maximum": "6.0.999"
         }
+      },
+      {
+        "id": "pf2e",
+        "manifest": "https://raw.githubusercontent.com/foundryvtt/pf2e/release/static/system.json",
+        "compatibility": {
+          "minimum": "8.5.0",
+          "verified": "8.5.1"
+        }
       }
     ],
     "requires": [

@@ -7,6 +7,7 @@ import {
 } from './constants.mjs'
 import {hash, item_roll, Logger} from './util.mjs'
 import {world_data} from './module.mjs'
+import * as pf2e from './systems/pf2e.mjs'
 
 function prune_roll_data({
     spells,
@@ -132,6 +133,24 @@ function fix_relative_url(url) {
     return !url || url.indexOf('http://') === 0 || url.indexOf('https://') === 0
         ? url
         : new URL(url, window.location.origin).href
+}
+
+/**
+ * The payload for a system with an Oronder-defined schema: the fields that
+ * don't depend on the system, plus whatever the system's exporter builds.
+ * dnd5e keeps sending its roll data through export_actor() instead.
+ * @param {Actor} actor
+ * @param {{export_actor: function(Actor): Promise<object>}} system
+ */
+async function export_system_actor(actor, system) {
+    return {
+        id: actor.id,
+        name: actor.name,
+        portrait_url: fix_relative_url(actor.img),
+        discord_ids: actor_to_discord_ids(actor),
+        world: world_data,
+        ...(await system.export_actor(actor))
+    }
 }
 
 // noinspection JSValidateJSDoc
@@ -307,6 +326,16 @@ export function syncable(actor) {
         )
         return false
     }
+    if (game.system.id === pf2e.GAME_SYSTEM) {
+        const missing = pf2e.missing(actor)
+        if (missing) {
+            Logger.info(
+                `${game.i18n.localize('oronder.Skipping-Sync-For')} ${actor.name}. ${game.i18n.localize(missing)}`
+            )
+            return false
+        }
+        return true
+    }
     if (!actor.system.details.level) {
         Logger.info(
             `${game.i18n.localize('oronder.Skipping-Sync-For')} ${actor.name}. ${game.i18n.localize('oronder.No-Level')}`
@@ -345,7 +374,10 @@ export async function sync_actor(actor) {
     }
 
     const old_hash = localStorage.getItem(`${ACTORS}.${actor.id}`)
-    const actor_obj = export_actor(actor)
+    const actor_obj =
+        game.system.id === pf2e.GAME_SYSTEM
+            ? await export_system_actor(actor, pf2e)
+            : export_actor(actor)
     const new_hash = hash(actor_obj)
 
     if (old_hash && old_hash === new_hash) {
