@@ -1,3 +1,4 @@
+import html
 import json
 import os
 import re
@@ -22,6 +23,16 @@ GITHUB_URL = os.environ['GITHUB_URL']
 TAG = os.environ['TAG']
 CHANGES = os.environ['CHANGES']
 FILES_CHANGED = os.environ['FILES_CHANGED']
+
+# foundryvtt.com's numeric package id for each system module.json can declare,
+# with the title its package edit form shows for that id. The title is checked
+# against the live form before posting, so a wrong id can't silently list the
+# wrong system. To support another system, add it here: the id is the value of
+# its option in the Systems list on the package edit page.
+FOUNDRY_SYSTEMS = {
+    'dnd5e': (1, 'Dungeons & Dragons Fifth Edition'),
+    'pf2e': (6, 'Pathfinder Second Edition'),
+}
 
 
 def main():
@@ -71,6 +82,19 @@ def update_repo_description(module_json):
         BAD(response.reason)
     session_id = response.getheader('Set-Cookie').split('sessionid=')[1].split(';')[0].strip()
 
+    INFO('Reading the package edit form')
+    conn = HTTPSConnection('foundryvtt.com')
+    conn.request('GET', f"/packages/{module_json['id']}/edit",
+                 headers={
+                     'Referer': f"https://foundryvtt.com/packages/{module_json['id']}",
+                     'Cookie': f'csrftoken={csrf_token}; privacy-policy-accepted=accepted; sessionid={session_id}',
+                 })
+    response = conn.getresponse()
+    edit_form = response.read().decode() if response.status == 200 else ''
+    systems = form_systems(module_json, edit_form)
+    if systems is None:
+        return
+
     INFO('Converting README.md to html')
     md = MarkdownIt('commonmark', {'html': True}).enable('table')
     with open('./README.md', 'r') as readme_file:
@@ -93,14 +117,9 @@ def update_repo_description(module_json):
                      ('csrfmiddlewaretoken', csrf_middleware_token),
                      ('author', FOUNDRY_AUTHOR),
                      ('secret-key', FOUNDRY_PACKAGE_RELEASE_TOKEN),
-                     ('systems', 1),  # dnd5e
+                     *systems,
                      ('tags', 7),  # Chat Log and Messaging
                      ('tags', 15)  # External Integrations
-                     #                      ('systems', 6), # pf2e
-                     #                      ('systems', 141), # blades-in-the-dark
-                     #                      ('systems', 367), # CoC7
-                     #                      ('systems', 642), # gurps
-                     #                      ('systems', 1358), # fallout
                      #                      ('tags', 17) # Contains Paid Features
                  ]))
     response = conn.getresponse()
@@ -108,6 +127,44 @@ def update_repo_description(module_json):
         errs = ''.join([f'\n- {c}' for c in extract_errorlist_text(response.read().decode())])
         BAD(f'Update Description Failed{errs}')
     GOOD('REPO DESCRIPTION UPDATED')
+
+
+def form_systems(module_json: dict, edit_form: str):
+    """
+    The package edit form's `systems` values for the systems module.json
+    declares, or None if they can't be trusted, in which case the package page
+    is left as it is rather than risk listing the wrong systems. The release
+    itself is never blocked by this.
+    """
+    declared = [s['id'] for s in module_json['relationships'].get('systems', [])]
+    select = re.search(r'<select[^>]*name="systems"[^>]*>(.*?)</select>', edit_form, re.S)
+    options = {
+        int(value): html.unescape(re.sub(r'<[^>]+>', '', label)).strip()
+        for value, label in re.findall(r'<option[^>]*value="(\d+)"[^>]*>(.*?)</option>', select.group(1), re.S)
+    } if select else {}
+
+    systems, problems = [], []
+    if not options:
+        problems.append('the edit form has no systems list')
+    for system in declared:
+        if system not in FOUNDRY_SYSTEMS:
+            problems.append(f'no foundryvtt.com id for "{system}"; add it to FOUNDRY_SYSTEMS')
+            continue
+        number, title = FOUNDRY_SYSTEMS[system]
+        if options and options.get(number) != title:
+            problems.append(f'foundryvtt.com system {number} is {options.get(number)!r}, expected {title!r} for "{system}"')
+            continue
+        systems.append(('systems', number))
+
+    INFO(f'Systems declared in module.json: {", ".join(declared) or "none"}')
+    if problems or not systems:
+        for problem in problems:
+            WARN(problem)
+        WARN(f'Systems that would have been posted: {", ".join(str(n) for _, n in systems) or "none"}')
+        SKIP('SKIPPING REPO DESCRIPTION UPDATE: package page left unchanged')
+        return None
+    INFO(f'Systems posted to the package page: {", ".join(str(n) for _, n in systems)}')
+    return systems
 
 
 def push_release(module_json: dict, dry_run: bool) -> None:
