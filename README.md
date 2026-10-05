@@ -5,6 +5,12 @@ No need for Foundry to be actively running.
 Oronder is designed to meet the needs of running a complex Westmarches game with multiple DMs and players,
 but also shines for single party campaigns.
 
+### Supported Systems
+
+- Dungeons & Dragons Fifth Edition (`dnd5e`)
+- Pathfinder Second Edition (`pf2e`)
+- Call of Cthulhu 7th Edition (`CoC7`)
+
 ### Installation Instructions
 
 _The following must be done by the owner of the Discord server you'd like to integrate with._
@@ -23,8 +29,12 @@ _The following must be done by the owner of the Discord server you'd like to int
     4. Click `Save Changes`.
 
 Players should now be able to access characters they own in Foundry from Discord.
-If a PC is not showing up, ensure that player ownership has been assigned and that the character has a class, race and
-background.
+If a PC is not showing up, ensure that player ownership has been assigned and that the character is complete enough to
+sync:
+
+- **dnd5e:** a level, class, race and background.
+- **pf2e:** an ancestry and class.
+- **Call of Cthulhu:** characteristics.
 
 ### Self-Hosting
 
@@ -51,5 +61,7 @@ Note that an Oronder token is only valid on the server that issued it, so changi
 [![](https://img.shields.io/github/v/release/oronder/Oronder?style=for-the-badge)](https://github.com/oronder/Oronder/releases/latest)
 [![](https://img.shields.io/badge/dynamic/json.svg?url=https%3A%2F%2Fraw.githubusercontent.com%2Foronder%2FOronder%2Fmain%2Fmodule.json&label=foundry&query=$.compatibility.verified&colorB=orange&style=for-the-badge&logo=foundryvirtualtabletop)](https://foundryvtt.com/releases/)
 [![](https://img.shields.io/badge/dynamic/json.svg?url=https%3A%2F%2Fraw.githubusercontent.com%2Foronder%2FOronder%2Fmain%2Fmodule.json&label=dnd5e&query=$.relationships.systems[0].compatibility.verified&colorB=red&style=for-the-badge&logo=dungeonsanddragons)](https://github.com/foundryvtt/dnd5e/releases)
+[![](https://img.shields.io/badge/dynamic/json.svg?url=https%3A%2F%2Fraw.githubusercontent.com%2Foronder%2FOronder%2Fmain%2Fmodule.json&label=pf2e&query=$.relationships.systems[1].compatibility.verified&colorB=darkred&style=for-the-badge)](https://github.com/foundryvtt/pf2e/releases)
+[![](https://img.shields.io/badge/dynamic/json.svg?url=https%3A%2F%2Fraw.githubusercontent.com%2Foronder%2FOronder%2Fmain%2Fmodule.json&label=CoC7&query=$.relationships.systems[2].compatibility.verified&colorB=darkgreen&style=for-the-badge)](https://github.com/Miskatonic-Investigative-Society/CoC7-FoundryVTT/releases)
 [![](https://img.shields.io/github/downloads/oronder/Oronder/module.zip?style=for-the-badge)](https://github.com/oronder/Oronder/releases/latest/download/module.zip)
 [![](https://img.shields.io/discord/860520082697617468?label=discord&style=for-the-badge&logo=discord&color=5865F2&logoColor=white)](https://discord.gg/Adg48Xrs6K)
