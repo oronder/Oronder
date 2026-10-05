@@ -214,7 +214,7 @@ def form_systems(module_json: dict, edit_form: str):
 
 def push_release(module_json: dict, dry_run: bool) -> None:
     INFO(f'{"Testing" if dry_run else "Pushing"} new release to Foundry VTT Module Repository')
-    conn = HTTPSConnection("api.foundryvtt.com", timeout=120)
+    conn = HTTPSConnection("foundryvtt.com", timeout=120)
     conn.request(
         "POST", "/_api/packages/release_version/",
         headers={
