@@ -173,6 +173,11 @@ def form_systems(module_json: dict, edit_form: str):
     declares, or None if they can't be trusted, in which case the package page
     is left as it is rather than risk listing the wrong systems. The release
     itself is never blocked by this.
+
+    The ids are checked against the form's systems list when it has one. Its
+    HTML no longer does (the selector may be drawn client-side), and the ids
+    in FOUNDRY_SYSTEMS are the ones this script has always posted, so then
+    they're posted as they are.
     """
     declared = [s['id'] for s in module_json['relationships'].get('systems', [])]
     select = re.search(r'<select[^>]*name="systems"[^>]*>(.*?)</select>', edit_form, re.S)
@@ -183,7 +188,7 @@ def form_systems(module_json: dict, edit_form: str):
 
     systems, problems = [], []
     if not options:
-        problems.append('the edit form has no systems list')
+        WARN('The edit form has no systems list to check against; posting the known ids unchecked')
     for system in declared:
         if system not in FOUNDRY_SYSTEMS:
             problems.append(f'no foundryvtt.com id for "{system}"; add it to FOUNDRY_SYSTEMS')
