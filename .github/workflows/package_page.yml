@@ -1,0 +1,36 @@
+name: Update Foundry VTT Package Page
+env:
+  GITHUB_URL: "https://github.com/${{ github.repository }}"
+
+# Updates the foundryvtt.com package page (systems, tags, description) from the
+# latest release, without publishing a release or notifying Discord.
+on:
+  workflow_dispatch:
+
+jobs:
+  package_page:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: Update Foundry VTT Package Page
+        run: |
+          pip install markdown-it-py --quiet
+          # The page describes the latest release, so take its README and
+          # module.json; the script itself comes from this checkout.
+          export TAG=$(git describe --tags --abbrev=0)
+          git checkout "$TAG" -- README.md module.json
+          python .github/workflows/foundry_release.py
+        env:
+          PACKAGE_PAGE_ONLY: 1
+          CHANGES: ''
+          FILES_CHANGED: ''
+          FOUNDRY_PACKAGE_RELEASE_TOKEN: ${{ secrets.FOUNDRY_PACKAGE_RELEASE_TOKEN }}
+          FOUNDRY_USERNAME: ${{ secrets.FOUNDRY_USERNAME }}
+          FOUNDRY_PASSWORD: ${{ secrets.FOUNDRY_PASSWORD }}
+          FOUNDRY_AUTHOR: ${{ secrets.FOUNDRY_AUTHOR }}
+          UPDATE_DISCORD_KEY: ${{ secrets.UPDATE_DISCORD_KEY }}

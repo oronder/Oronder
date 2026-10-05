@@ -23,6 +23,9 @@ GITHUB_URL = os.environ['GITHUB_URL']
 TAG = os.environ['TAG']
 CHANGES = os.environ['CHANGES']
 FILES_CHANGED = os.environ['FILES_CHANGED']
+# Set by the package_page workflow: update the foundryvtt.com package page
+# from main without publishing a release.
+PACKAGE_PAGE_ONLY = bool(os.environ.get('PACKAGE_PAGE_ONLY'))
 
 # foundryvtt.com's numeric package id for each system module.json can declare,
 # with the title its package edit form shows for that id. The title is checked
@@ -42,6 +45,9 @@ FOUNDRY_SYSTEMS = {
 def main():
     with open('./module.json', 'r') as file:
         module_json = json.load(file)
+    if PACKAGE_PAGE_ONLY:
+        update_repo_description(module_json)
+        return
     if all(f.startswith('.github') for f in FILES_CHANGED.split()):
         SKIP('SKIPPING DEPLOYMENT. ONLY RELEASE CONFIG MODIFIED')
         for f in FILES_CHANGED.split():
@@ -55,7 +61,7 @@ def main():
 
 
 def update_repo_description(module_json):
-    if not any(f in FILES_CHANGED for f in ['README.md', 'module.json', 'foundry_release.py']):
+    if not PACKAGE_PAGE_ONLY and not any(f in FILES_CHANGED for f in ['README.md', 'module.json', 'foundry_release.py']):
         SKIP('SKIPPING REPO DESCRIPTION UPDATE')
         return
 
@@ -84,7 +90,13 @@ def update_repo_description(module_json):
     response = conn.getresponse()
     if response.status == 403:
         BAD(response.reason)
-    session_id = response.getheader('Set-Cookie').split('sessionid=')[1].split(';')[0].strip()
+    INFO(f'Login responded {describe(response)}')
+    cookies = response.getheader('Set-Cookie') or ''
+    if 'sessionid=' not in cookies:
+        WARN('Login set no session cookie')
+        SKIP('SKIPPING REPO DESCRIPTION UPDATE: package page left unchanged')
+        return
+    session_id = cookies.split('sessionid=')[1].split(';')[0].strip()
 
     INFO('Reading the package edit form')
     conn = HTTPSConnection('foundryvtt.com')
@@ -95,6 +107,9 @@ def update_repo_description(module_json):
                  })
     response = conn.getresponse()
     edit_form = response.read().decode() if response.status == 200 else ''
+    INFO(f'Edit form responded {describe(response)}')
+    if edit_form:
+        INFO(f'Edit form page: {page_summary(edit_form)}')
     systems = form_systems(module_json, edit_form)
     if systems is None:
         return
@@ -127,10 +142,29 @@ def update_repo_description(module_json):
                      #                      ('tags', 17) # Contains Paid Features
                  ]))
     response = conn.getresponse()
+    INFO(f'Edit form submit responded {describe(response)}')
     if response.status != 302:
         errs = ''.join([f'\n- {c}' for c in extract_errorlist_text(response.read().decode())])
         BAD(f'Update Description Failed{errs}')
     GOOD('REPO DESCRIPTION UPDATED')
+
+
+def describe(response) -> str:
+    """An HTTP response's status, and where it redirects to, for the log."""
+    location = response.getheader('Location')
+    return f'{response.status} {response.reason}' + (f' -> {location}' if location else '')
+
+
+def page_summary(page: str) -> str:
+    """
+    A page's title and the names of its form fields, for the log: enough to
+    tell the package edit form from a login page or a redirect target, without
+    printing any field values.
+    """
+    title = re.search(r'<title[^>]*>(.*?)</title>', page, re.S)
+    fields = dict.fromkeys(re.findall(r'<(?:input|select|textarea)[^>]*\bname="([^"]+)"', page))
+    return f"title {html.unescape(title.group(1)).strip()!r}, fields {', '.join(fields) or 'none'}" if title \
+        else f"no title, fields {', '.join(fields) or 'none'}"
 
 
 def form_systems(module_json: dict, edit_form: str):
