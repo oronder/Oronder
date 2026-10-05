@@ -40,14 +40,9 @@ sync:
 
 By default the module talks to Oronder's own server at `https://api.oronder.com` and there is nothing to configure.
 
-If you run your own Oronder server, point the module at it in `Game Settings` → `Configure Settings` → `Oronder`:
-
-| Setting                    | Value                                                                                                 |
-| -------------------------- | ----------------------------------------------------------------------------------------------------- |
-| **Oronder Server**         | Your server's address, e.g. `https://oronder.example.com`. Blank means Oronder's server.              |
-| **Discord Application Id** | Leave blank. Only needed for servers older than the `/config` endpoint, which report this themselves. |
-
-Both take effect after a reload.
+If you run your own Oronder server, point the module at it in `Game Settings` → `Configure Settings` → `Oronder` →
+**Oronder Server**: your server's address, e.g. `https://oronder.example.com`. Blank means Oronder's server. It takes
+effect after a reload.
 
 Your server has its own Discord application, and that application has to allow the module to pair with it:
 
