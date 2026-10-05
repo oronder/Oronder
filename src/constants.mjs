@@ -18,7 +18,6 @@ export const COMBAT_HEALTH_ESTIMATE_TYPE = Object.freeze({
 })
 export const ACTORS = `${MODULE_ID}.actors`
 export const SERVER_URL = 'server_url'
-export const DISCORD_APP_ID = 'discord_app_id'
 
 const DEFAULT_SERVER_URL = 'https://api.oronder.com'
 const DEFAULT_DISCORD_APP_ID = '1064553830810923048'
@@ -67,9 +66,9 @@ export function oronder_ws_url() {
 
 /**
  * The server's own Discord application id and OAuth2 redirect, which it knows
- * and the module must match exactly. Servers older than this endpoint answer
- * 404, in which case fall back to the configured or built-in values.
- * Cached: the server URL setting requires a reload to change.
+ * and the module must match exactly. If /config can't be read, fall back to
+ * Oronder's own app, so the default server still pairs through a transient
+ * failure. Cached: the server URL setting requires a reload to change.
  * @returns {Promise<{discord_app_id: string, redirect_uri: string}>}
  */
 let discord_config_promise
@@ -77,16 +76,13 @@ export function discord_config() {
     discord_config_promise ??= (async () => {
         const base = oronder_base_url()
         const fallback = {
-            discord_app_id: setting(DISCORD_APP_ID) || DEFAULT_DISCORD_APP_ID,
+            discord_app_id: DEFAULT_DISCORD_APP_ID,
             redirect_uri: `${base}/init`
         }
         try {
             const response = await fetch(`${base}/config`, {
                 signal: AbortSignal.timeout(5000)
             })
-            if (response.status === 404) {
-                return fallback // a server from before /config
-            }
             if (!response.ok) {
                 throw new Error(response.statusText)
             }
