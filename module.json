@@ -35,6 +35,15 @@
           "verified": "8.5.1",
           "maximum": "8.5.999"
         }
+      },
+      {
+        "id": "CoC7",
+        "manifest": "https://github.com/Miskatonic-Investigative-Society/CoC7-FoundryVTT/releases/latest/download/system.json",
+        "compatibility": {
+          "minimum": "8.15",
+          "verified": "8.15",
+          "maximum": "8.15.999"
+        }
       }
     ],
     "requires": [

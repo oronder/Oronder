@@ -32,6 +32,10 @@ FILES_CHANGED = os.environ['FILES_CHANGED']
 FOUNDRY_SYSTEMS = {
     'dnd5e': (1, 'Dungeons & Dragons Fifth Edition'),
     'pf2e': (6, 'Pathfinder Second Edition'),
+    'blades-in-the-dark': (141, 'Blades In The Dark'),
+    'CoC7': (367, 'Call of Cthulhu 7th edition'),
+    'gurps': (642, 'GURPS 4th Edition Game Aid (Unofficial)'),
+    'fallout': (1358, 'Fallout: The Roleplaying Game'),
 }
 
 
@@ -151,7 +155,9 @@ def form_systems(module_json: dict, edit_form: str):
             problems.append(f'no foundryvtt.com id for "{system}"; add it to FOUNDRY_SYSTEMS')
             continue
         number, title = FOUNDRY_SYSTEMS[system]
-        if options and options.get(number) != title:
+        # Compared loosely: foundryvtt.com's titles don't always match the
+        # system.json's capitalization ("7th edition" vs "7th Edition").
+        if options and ' '.join(str(options.get(number)).split()).casefold() != title.casefold():
             problems.append(f'foundryvtt.com system {number} is {options.get(number)!r}, expected {title!r} for "{system}"')
             continue
         systems.append(('systems', number))

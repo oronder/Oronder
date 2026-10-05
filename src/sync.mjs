@@ -7,7 +7,16 @@ import {
 } from './constants.mjs'
 import {hash, item_roll, Logger} from './util.mjs'
 import {world_data} from './module.mjs'
+import * as coc7 from './systems/coc7.mjs'
 import * as pf2e from './systems/pf2e.mjs'
+
+/**
+ * The systems with an Oronder-defined schema, by game.system.id. Any other
+ * system (dnd5e) sends its roll data through export_actor().
+ */
+const SYSTEMS = Object.fromEntries(
+    [coc7, pf2e].map(system => [system.GAME_SYSTEM, system])
+)
 
 function prune_roll_data({
     spells,
@@ -326,8 +335,9 @@ export function syncable(actor) {
         )
         return false
     }
-    if (game.system.id === pf2e.GAME_SYSTEM) {
-        const missing = pf2e.missing(actor)
+    const system = SYSTEMS[game.system.id]
+    if (system) {
+        const missing = system.missing(actor)
         if (missing) {
             Logger.info(
                 `${game.i18n.localize('oronder.Skipping-Sync-For')} ${actor.name}. ${game.i18n.localize(missing)}`
@@ -374,10 +384,10 @@ export async function sync_actor(actor) {
     }
 
     const old_hash = localStorage.getItem(`${ACTORS}.${actor.id}`)
-    const actor_obj =
-        game.system.id === pf2e.GAME_SYSTEM
-            ? await export_system_actor(actor, pf2e)
-            : export_actor(actor)
+    const system = SYSTEMS[game.system.id]
+    const actor_obj = system
+        ? await export_system_actor(actor, system)
+        : export_actor(actor)
     const new_hash = hash(actor_obj)
 
     if (old_hash && old_hash === new_hash) {
